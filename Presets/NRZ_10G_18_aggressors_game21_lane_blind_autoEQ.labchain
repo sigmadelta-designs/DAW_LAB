@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="NRZ_10G_18_aggressors_game21_lane_blind_autoEQ"
+          lineRateGBd="10.0" modulation="0">
+  <SLOT bypassed="0" state="342.VMjLgzT....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXsAGaoQWcjUlHfXWXrUWY8HBLtHSMh7hO7.UPRETSfjFY8HBYiQlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPlboYWYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBbgQGckImah.hcgwVck0iHz3BLh7hO7.UPRETSfjFY8HhboMWYh.hcgwVck0iHv3BMv.CLv.CLvTSN1.CM1PSMh7hO7.UPRETSfjFY8HhbpIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHyoVXsAmHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhLmZlIWYwIBH1EFa0UVOhTiKv.CLv.CLzbiM3LyMwTCNh7hO77xTTEDUE4C.">
+    <PARAM id="pattern" value="0.5"/>
+    <PARAM id="drive" value="0.0"/>
+    <PARAM id="amplitude" value="0.4791666865348816"/>
+    <PARAM id="rise" value="0.3684210479259491"/>
+    <PARAM id="rj" value="0.0"/>
+    <PARAM id="sjamp" value="0.0"/>
+    <PARAM id="sjfreq" value="0.3502276241779327"/>
+    <PARAM id="dcd" value="0.0"/>
+    <PLUGIN name="SerDes Signal Generator" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.generator" uniqueId="7f6fc3b2"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="7f6fc3b2"/>
+  </SLOT>
+  <SLOT bypassed="0" state="480.VMjLgbc....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXjEFbzIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHsEVZtIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHv81bzEiHfXWXrUWY8HRKy3xMxTiL4.iL4fCM1DSNwPSYsfiHu3COPEjTA0DHoQVOh.2ayQmLh.hcgwVck0iHsLiK2HSMxjCLxjCNzXSL4DCMk0BNh7hO7.UPRETSfjFY8HBbuMGcyHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHvIWYwHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHvIWYxHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHvIWYyHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHxUlckI2bkIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHzgWauQVYh.hcgwVck0iHw3BLh7hO77xTTEDUE4C.">
+    <PARAM id="pre3" value="0.4999999403953552"/>
+    <PARAM id="pre2" value="0.4999999403953552"/>
+    <PARAM id="pre1" value="0.4999999403953552"/>
+    <PARAM id="main" value="0.6666666865348816"/>
+    <PARAM id="post1" value="0.4999999403953552"/>
+    <PARAM id="post2" value="0.4999999403953552"/>
+    <PARAM id="post3" value="0.4999999403953552"/>
+    <PARAM id="txmode" value="1.0"/>
+    <PARAM id="reverse" value="0.0"/>
+    <PARAM id="adapt" value="1.0"/>
+    <PLUGIN name="SerDes FFE" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ffe" uniqueId="fc2287c4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="fc2287c4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="1391.VMjLgXVA...O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOTIUPCUzPHEjSNUDS9vyTTEDUE4COPEjTA0DHoQVOhD1YmIWYyM2axMmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhL1a0AGao41Yh.hcgwVck0iHw3BLh7hO7.UPRETSfjFY8HRYtElXrUFYh.hcgwVck0iHw3BLh7hO7.UPRETSfjFY8HBauM2byMVXrUlHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhXWYr81XoQWdh.hcgwVck0iHwbCLt.iHu3COuLEUAQUQ9viPOEjTDARauQVY8HxYg0VYh.xbkUFY8HhLwHBHjklYlk1X0wFc40iH0HBHvElb8HBNtLSL1HSN0.SNvLSNvHiL2HBHvElbC8VcvwVZtcVOh.iKvfCM2HSL2jiMxHSM1.SLxfiH9vCTAQzTfPmbgMVY8HBLh.RZtgUOhPiHfjlaY0iHw.iHf7VczgUOhDSM0HBHuUGcY0iHyLiHu3COPEDQSABcxE1Xk0iHwHBHo4FV8HBMh.RZtkUOhDiMh.xa0QGV8HRL0TiHf7VczkUOhLSNh7hO77jPSQUPCwTQffWOhLiMh.Rd8HBMvHBH20iHwfiHffVOhDSMh7hO77jPSQUPCwTQffWOhDSLyHBH40iH0HBH20iH4HBHn0iHwTiHu3COOIzTTEzPLUDH30iHy.iHfjWOhjiHfbWOhjiHffVOhfiHu3COOIzTTEzPLUDH30iHyDiHfjWOhXyLh.xc8HhMh.BZ8HRLvHxK9vySBMEUAMDSEABd8HhMyHBH40iHzjiHfbWOhDCLh.BZ8HBNh7hO77jPSQUPCwTQffWOhbyMh.Rd8HxMxHBH20iH0HBHn0iHwbiHu3COOIzTTEzPLUDH30iH4jiHfjWOhLSMh.xc8HRL2HBHn0iH4HxK9vySBMEUAMDSEABd8HRLy.iHfjWOhTyLh.xc8HRLwHBHn0iH4HxK9vySBMEUAMDSEABd8HBNzHBH40iHx.iHfbWOhjiHffVOhDiMh7hO77jPSQUPCwTQffWOhPCMh.Rd8HxMxHBH20iHwHiHffVOhHCLh7hO77jPSQUPCwTQffWOhDyMh.Rd8HhLxHBH20iH0HBHn0iHxXiHu3COOIzTTEzPLUDH30iHwfiHfjWOhTSMh.xc8HBNh.BZ8HRLwHxK9vySBMEUAMDSEABd8HBN3HBH40iH2fiHfbWOhDCLh.BZ8HRL0HxK9vSPGcjTEM0TOIEHxEFco8VOh.iK4biMzfCN1LyM4jCN2.CLwHBHyUVYj0iH2TiLh.BbuklazMWOhLCLrLyMfbSLrLyMffiLrPCNfDyLvvBM3HxK9vSPGcjTEM0TOIEHxEFco8VOhDiKv.CLvLSM1.SLwHyM3jyLh.xbkUFY8HRMzHBHv8VZtQ2b8HBM2vRL1.RLvPCKwXCHwDyLrHSMfDCMwvhL0HxK9vSPGcjTEM0TOIEHxEFco8VOh.iK4byMyfCLvLiLvTSMvfiHfLWYkQVOhXCNzHBHv8VZtQ2b8HBM1vhM2.BNyvhM2.RNwvxM0.RLyDCK2TiHu3COTIUPCUDHzIWXiUVOh.iHf.2ao4Fcy0iHzvRLv.RLyvRL4.RL0vRL4.RL3vRL1.hLwvRL4.RLw.CKwjCHwHCMrLyLfDSM0vxLyHxK9vCUREzPEABcxE1Xk0iHwHBHv8VZtQ2b8HBMrDiMfjCKxDCHxLCKxDCHyjCKybCH4TCKybCH4fCKyPCHwHiLrLCMfDiL2vxL4.RL0TCKyjiHu3COuHzSAIEQ9vyKTIUPCUzPHEjSNUDS9..">
+    <PARAM id="enabled" value="1.0"/>
+    <PARAM id="velocity" value="0.4375"/>
+    <PARAM id="lossscale" value="0.3333333432674408"/>
+    <PARAM id="coupling" value="0.25"/>
+    <PARAM id="aggressors" value="0.25"/>
+    <PLUGIN name="SerDes Trace Channel" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.trace" uniqueId="7e6a61a4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="7e6a61a4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="271.VMjLgXP....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXmc1alY1bkQmHfXWXrUWY8HRLtLCLv.CLvPiL4DSMyPCMxHxK9vCTAIUPMARZj0iHlIWYwIBH1EFa0UVOhDCLt.iHu3COPEjTA0DHoQVOhjlapU1Xzk1atIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHo4lckIGch.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBakYWYrIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHzkGbkIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="type" value="0.0"/>
+    <PARAM id="level" value="0.0"/>
+    <PARAM id="injection" value="0.0"/>
+    <PARAM id="invert" value="0.0"/>
+    <PARAM id="freq" value="0.3091585338115692"/>
+    <PARAM id="aggoffset" value="0.5260000228881836"/>
+    <PLUGIN name="SerDes Noise Injector" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.noise" uniqueId="7e149779"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="7e149779"/>
+  </SLOT>
+  <SLOT bypassed="0" state="177.VMjLgfJ....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iH1kVY2IBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1M2XgwVYh.hcgwVck0iHv3RM4jSN4jSN1PiLybiLwLSLh7hO77xTTEDUE4C.">
+    <PARAM id="vscale" value="0.4488795399665833"/>
+    <PARAM id="view" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="SerDes Eye Scope" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.eyescope" uniqueId="81882a04"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="81882a04"/>
+  </SLOT>
+</LABCHAIN>
