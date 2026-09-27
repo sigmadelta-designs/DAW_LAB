@@ -1,4 +1,7 @@
 #include "LossyChannel.h"
+#include "LossyEditor.h"
+
+juce::AudioProcessorEditor* LossyChannel::createEditor() { return new LossyEditor (*this); }
 
 LossyChannel::LossyChannel (std::shared_ptr<LinkSettings> linkSettings)
     : BuiltInProcessor (id, "SerDes Lossy Channel", std::move (linkSettings), createLayout())

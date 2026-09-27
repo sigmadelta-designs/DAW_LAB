@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SParamChannel.h"
+#include "DawLabLookAndFeel.h"
 
 // Load a Touchstone file, choose how its ports map onto the + / - traces, and see what it does:
 // insertion loss and mode conversion against frequency, the differential step response, and the
@@ -35,6 +36,9 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> enabledAttachment;
 
     juce::Rectangle<int> responseArea, stepArea, textArea;
+
+    DawLabLookAndFeel lookAndFeel;
+    juce::TooltipWindow tooltipWindow { this };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SParamEditor)
 };

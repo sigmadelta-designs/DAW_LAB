@@ -25,6 +25,9 @@ public:
     void prepareToPlay (double sampleRate, int) override;
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
+    bool hasEditor() const override { return true; }
+    juce::AudioProcessorEditor* createEditor() override;
+
     // Unit-RMS generators, exposed so they can be measured.
     class Coloured
     {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DiffFfe.h"
+#include "DawLabLookAndFeel.h"
 
 // Tap sliders plus a picture of the taps actually applied and what they do to
 // the spectrum (DC vs Nyquist), compared with the channel's loss.
@@ -28,6 +29,9 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> txAttachment, reverseAttachment, adaptAttachment;
 
     juce::Rectangle<int> plotArea, textArea, statusArea;
+
+    DawLabLookAndFeel lookAndFeel;
+    juce::TooltipWindow tooltipWindow { this };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FfeEditor)
 };

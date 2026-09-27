@@ -34,11 +34,15 @@ set(DAWLAB_STAGE_SOURCES
     Source/Builtin/EyeScope.cpp
     Source/Builtin/EyeScopeEditor.cpp
     Source/Builtin/FfeEditor.cpp
+    Source/Builtin/GeneratorEditor.cpp
     Source/Builtin/LossyChannel.cpp
+    Source/Builtin/LossyEditor.cpp
     Source/Builtin/NoiseInjector.cpp
+    Source/Builtin/NoiseEditor.cpp
     Source/Builtin/SignalGenerator.cpp
     Source/Builtin/ReceiverEditor.cpp
     Source/Builtin/SerdesReceiver.cpp
+    Source/Builtin/SimpleParamEditor.cpp
     Source/Builtin/SParamChannel.cpp
     Source/Builtin/SParamEditor.cpp
     Source/Builtin/SParamSynthesis.cpp

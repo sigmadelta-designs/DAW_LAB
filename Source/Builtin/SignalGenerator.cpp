@@ -1,4 +1,7 @@
 #include "SignalGenerator.h"
+#include "GeneratorEditor.h"
+
+juce::AudioProcessorEditor* SignalGenerator::createEditor() { return new GeneratorEditor (*this); }
 
 SignalGenerator::SignalGenerator (std::shared_ptr<LinkSettings> linkSettings, bool drivesLinkSettings)
     : BuiltInProcessor (id, "SerDes Signal Generator", std::move (linkSettings), createLayout (drivesLinkSettings)),

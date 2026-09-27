@@ -16,6 +16,9 @@ public:
     void prepareToPlay (double sampleRate, int) override;
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
+    bool hasEditor() const override { return true; }
+    juce::AudioProcessorEditor* createEditor() override;
+
     // Corner frequency (Hz) of each of the two poles for the requested loss.
     static double cornerForLoss (double lossDb, double nyquistHz);
 

@@ -1,6 +1,7 @@
 #include "ReceiverEditor.h"
 
-ReceiverEditor::SliderRow& ReceiverEditor::addSlider (const char* parameterId, const juce::String& text, bool vertical)
+ReceiverEditor::SliderRow& ReceiverEditor::addSlider (const char* parameterId, const juce::String& text,
+                                                     ControlTip::Domain domain, const juce::String& reason, bool vertical)
 {
     auto row = std::make_unique<SliderRow>();
     row->slider.setSliderStyle (vertical ? juce::Slider::LinearVertical : juce::Slider::LinearHorizontal);
@@ -8,6 +9,7 @@ ReceiverEditor::SliderRow& ReceiverEditor::addSlider (const char* parameterId, c
     row->label.setText (text, juce::dontSendNotification);
     row->label.setJustificationType (vertical ? juce::Justification::centred : juce::Justification::centredRight);
     row->label.setFont (juce::FontOptions (12.0f));
+    row->slider.setTooltip (ControlTip::make (text, domain, reason));
     row->attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (receiver.getParameterTree(), parameterId, row->slider);
     addAndMakeVisible (row->slider);
     addAndMakeVisible (row->label);
@@ -19,17 +21,33 @@ ReceiverEditor::SliderRow& ReceiverEditor::addSlider (const char* parameterId, c
 ReceiverEditor::ReceiverEditor (SerdesReceiver& receiverToEdit)
     : juce::AudioProcessorEditor (receiverToEdit), receiver (receiverToEdit)
 {
-    addSlider ("target", "Target level");
-    addSlider ("ctleboost", "CTLE boost dB");
-    addSlider ("ctlezero", "Zero GHz");
-    addSlider ("ctlepole2", "High pole GHz");
-    addSlider ("ctledc", "DC gain dB");
-    addSlider ("dfestep", "DFE step");
+    setLookAndFeel (&lookAndFeel);
+
+    using D = ControlTip::Domain;
+    addSlider ("target", "Target level", D::dut,
+        "The signal level the receiver's automatic gain control aims for at its input - a real AGC target register.");
+    addSlider ("ctleboost", "CTLE boost dB", D::dut,
+        "High-frequency boost the continuous-time linear equalizer applies - a real receiver's CTLE gain register.");
+    addSlider ("ctlezero", "Zero GHz", D::dut,
+        "Where the CTLE's boost starts rising - a real CTLE's zero-frequency setting.");
+    addSlider ("ctlepole2", "High pole GHz", D::dut,
+        "Where the CTLE's response rolls back off above the boost - a real CTLE's second-pole setting.");
+    addSlider ("ctledc", "DC gain dB", D::dut,
+        "Overall gain the CTLE applies at DC, before its high-frequency boost - a real CTLE's DC gain register.");
+    addSlider ("dfestep", "DFE step", D::dut,
+        "How big a correction the DFE's sign-sign LMS loop makes per symbol - a real adaptive DFE's loop-gain register. "
+        "Larger settles faster but tracks noisier; smaller is steadier but slower to adapt.");
     for (int k = 1; k <= SerdesReceiver::dfeTaps; ++k)
-        addSlider (("dfe" + juce::String (k)).toRawUTF8(), "h" + juce::String (k), true);
-    addSlider ("cdrkp", "Kp (mUI)");
-    addSlider ("cdrki", "Ki (uUI)");
-    addSlider ("clockppm", "Ref. offset ppm");
+        addSlider (("dfe" + juce::String (k)).toRawUTF8(), "h" + juce::String (k), D::dut,
+            "A decision-feedback equalizer tap - cancels this much of the residual ISI from " + juce::String (k)
+                + " symbol" + (k == 1 ? "" : "s") + " ago. A real DFE's tap register; when auto-adapt is on, the loop sets it for you.", true);
+    addSlider ("cdrkp", "Kp (mUI)", D::dut,
+        "The clock-recovery loop's proportional step - how hard it corrects clock phase per bang-bang decision. A real CDR's loop-filter register.");
+    addSlider ("cdrki", "Ki (uUI)", D::dut,
+        "The clock-recovery loop's integral step - how fast it corrects a steady frequency offset. A real CDR's loop-filter register.");
+    addSlider ("clockppm", "Ref. offset ppm", ControlTip::Domain::simulation,
+        "Mistunes the transmitter's clock away from the receiver's nominal rate, to see how much frequency offset this "
+        "simulated CDR can pull in and track. A stress condition you dial in to characterise the receiver, not a setting on it.");
 
     for (auto* b : { &enabledButton, &ctleAdaptButton, &dfeAdaptButton, &trainerButton })
         addAndMakeVisible (b);
@@ -46,6 +64,23 @@ ReceiverEditor::ReceiverEditor (SerdesReceiver& receiverToEdit)
     outputAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (tree, "output", outputBox);
     resetButton.onClick = [this] { compare.reset(); };
 
+    enabledButton.setTooltip (ControlTip::make ("Receiver enabled", ControlTip::Domain::dut,
+        "Puts the physical receiver chip in or out of the signal path - like swapping in a direct-attach loopback "
+        "instead of the real receiver, a real bring-up step."));
+    ctleAdaptButton.setTooltip (ControlTip::make ("Auto-adapt boost", ControlTip::Domain::dut,
+        "Has the CTLE tune its own boost against the slicer's decision error, the way many real receiver ICs "
+        "auto-calibrate their equalizer on link-up instead of using a fixed register value."));
+    dfeAdaptButton.setTooltip (ControlTip::make ("Auto-adapt DFE taps", ControlTip::Domain::dut,
+        "Has the DFE's sign-sign LMS loop set its own taps, the way a real adaptive DFE does, instead of using "
+        "the h1..h5 sliders' fixed values."));
+    outputBox.setTooltip (ControlTip::make ("Output", ControlTip::Domain::dut,
+        "Chooses which internal node the receiver hands to the next stage - many real receiver ICs expose exactly "
+        "this kind of debug/eye-monitor tap mux (pre-CTLE, post-CTLE, or fully retimed data)."));
+    trainerButton.setTooltip (ControlTip::make ("Feed the FFE trainer", ControlTip::Domain::simulation,
+        "Routes this receiver's slicer error into the upstream TX FFE's auto-adapt search - a wiring choice for "
+        "this measurement setup, not a signal-path property."));
+    resetButton.setTooltip ("Zeroes the bit-error counters below and restarts the sent/received alignment search.");
+
     setSize (1010, 840);
     startTimerHz (20);
 }
@@ -53,6 +88,7 @@ ReceiverEditor::ReceiverEditor (SerdesReceiver& receiverToEdit)
 ReceiverEditor::~ReceiverEditor()
 {
     stopTimer();
+    setLookAndFeel (nullptr);
 }
 
 void ReceiverEditor::timerCallback()

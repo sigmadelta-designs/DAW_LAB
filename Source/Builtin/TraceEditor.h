@@ -2,6 +2,7 @@
 
 #include "TraceChannel.h"
 #include "TraceRouter.h"
+#include "DawLabLookAndFeel.h"
 
 // Board view (left), readouts (right) and the game panel (bottom).
 // Click to place trace corners (45/90 degree routing, snapped to the 0.05" grid);
@@ -71,6 +72,9 @@ private:
     int activeTrace = TraceBoard::plus;
     bool assisted = false;
     juce::String message;
+
+    DawLabLookAndFeel lookAndFeel;
+    juce::TooltipWindow tooltipWindow { this };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TraceEditor)
 };

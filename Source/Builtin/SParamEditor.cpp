@@ -8,6 +8,8 @@ namespace
 SParamEditor::SParamEditor (SParamChannel& channelToEdit)
     : juce::AudioProcessorEditor (channelToEdit), channel (channelToEdit)
 {
+    setLookAndFeel (&lookAndFeel);
+
     for (auto* c : std::initializer_list<juce::Component*> { &loadButton, &clearButton, &portsBox, &tapsBox, &portsLabel, &tapsLabel, &enabledButton })
         addAndMakeVisible (c);
 
@@ -16,6 +18,19 @@ SParamEditor::SParamEditor (SParamChannel& channelToEdit)
     portsAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (channel.getParameterTree(), "ports", portsBox);
     tapsAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (channel.getParameterTree(), "taps", tapsBox);
     enabledAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (channel.getParameterTree(), "enabled", enabledButton);
+
+    loadButton.setTooltip ("Picks the .sNp (Touchstone) file that models the channel - a measured or simulated cable/backplane/board.");
+    clearButton.setTooltip ("Removes the loaded file; the stage becomes an ideal wire until you load another.");
+    portsBox.setTooltip (ControlTip::make ("Ports", ControlTip::Domain::dut,
+        "Which physical port pair the + and - traces are wired to. Matches how the real board or cable is "
+        "connected - get it wrong and the differential signal is built from the wrong port pair."));
+    tapsBox.setTooltip (ControlTip::make ("Filter length", ControlTip::Domain::simulation,
+        "How many FIR taps this simulation uses to realise the file's measured frequency response. More taps "
+        "track sharp resonances/notches more accurately at the cost of CPU - a fidelity setting of this "
+        "simulation, not a property of the physical channel."));
+    enabledButton.setTooltip (ControlTip::make ("Enabled", ControlTip::Domain::dut,
+        "Puts the physical channel in or out of the path - like swapping in a direct-attach loopback instead "
+        "of the real cable/board, a real bring-up step."));
 
     loadButton.onClick = [this] { chooseFile(); };
     clearButton.onClick = [this] { channel.clearData(); message = {}; };
@@ -29,6 +44,7 @@ SParamEditor::~SParamEditor()
 {
     stopTimer();
     channel.changed.removeChangeListener (this);
+    setLookAndFeel (nullptr);
 }
 
 void SParamEditor::chooseFile()

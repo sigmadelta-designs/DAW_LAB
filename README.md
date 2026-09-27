@@ -6,6 +6,28 @@ goes to every plugin that accepts it). The chain order is shown top to bottom in
 window; each row has Bypass / Edit / Up / Down / Remove. With an empty chain, input
 passes straight to output.
 
+## Hover tips
+
+Every control on every stage - built-in or plugin - has a hover tip with its name, a coloured **DUT**
+(blue) or **SIM** (amber) tag, and why you'd reach for it:
+
+- **DUT** - the control mirrors a real, physical knob, register or property of the transmitter, channel
+  (PCB/cable/backplane) or receiver you'd be testing: line rate, FFE taps, CTLE boost, trace length,
+  termination resistors, DFE taps, CDR loop gains.
+- **SIM** - the control only exists because this is a simulation: which test pattern or stress condition
+  you chose (PRBS pattern, injected jitter, injected noise, a mistuned reference clock), or a setting of
+  the measurement/display itself (the eye scope's persistence, vertical scale, or view; an S-parameter
+  channel's FIR tap count).
+
+Momentary actions (Load file, Auto-solve, Restart, Reset counters, board-drawing tools) get a plain
+tip instead, since "DUT or SIM" doesn't apply to a button you click rather than a value you set.
+The rendering lives in `Source/Builtin/ControlTip.h` (the DUT/SIM encoding) and
+`Source/Builtin/DawLabLookAndFeel.h` (the tooltip's look); every custom editor owns one of each plus a
+`juce::TooltipWindow`, so this also works when a stage is loaded as a standalone plugin in another DAW.
+The Signal Generator, Lossy Channel and Noise Injector stages - previously shown with JUCE's generic,
+un-tooltipped parameter list - now have small dedicated editors (`GeneratorEditor`, `LossyEditor`,
+`NoiseEditor`, built on a shared `SimpleParamEditor` base) so their controls get tips too.
+
 ## SerDes / TxRx stages (built in)
 
 The chain list starts with four built-in stages. They are ordinary chain members (bypass, reorder, presets all work),

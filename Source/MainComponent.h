@@ -2,6 +2,7 @@
 
 #include "ChainView.h"
 #include "HostEngine.h"
+#include "Builtin/DawLabLookAndFeel.h"
 
 // Top-level UI: pick a scanned plugin, append it to the chain, reorder/bypass/
 // edit the chain, and save/load whole chains (with plugin state) as presets.
@@ -62,6 +63,9 @@ private:
     juce::ToggleButton muteButton { "Mute output" };
     ChainView chainView;
     juce::Viewport viewport;
+
+    DawLabLookAndFeel lookAndFeel;
+    juce::TooltipWindow tooltipWindow { this };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

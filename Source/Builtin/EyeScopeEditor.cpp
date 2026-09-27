@@ -3,6 +3,8 @@
 EyeScopeEditor::EyeScopeEditor (EyeScope& scopeToEdit)
     : juce::AudioProcessorEditor (scopeToEdit), scope (scopeToEdit)
 {
+    setLookAndFeel (&lookAndFeel);
+
     for (auto* c : std::initializer_list<juce::Component*> { &scaleSlider, &persistenceBox, &clearButton,
                                                              &relockButton, &scaleLabel, &persistenceLabel, &viewBox, &viewLabel, &thruButton, &trainerButton })
         addAndMakeVisible (c);
@@ -18,7 +20,29 @@ EyeScopeEditor::EyeScopeEditor (EyeScope& scopeToEdit)
 
     thruAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (scope.getParameterTree(), "thru", thruButton);
     trainerAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (scope.getParameterTree(), "trainer", trainerButton);
-    thruButton.setTooltip ("On: the signal continues to the next stage unchanged. Off: the scope terminates it (nothing is passed on).");
+
+    scaleSlider.setTooltip (ControlTip::make ("Vertical scale", ControlTip::Domain::simulation,
+        "Sets how much signal amplitude fills the plot - a display range control on this simulated scope, "
+        "the same idea as Volts/div on a real one. It changes what you see, not the signal itself."));
+    persistenceBox.setTooltip (ControlTip::make ("Persistence", ControlTip::Domain::simulation,
+        "How long each trace glows before fading - a display setting on this simulated scope, the same "
+        "idea as an oscilloscope's persistence control. Longer makes an intermittent problem easier to "
+        "spot; shorter makes the current eye shape clearer."));
+    viewBox.setTooltip (ControlTip::make ("View", ControlTip::Domain::simulation,
+        "Chooses which combination of the two legs the plot and its measurements show - like switching an "
+        "oscilloscope between a differential math channel and its individual inputs. Switch to a single "
+        "leg or common-mode to see something the differential view hides, such as an amplitude imbalance "
+        "or induced common-mode."));
+    thruButton.setTooltip (ControlTip::make ("Pass-through", ControlTip::Domain::simulation,
+        "On: the signal continues to the next stage unchanged, so probing here doesn't disturb the chain. "
+        "Off: the scope terminates the line instead, the way removing a probe and terminating the trace "
+        "would. A choice about how you've inserted this measurement, not a property of the link itself."));
+    trainerButton.setTooltip (ControlTip::make ("Feed FFE trainer", ControlTip::Domain::simulation,
+        "Routes this probe's decision error into the upstream FFE's auto-adapt search. Only one scope in "
+        "the chain should do this - it's a wiring choice for this measurement setup, not a signal property."));
+    clearButton.setTooltip ("Clears the persistence image and starts it over.");
+    relockButton.setTooltip ("Re-estimates the clock phase this display uses to line up symbols, in case the picture has drifted.");
+
     clearButton.onClick = [this] { analyzer.clearImage(); };
     relockButton.onClick = [this] { analyzer.relock(); };
 
@@ -31,6 +55,7 @@ EyeScopeEditor::~EyeScopeEditor()
 {
     stopTimer();
     scope.setCaptureActive (false);
+    setLookAndFeel (nullptr);
 }
 
 void EyeScopeEditor::resized()

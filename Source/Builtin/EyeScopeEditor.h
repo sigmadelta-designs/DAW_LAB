@@ -2,6 +2,7 @@
 
 #include "EyeAnalyzer.h"
 #include "EyeScope.h"
+#include "DawLabLookAndFeel.h"
 
 class EyeScopeEditor : public juce::AudioProcessorEditor,
                        private juce::Timer
@@ -34,6 +35,9 @@ private:
     int lastView = -1;
 
     juce::Rectangle<int> eyeArea, readoutArea;
+
+    DawLabLookAndFeel lookAndFeel;
+    juce::TooltipWindow tooltipWindow { this };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EyeScopeEditor)
 };

@@ -2,6 +2,7 @@
 
 #include "BitCompare.h"
 #include "SerdesReceiver.h"
+#include "DawLabLookAndFeel.h"
 
 class ReceiverEditor : public juce::AudioProcessorEditor,
                        private juce::Timer
@@ -22,7 +23,8 @@ private:
     };
 
     void timerCallback() override;
-    SliderRow& addSlider (const char* parameterId, const juce::String& text, bool vertical = false);
+    SliderRow& addSlider (const char* parameterId, const juce::String& text, ControlTip::Domain domain,
+                         const juce::String& reason, bool vertical = false);
     void drawCtle (juce::Graphics&, juce::Rectangle<int>);
     void drawCompare (juce::Graphics&, juce::Rectangle<int>);
 
@@ -41,6 +43,9 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> outputAttachment;
 
     juce::Rectangle<int> ctleTitleArea, ctleArea, cdrTitleArea, cdrTextArea, dfeArea, dfeNoteArea, compareArea;
+
+    DawLabLookAndFeel lookAndFeel;
+    juce::TooltipWindow tooltipWindow { this };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReceiverEditor)
 };

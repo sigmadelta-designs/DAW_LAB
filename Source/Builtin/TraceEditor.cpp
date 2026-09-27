@@ -7,7 +7,8 @@ namespace
 }
 
 // ---------------------------------------------------------------------------------
-class TraceEditor::BoardView : public juce::Component
+class TraceEditor::BoardView : public juce::Component,
+                               public juce::SettableTooltipClient
 {
 public:
     BoardView (TraceEditor& ownerEditor) : owner (ownerEditor)
@@ -296,7 +297,12 @@ private:
 TraceEditor::TraceEditor (TraceChannel& channelToEdit)
     : juce::AudioProcessorEditor (channelToEdit), channel (channelToEdit)
 {
+    setLookAndFeel (&lookAndFeel);
+
     boardView = std::make_unique<BoardView> (*this);
+    boardView->setTooltip ("Click to place trace corners (45/90 degree routing, snapped to the grid); click near the "
+                            "output pad to finish. Right-click or Backspace undoes a corner. This draws the physical "
+                            "board - the real thing being tested, not a setting of this simulation.");
     addAndMakeVisible (*boardView);
 
     for (auto* b : { &sandboxButton, &gameButton, &newGameButton, &solveButton, &undoButton, &clearPlusButton,
@@ -317,6 +323,50 @@ TraceEditor::TraceEditor (TraceChannel& channelToEdit)
                                                              &reflectionLabel, &connectorLabel, &sourceLabel, &loadLabel,
                                                              &readoutsTab, &settingsTab, &tdrButton })
         addAndMakeVisible (c);
+
+    using D = ControlTip::Domain;
+    sandboxButton.setTooltip ("Free-form drawing: no obstacles, no scoring - just the two traces and what they do to the signal.");
+    gameButton.setTooltip ("A generated practice board: route around obstacles and noisy aggressor lanes, then check your score.");
+    difficultyBox.setTooltip ("How large and cluttered the next generated practice board is. A setting of this training exercise, not the board itself.");
+    newGameButton.setTooltip ("Generates a new practice board at the chosen difficulty.");
+    solveButton.setTooltip ("Runs this tool's own router (A* with a lane penalty, then length matching) and draws both traces for you.");
+    undoButton.setTooltip ("Removes the last corner placed on the trace you're currently drawing.");
+    drawPlusButton.setTooltip ("Clicks on the board add corners to the + trace.");
+    drawMinusButton.setTooltip ("Clicks on the board add corners to the - trace.");
+    clearPlusButton.setTooltip ("Erases the + trace so you can redraw it.");
+    clearMinusButton.setTooltip ("Erases the - trace so you can redraw it.");
+    clearBothButton.setTooltip ("Erases both traces so you can redraw them.");
+    readoutsTab.setTooltip ("Shows the measurements this board implies: loss, skew, crosstalk, mode conversion, return loss.");
+    settingsTab.setTooltip ("Shows the sliders below that control how strongly length, coupling and mismatches affect the signal.");
+    tdrButton.setTooltip ("Switches the readouts page to a simulated time-domain-reflectometry trace of the impedance along each leg - "
+                          "the same measurement a real TDR instrument makes on a real board.");
+    velocitySlider.setTooltip (ControlTip::make ("Propagation delay", D::dut,
+        "How fast a signal travels along the trace, in picoseconds per inch - a real PCB dielectric's propagation speed. "
+        "Combined with the lengths you draw, this sets each trace's delay and therefore the pair's skew."));
+    lossSlider.setTooltip (ControlTip::make ("Loss vs FR4", D::dut,
+        "Scales the trace material's real loss relative to a reference FR4 recipe - stand-ins for a lower-loss laminate "
+        "(below 1x) or a cheaper, lossier one (above 1x)."));
+    couplingSlider.setTooltip (ControlTip::make ("Coupling strength", D::dut,
+        "Scales how strongly the two traces couple where they run close and parallel - a real board's spacing/dielectric "
+        "property. Drives the FEXT and odd/even mode splitting you see in the readouts."));
+    aggressorSlider.setTooltip (ControlTip::make ("Aggressor pickup", D::dut,
+        "Scales how strongly a neighbouring noisy lane's signal couples onto this pair - the same physical mechanism as "
+        "Coupling strength, applied to the board's aggressor lanes."));
+    reflectionSlider.setTooltip (ControlTip::make ("Reflection strength", D::dut,
+        "Scales how much the drawn geometry's impedance bumps (corners, close-run sections) actually perturb the line - "
+        "a real board's sensitivity to those discontinuities."));
+    connectorSlider.setTooltip (ControlTip::make ("Pad/connector mismatch", D::dut,
+        "The impedance mismatch, as a percentage, at each trace's connector - a real connector or via transition's "
+        "characteristic impedance error."));
+    sourceSlider.setTooltip (ControlTip::make ("Source resistance", D::dut,
+        "The driver's real output impedance. Away from the line's impedance, it reflects energy bouncing back from the "
+        "load - a real transmitter's output termination."));
+    loadSlider.setTooltip (ControlTip::make ("Load resistance", D::dut,
+        "The far end's real termination resistance. Away from the line's impedance, it reflects incoming energy back "
+        "toward the source - a real receiver's input termination."));
+    enabledButton.setTooltip (ControlTip::make ("Channel enabled", D::dut,
+        "Puts the physical board in or out of the path - like swapping in a direct-attach loopback instead of the "
+        "real traces, a real bring-up step."));
 
     sandboxButton.setClickingTogglesState (true);
     gameButton.setClickingTogglesState (true);
@@ -381,6 +431,7 @@ TraceEditor::~TraceEditor()
 {
     stopTimer();
     channel.boardChanged.removeChangeListener (this);
+    setLookAndFeel (nullptr);
 }
 
 void TraceEditor::refreshButtons()

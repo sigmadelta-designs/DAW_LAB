@@ -27,6 +27,9 @@ public:
     void prepareToPlay (double sampleRate, int) override;
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
+    bool hasEditor() const override { return true; }
+    juce::AudioProcessorEditor* createEditor() override;
+
     // Total edge displacement never exceeds this, which keeps edges in order.
     static constexpr double maxEdgeShiftUI = 0.45;
 

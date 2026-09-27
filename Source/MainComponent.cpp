@@ -26,6 +26,8 @@ private:
 
 MainComponent::MainComponent()
 {
+    setLookAndFeel (&lookAndFeel);
+
     for (auto* button : { &addButton, &scanButton, &saveButton, &loadButton, &clearButton, &audioButton })
         addAndMakeVisible (button);
 
@@ -44,12 +46,26 @@ MainComponent::MainComponent()
     };
     addAndMakeVisible (rateInfoLabel);
 
+    pluginBox.setTooltip ("Choose a built-in stage or a scanned plugin, then Add to Chain to append it.");
+    addButton.setTooltip ("Appends the chosen plugin to the end of the chain.");
+    scanButton.setTooltip ("Scans your AU/VST3 plugin folders (or a folder you pick) and adds what it finds to the list above.");
+    saveButton.setTooltip ("Writes the current chain - stage order, bypass flags, and every parameter - to a .labchain preset file.");
+    loadButton.setTooltip ("Replaces the current chain with one loaded from a .labchain preset file.");
+    clearButton.setTooltip ("Removes every stage from the chain.");
+    audioButton.setTooltip ("Opens JUCE's audio/MIDI device picker for this app.");
+
     // 1 GBd on the wire runs as 1 kBd here (simulation scale 1e6).
     rateSlider.setRange (LinkSettings::minGBd, LinkSettings::maxGBd, 0.01);
     rateSlider.setNumDecimalPlacesToDisplay (2);
     rateSlider.setTextValueSuffix (" GBd");
+    rateSlider.setTooltip (ControlTip::make ("Line rate", ControlTip::Domain::dut,
+        "The link's real symbol rate, in Gigabaud - a property of the transmitter and receiver you're testing, "
+        "not of this simulation. Everything downstream (channel loss, CDR range, eye timing) scales with it."));
     rateSlider.onValueChange = [this] { engine.link->lineRateGBd = (float) rateSlider.getValue(); };
     modulationBox.addItemList ({ "NRZ", "PAM4" }, 1);
+    modulationBox.setTooltip (ControlTip::make ("Modulation", ControlTip::Domain::dut,
+        "NRZ (one bit per symbol) or PAM4 (two bits per symbol, four levels) - the real signalling format the "
+        "transmitter and receiver are built for."));
     modulationBox.onChange = [this] { engine.link->modulation = modulationBox.getSelectedItemIndex(); };
     rateInfoLabel.setColour (juce::Label::textColourId, juce::Colours::lightgrey);
     syncLinkControls();
@@ -92,6 +108,7 @@ MainComponent::~MainComponent()
     engine.chainChanged.removeChangeListener (this);
     closeAllEditors();
     engine.clearChain();
+    setLookAndFeel (nullptr);
 }
 
 void MainComponent::resized()

@@ -3,12 +3,17 @@
 FfeEditor::FfeEditor (DiffFfe& ffeToEdit)
     : juce::AudioProcessorEditor (ffeToEdit), ffe (ffeToEdit)
 {
+    setLookAndFeel (&lookAndFeel);
+
     for (int tap = 0; tap < DiffFfe::numTaps; ++tap)
     {
         auto& slider = sliders[(size_t) tap];
         slider.setSliderStyle (juce::Slider::LinearVertical);
         slider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 56, 20);
         slider.setDoubleClickReturnValue (true, tap == DiffFfe::mainTap ? 1.0 : 0.0);
+        slider.setTooltip (ControlTip::make (DiffFfe::getTapName (tap), ControlTip::Domain::dut,
+            "A transmitter FFE tap - a real pre-emphasis/de-emphasis coefficient. Adjust these to pre-shape "
+            "the signal for whatever loss the channel downstream has, before it ever reaches the receiver."));
         addAndMakeVisible (slider);
 
         auto& label = labels[(size_t) tap];
@@ -20,6 +25,13 @@ FfeEditor::FfeEditor (DiffFfe& ffeToEdit)
             ffe.getParameterTree(), DiffFfe::getTapParamId (tap), slider);
     }
 
+    txModeButton.setTooltip (ControlTip::make ("TX mode", ControlTip::Domain::dut,
+        "Keeps the transmitter's total output swing fixed by computing the main tap as 1 minus the sum of "
+        "the other taps' magnitudes - how a real TX FFE enforces its swing budget as you redistribute "
+        "pre/post emphasis."));
+    reverseButton.setTooltip (ControlTip::make ("Reverse tap direction", ControlTip::Domain::dut,
+        "Swaps which taps are pre-cursor and which are post-cursor - the same mistake as wiring a real "
+        "FFE's tap order backwards. Turn this on to see what a wrong-direction configuration does to the eye."));
     addAndMakeVisible (txModeButton);
     addAndMakeVisible (reverseButton);
     txAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (
@@ -27,6 +39,11 @@ FfeEditor::FfeEditor (DiffFfe& ffeToEdit)
     reverseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (
         ffe.getParameterTree(), "reverse", reverseButton);
 
+    adaptButton.setTooltip (ControlTip::make ("Auto-adapt taps", ControlTip::Domain::dut,
+        "Runs this tool's tap search against the Eye Scope downstream instead of using the sliders' values "
+        "directly - the same idea as the link-training exchange real high-speed standards (PCIe, Ethernet) "
+        "use to let the far end tune the near end's taps automatically."));
+    restartButton.setTooltip ("Restarts the tap search from flat, in case it settled on a bad local optimum.");
     addAndMakeVisible (adaptButton);
     addAndMakeVisible (restartButton);
     adaptAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (
@@ -40,6 +57,7 @@ FfeEditor::FfeEditor (DiffFfe& ffeToEdit)
 FfeEditor::~FfeEditor()
 {
     stopTimer();
+    setLookAndFeel (nullptr);
 }
 
 void FfeEditor::timerCallback()

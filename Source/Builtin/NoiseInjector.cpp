@@ -1,4 +1,7 @@
 #include "NoiseInjector.h"
+#include "NoiseEditor.h"
+
+juce::AudioProcessorEditor* NoiseInjector::createEditor() { return new NoiseEditor (*this); }
 
 namespace
 {
