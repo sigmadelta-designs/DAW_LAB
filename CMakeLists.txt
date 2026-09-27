@@ -24,6 +24,7 @@ juce_add_gui_app(DawLab
     BUNDLE_ID com.vstfactory.dawlab
     MICROPHONE_PERMISSION_ENABLED TRUE
     MICROPHONE_PERMISSION_TEXT "DAW_LAB routes audio input through hosted plugins."
+    ICON_BIG "Assets/AppIcon.png"
     PRODUCT_NAME "DAW_LAB")
 
 # The SerDes stages, shared by the host (which lists them as built-ins) and the plugins.

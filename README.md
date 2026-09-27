@@ -6,6 +6,11 @@ goes to every plugin that accepts it). The chain order is shown top to bottom in
 window; each row has Bypass / Edit / Up / Down / Remove. With an empty chain, input
 passes straight to output.
 
+The app icon (`Assets/AppIcon.png`, wired in via `ICON_BIG` in CMakeLists.txt) is a small eye diagram: one
+crossing of an NRZ eye, drawn with the same raised-cosine edges the Signal Generator uses, in the app's own
+orange/blue trace colours. `Assets/generate_icon.cpp` is the one-off JUCE program that drew it (not part of
+the app build; its own header comment says how to build and run it) - edit and re-run that to restyle it.
+
 ## Hover tips
 
 Every control on every stage - built-in or plugin - has a hover tip with its name, a coloured **DUT**
