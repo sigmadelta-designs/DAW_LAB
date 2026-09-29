@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_06_ctle_overboost" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="358.VMjLgzU....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXsAGaoQWcjUlHfXWXrUWY8HBLtHSMh7hO7.UPRETSfjFY8HBYiQlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPlboYWYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBbgQGckImah.hcgwVck0iHz3BLh7hO7.UPRETSfjFY8HhboMWYh.hcgwVck0iHv3BMv.CLv.CLvTSN1.CM1PSMh7hO7.UPRETSfjFY8HhbpIBH1EFa0UVOh.iKvDCLv.CLv.CL2.yM3.SMwXiHu3COPEjTA0DHoQVOhLmZg0Fbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxbpYlbkEmHfXWXrUWY8HRMt.CLv.CLvPyM1fyL2DSM3HxK9vyKSQUPTUjO..">
+    <PARAM id="pattern" value="0.5"/>
+    <PARAM id="drive" value="0.0"/>
+    <PARAM id="amplitude" value="0.4791666865348816"/>
+    <PARAM id="rise" value="0.3684210479259491"/>
+    <PARAM id="rj" value="0.06666667014360428"/>
+    <PARAM id="sjamp" value="0.0"/>
+    <PARAM id="sjfreq" value="0.3502276241779327"/>
+    <PARAM id="dcd" value="0.0"/>
+    <PLUGIN name="SerDes Signal Generator" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.generator" uniqueId="7f6fc3b2"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="7f6fc3b2"/>
+  </SLOT>
+  <SLOT bypassed="0" state="480.VMjLgbc....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXjEFbzIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHsEVZtIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHv81bzEiHfXWXrUWY8HRKy3xMxTiL4.iL4fCM1DSNwPSYsfiHu3COPEjTA0DHoQVOh.2ayQmLh.hcgwVck0iHsLiK2HSMxjCLxjCNzXSL4DCMk0BNh7hO7.UPRETSfjFY8HBbuMGcyHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHvIWYwHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHvIWYxHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHvIWYyHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHxUlckI2bkIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHzgWauQVYh.hcgwVck0iHw3BLh7hO77xTTEDUE4C.">
+    <PARAM id="pre3" value="0.4999999403953552"/>
+    <PARAM id="pre2" value="0.4999999403953552"/>
+    <PARAM id="pre1" value="0.4999999403953552"/>
+    <PARAM id="main" value="0.6666666865348816"/>
+    <PARAM id="post1" value="0.4999999403953552"/>
+    <PARAM id="post2" value="0.4999999403953552"/>
+    <PARAM id="post3" value="0.4999999403953552"/>
+    <PARAM id="txmode" value="1.0"/>
+    <PARAM id="reverse" value="0.0"/>
+    <PARAM id="adapt" value="0.0"/>
+    <PLUGIN name="SerDes FFE" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ffe" uniqueId="fc2287c4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="fc2287c4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="126.VMjLgTG....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRYtElXrUFYh.hcgwVck0iHw3BLh7hO7.UPRETSfjFY8HBauM2bh.hcgwVck0iH33BLh7hO77xTTEDUE4C.">
+    <PARAM id="enabled" value="1.0"/>
+    <PARAM id="loss" value="0.2000000029802322"/>
+    <PLUGIN name="SerDes Lossy Channel" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.channel" uniqueId="f90351a2"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="f90351a2"/>
+  </SLOT>
+  <SLOT bypassed="0" state="287.VMjLgXQ....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXmc1alY1bkQmHfXWXrUWY8HRLtLCLv.CLvPiL4DSMyPCMxHxK9vCTAIUPMARZj0iHlIWYwIBH1EFa0UVOhDCLt.iHu3COPEjTA0DHoQVOhjlapU1Xzk1atIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHo4lckIGch.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBakYWYrIBH1EFa0UVOh.iKvTCLv.CLv.CL2PSMvTCNvXiHu3COPEjTA0DHoQVOhPWdvUlHfXWXrUWY8HBLt.iHu3COuLEUAQUQ9..">
+    <PARAM id="type" value="0.0"/>
+    <PARAM id="level" value="0.3162277638912201"/>
+    <PARAM id="injection" value="0.0"/>
+    <PARAM id="invert" value="0.0"/>
+    <PARAM id="freq" value="0.3091585338115692"/>
+    <PARAM id="aggoffset" value="0.5260000228881836"/>
+    <PLUGIN name="SerDes Noise Injector" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.noise" uniqueId="7e149779"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="7e149779"/>
+  </SLOT>
+  <SLOT bypassed="0" state="814.VMjLgTx....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXjI2ZoIBH1EFa0UVOhLCLt.iHu3COPEjTA0DHoQVOhLFYxsFbh.hcgwVck0iHy3BLh7hO7.UPRETSfjFY8HxXr81XqAGbsIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHiQGakEFYgAGch.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXzwVYh81ayQmHfXWXrUWY8HRL33BLh7hO7.UPRETSfjFY8HxXzwVYjMlHfXWXrUWY8HRLtbCN3DyL4LCMyHiMwbSL4TVK2HxK9vCTAIUPMARZj0iHiQGakA2arUlLh.hcgwVck0iHwXiKvHxK9vCTAIUPMARZj0iHiQGakoWYx8lHfXWXrUWY8HhLt.iHu3COPEjTA0DHoQVOhPlYkEiHfXWXrUWY8HBMtbCM4bCM0DyLvTyL3jCMk0BNh7hO7.UPRETSfjFY8HBYlUlLh.hcgwVck0iHz3xMzjyMzTSLy.SMyfSNzTVK3HxK9vCTAIUPMARZj0iHjYVYyHBH1EFa0UVOhPiK2PSN2PSMwLCL0LCN4PSYsfiHu3COPEjTA0DHoQVOhPlYkQiHfXWXrUWY8HBMtbCM4bCM0DyLvTyL3jCMk0BNh7hO7.UPRETSfjFY8HBYlUVMh.hcgwVck0iHz3xMzjyMzTSLy.SMyfSNzTVK3HxK9vCTAIUPMARZj0iHjYVYgQVXvQmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhPlYkMGckAmHfXWXrUWY8HBLt.CLvjSN4jSN4jyLw.CNxDiL4TiHu3COPEjTA0DHoQVOhTlagIFakQlHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhXVYkQFcxEVZtUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8Hxa0QGb0QmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhPWXxcVYzIBH1EFa0UVOh.iKxjSN4jSN4fiLwDCN1.iM1HxK9vyKSQUPTUjO..">
+    <PARAM id="enabled" value="1.0"/>
+    <PARAM id="output" value="0.5"/>
+    <PARAM id="target" value="0.2631578743457794"/>
+    <PARAM id="ctleboost" value="1.0"/>
+    <PARAM id="ctlezero" value="0.2000000029802322"/>
+    <PARAM id="ctlepole2" value="0.4615384638309479"/>
+    <PARAM id="ctledc" value="0.6666666865348816"/>
+    <PARAM id="ctleadapt" value="0.0"/>
+    <PARAM id="dfeadapt" value="1.0"/>
+    <PARAM id="dfestep" value="0.3015113472938538"/>
+    <PARAM id="dfe1" value="0.5"/>
+    <PARAM id="dfe2" value="0.5"/>
+    <PARAM id="dfe3" value="0.5"/>
+    <PARAM id="dfe4" value="0.5"/>
+    <PARAM id="dfe5" value="0.5"/>
+    <PARAM id="cdrkp" value="0.376050740480423"/>
+    <PARAM id="cdrki" value="0.2449489682912827"/>
+    <PARAM id="clockppm" value="0.5"/>
+    <PARAM id="feedtrainer" value="0.0"/>
+    <PLUGIN name="SerDes Receiver" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.rx" uniqueId="bdcf9247"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="bdcf9247"/>
+  </SLOT>
+  <SLOT bypassed="0" state="240.VMjLgbN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzglb0IBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzIWXo4VYxIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1kVY2IBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1M2XgwVYh.hcgwVck0iHv3RM4jSN4jSN1PiLybiLwLSLh7hO77xTTEDUE4C.">
+    <PARAM id="vscale" value="0.4488795399665833"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="trainer" value="0.0"/>
+    <PARAM id="view" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="SerDes Eye Scope" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.eyescope" uniqueId="81882a04"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="81882a04"/>
+  </SLOT>
+  <HOMEWORK title="Homework 6: &quot;I turned it up and it got worse&quot;"
+            prompt="Someone &quot;fixed&quot; this receiver's poor BER by cranking the CTLE boost all the way up, and it got worse instead of better. The channel itself isn't that lossy. What actually happened?"
+            hint="Compare the CTLE boost setting to how much loss the channel is actually reporting. What else, besides the signal, does a CTLE boost amplify?"
+            explanation="The channel only has about 8 dB of loss at Nyquist, but the CTLE boost is set near its maximum (about 17 dB) - far more gain than the channel needs. A CTLE boosts everything at high frequency, not just the attenuated signal, so the excess boost is mostly amplifying the noise floor instead of recovering signal, which is why BER got worse rather than better. This is a real and common equalization mistake: more boost isn't always better past the point that matches the actual channel loss. The fix is to bring the CTLE boost down to roughly match the measured/reported channel loss (or turn on CTLE auto-adapt) and let the DFE handle the rest."/>
+</LABCHAIN>

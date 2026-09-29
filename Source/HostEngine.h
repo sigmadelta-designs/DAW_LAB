@@ -55,6 +55,17 @@ public:
     // Returns false (and does nothing) if the XML isn't a chain preset.
     bool loadChain (const juce::XmlElement& xml, LoadChainCallback onDone);
 
+    // "Homework": a preset can carry a scenario with something deliberately wrong, a nudge (hint) and the
+    // root cause (explanation), for hands-on validation/debug practice. Empty (`present` false) for an
+    // ordinary preset, or after Clear Chain. Round-trips through createChainXml/loadChain automatically -
+    // there is no UI to author one, these are written by hand into a preset's XML.
+    struct Homework
+    {
+        bool present = false;
+        juce::String title, prompt, hint, explanation;
+    };
+    Homework homework;
+
     void setOutputMuted (bool shouldMute) noexcept { gate.muted = shouldMute; }
     bool isOutputMuted() const noexcept { return gate.muted.load(); }
 

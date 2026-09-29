@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_07_bad_connector" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="342.VMjLgzT....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXsAGaoQWcjUlHfXWXrUWY8HBLtHSMh7hO7.UPRETSfjFY8HBYiQlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPlboYWYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBbgQGckImah.hcgwVck0iHz3BLh7hO7.UPRETSfjFY8HhboMWYh.hcgwVck0iHv3BMv.CLv.CLvTSN1.CM1PSMh7hO7.UPRETSfjFY8HhbpIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHyoVXsAmHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhLmZlIWYwIBH1EFa0UVOhTiKv.CLv.CLzbiM3LyMwTCNh7hO77xTTEDUE4C.">
+    <PARAM id="pattern" value="0.5"/>
+    <PARAM id="drive" value="0.0"/>
+    <PARAM id="amplitude" value="0.4791666865348816"/>
+    <PARAM id="rise" value="0.3684210479259491"/>
+    <PARAM id="rj" value="0.0"/>
+    <PARAM id="sjamp" value="0.0"/>
+    <PARAM id="sjfreq" value="0.3502276241779327"/>
+    <PARAM id="dcd" value="0.0"/>
+    <PLUGIN name="SerDes Signal Generator" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.generator" uniqueId="7f6fc3b2"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="7f6fc3b2"/>
+  </SLOT>
+  <SLOT bypassed="0" state="480.VMjLgbc....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXjEFbzIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHsEVZtIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHv81bzEiHfXWXrUWY8HRKy3xMxTiL4.iL4fCM1DSNwPSYsfiHu3COPEjTA0DHoQVOh.2ayQmLh.hcgwVck0iHsLiK2HSMxjCLxjCNzXSL4DCMk0BNh7hO7.UPRETSfjFY8HBbuMGcyHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHvIWYwHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHvIWYxHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHvIWYyHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHxUlckI2bkIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHzgWauQVYh.hcgwVck0iHw3BLh7hO77xTTEDUE4C.">
+    <PARAM id="pre3" value="0.4999999403953552"/>
+    <PARAM id="pre2" value="0.4999999403953552"/>
+    <PARAM id="pre1" value="0.4999999403953552"/>
+    <PARAM id="main" value="0.6666666865348816"/>
+    <PARAM id="post1" value="0.4999999403953552"/>
+    <PARAM id="post2" value="0.4999999403953552"/>
+    <PARAM id="post3" value="0.4999999403953552"/>
+    <PARAM id="txmode" value="1.0"/>
+    <PARAM id="reverse" value="0.0"/>
+    <PARAM id="adapt" value="1.0"/>
+    <PLUGIN name="SerDes FFE" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ffe" uniqueId="fc2287c4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="fc2287c4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="1149.VMjLgPGA...O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOTIUPCUzPHEjSNUDS9vyTTEDUE4COPEjTA0DHoQVOhD1YmIWYyM2axMmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhL1at4VYiQ2axIBH1EFa0UVOhHCNt.iHu3COPEjTA0DHoQVOhL1a0AGao41Yh.hcgwVck0iHw3BLh7hO7.UPRETSfjFY8HRYtElXrUFYh.hcgwVck0iHw3BLh7hO7.UPRETSfjFY8HBauEFYxIBH1EFa0UVOhPSNtjSN4jSN1DCN0LCLxbyLh7hO7.UPRETSfjFY8HBauM2byMVXrUlHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhHWYlwVYiQWZu41bh.hcgwVck0iHx3BLh7hO7.UPRETSfjFY8HxbuUmbiUlbh.hcgwVck0iHzjiK4jSN4jiMwfSMy.iL2LiHu3COPEjTA0DHoQVOhXWYr81XoQWdh.hcgwVck0iHwbCLt.iHu3COuLEUAQUQ9viPOEjTDARauQVY8HxYg0VYh.xbkUFY8HRLwHBHjklYlk1X0wFc40iHxHBHvElb8HBNtXCN4.CN2HSN1TiL1.SLxHBHvElbC8VcvwVZtcVOh.iKvTyLyLCM0fiLyHSMzHiL2jiH9vCTAQzTfPmbgMVY8HBLh.RZtgUOhPiHfjlaY0iHxPiHf7VczgUOhDSM0HBHuUGcY0iHzjiHu3COPEDQSABcxE1Xk0iHwHBHo4FV8HBMh.RZtkUOhLCLh.xa0QGV8HRL0TiHf7VczkUOhTSMh7hO77jPSQUPCwTQffWOhXSNh.Rd8HBNvHBH20iH3HBHn0iHw.iHu3COOIzTTEzPLUDH30iHwDSLh.Rd8HBMh.xc8HRL2HBHn0iHxTiHu3COOIzTTEzPLUDH30iHy.iHfjWOhXiHfbWOhDCMh.BZ8HxLxHxK9vySBMEUAMDSEABd8HRL1HBH40iHzbiHfbWOhXiHffVOhDCLh7hO77jPSQUPCwTQffWOhDCL2HBH40iH3TiHfbWOhDyMh.BZ8HBNh7hO77jPSQUPCwTQffWOhbCLh.Rd8HRMyHBH20iH2HBHn0iHwXiHu3COOIzTTEzPLUDH30iHw.SLh.Rd8HRM2HBH20iH4HBHn0iHwjiHu3COAczQRUzTS8jTfHWXzk1a8HBLtjSNyTSL1byL2HyLwjCNzbiHfLWYkQVOhLyLh.BbuklazMWOhPiMrPiLfjSMrPiLfDCLvvxL2.RLzTCKybiHu3COTIUPCUDHzIWXiUVOh.iHf.2ao4Fcy0iHzvhLz.RL4vxL4.BM1vxL4.RM3vRMw.hMvvRMw.xMyvxL3.BN1vRMw.RL0LCK0DCHwTSMrPSNh7hO7PkTAMTQfPmbgMVY8HRLh.BbuklazMWOhPCKy.CH2vxLv.BM2vxMv.BN1vxMv.RLvDCK0TCHwTSMrTSMh7hO77hPOEjTD4COuPkTAMTQCgTPN4TQL4C.">
+    <PARAM id="enabled" value="1.0"/>
+    <PARAM id="velocity" value="0.4375"/>
+    <PARAM id="lossscale" value="0.3333333432674408"/>
+    <PARAM id="coupling" value="0.25"/>
+    <PARAM id="aggressors" value="0.25"/>
+    <PARAM id="reflections" value="0.6666666865348816"/>
+    <PARAM id="connector" value="0.9666666388511658"/>
+    <PARAM id="sourcer" value="0.2857142686843872"/>
+    <PARAM id="loadr" value="0.2857142686843872"/>
+    <PLUGIN name="SerDes Trace Channel" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.trace" uniqueId="7e6a61a4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="7e6a61a4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="240.VMjLgbN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzglb0IBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzIWXo4VYxIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iH1kVY2IBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1M2XgwVYh.hcgwVck0iHv3RM4jSN4jSN1PiLybiLwLSLh7hO77xTTEDUE4C.">
+    <PARAM id="vscale" value="0.4488795399665833"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="trainer" value="1.0"/>
+    <PARAM id="view" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="SerDes Eye Scope" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.eyescope" uniqueId="81882a04"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="81882a04"/>
+  </SLOT>
+  <HOMEWORK title="Homework 7: Both ends are terminated, so where's the echo from?"
+            prompt="Both ends of this link are properly terminated (50 ohm in, 50 ohm out) and the trace itself is short and clean, yet there's a visible echo in the eye. Terminations aren't the problem this time - where else would a reflection come from?"
+            hint="A matched source and load don't rule out a reflection from somewhere in the middle of the path. Check the TDR trace for a bump that isn't at either end."
+            explanation="Source and load are both correctly matched at 50 ohm, but the connector/pad mismatch is set very high (28%), which models a bad connector or via transition partway along the trace - a real, physical impedance discontinuity that isn't at either termination. The TDR view shows the bump sitting in the middle of the trace rather than at an end, which is exactly how you'd localise this in a real lab: a mid-trace reflection means look at connectors, vias and layer transitions along the path, not the terminations. Fixing (or here, dialling down) that connector mismatch removes the echo."/>
+</LABCHAIN>

@@ -158,6 +158,7 @@ void HostEngine::clearChain()
         graph.removeNode (slot.nodeId);
 
     slots.clear();
+    homework = Homework{};
     rebuildConnections();
     chainChanged.sendChangeMessage();
 }
@@ -277,6 +278,15 @@ std::unique_ptr<juce::XmlElement> HostEngine::createChainXml (const juce::String
         element->addChildElement (slots[i].description.createXml().release());
     }
 
+    if (homework.present)
+    {
+        auto* hw = root->createNewChildElement ("HOMEWORK");
+        hw->setAttribute ("title", homework.title);
+        hw->setAttribute ("prompt", homework.prompt);
+        hw->setAttribute ("hint", homework.hint);
+        hw->setAttribute ("explanation", homework.explanation);
+    }
+
     return root;
 }
 
@@ -316,7 +326,17 @@ bool HostEngine::loadChain (const juce::XmlElement& xml, LoadChainCallback onDon
     if (xml.hasAttribute ("modulation"))
         link->modulation = xml.getIntAttribute ("modulation");
 
-    clearChain();
+    clearChain();   // also resets `homework`, so this has to run before reading HOMEWORK below
+
+    if (auto* hw = xml.getChildByName ("HOMEWORK"))
+    {
+        homework.present = true;
+        homework.title = hw->getStringAttribute ("title");
+        homework.prompt = hw->getStringAttribute ("prompt");
+        homework.hint = hw->getStringAttribute ("hint");
+        homework.explanation = hw->getStringAttribute ("explanation");
+    }
+
     loadPending (chain, 0);
     return true;
 }

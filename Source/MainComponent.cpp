@@ -28,7 +28,7 @@ MainComponent::MainComponent()
 {
     setLookAndFeel (&lookAndFeel);
 
-    for (auto* button : { &addButton, &scanButton, &saveButton, &loadButton, &clearButton, &audioButton })
+    for (auto* button : { &addButton, &scanButton, &saveButton, &loadButton, &clearButton, &audioButton, &hintButton })
         addAndMakeVisible (button);
 
     addAndMakeVisible (pluginBox);
@@ -53,6 +53,9 @@ MainComponent::MainComponent()
     loadButton.setTooltip ("Replaces the current chain with one loaded from a .labchain preset file.");
     clearButton.setTooltip ("Removes every stage from the chain.");
     audioButton.setTooltip ("Opens JUCE's audio/MIDI device picker for this app.");
+    hintButton.setTooltip ("Opens the homework window: the scenario for a HOMEWORK_*.labchain preset, "
+                           "with a hint and an explanation you can reveal if you get stuck.");
+    hintButton.onClick = [this] { toggleHintWindow(); };
 
     // 1 GBd on the wire runs as 1 kBd here (simulation scale 1e6).
     rateSlider.setRange (LinkSettings::minGBd, LinkSettings::maxGBd, 0.01);
@@ -142,6 +145,8 @@ void MainComponent::resized()
 
     auto bottom = area.removeFromBottom (28);
     audioButton.setBounds (bottom.removeFromRight (140));
+    bottom.removeFromRight (6);
+    hintButton.setBounds (bottom.removeFromRight (130));
     bottom.removeFromRight (6);
     clearButton.setBounds (bottom.removeFromRight (100));
     bottom.removeFromRight (6);
@@ -375,6 +380,25 @@ void MainComponent::toggleEditor (int index)
 void MainComponent::closeAllEditors()
 {
     editors.clear();
+}
+
+void MainComponent::toggleHintWindow()
+{
+    if (hintWindow != nullptr)
+    {
+        hintWindow.reset();
+        return;
+    }
+
+    hintWindow = std::make_unique<HintWindow> (engine,
+        [safeThis = juce::Component::SafePointer<MainComponent> (this)]
+        {
+            juce::MessageManager::callAsync ([safeThis]
+            {
+                if (safeThis != nullptr)
+                    safeThis->hintWindow.reset();
+            });
+        });
 }
 
 void MainComponent::clearChain()

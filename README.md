@@ -222,6 +222,38 @@ Parameter values are stored as well as the state blob because a plugin whose
 lose its settings. A plugin's non-parameter state only persists if the plugin implements
 its state methods.
 
+## Homework: presets with something wrong
+
+`Presets/HOMEWORK_*.labchain` are exercises: each one is a chain with something realistic and deliberately
+wrong in it, modelled on an actual SerDes bring-up/debug scenario rather than an arbitrary bug. Load one
+(Load Preset...) and try to find the problem using the tool's own measurements (eye, TDR, CTLE/DFE/CDR
+status, BER) before checking the **Homework Hint...** button, which opens a window with:
+
+- the scenario, framed as a lab ticket - always visible;
+- **Reveal hint** - a nudge, not the fix;
+- **Reveal explanation** - the root cause and how a real debug session would confirm and fix it.
+
+Both stay hidden until clicked, so opening the window to check whether a preset has homework attached
+doesn't spoil the exercise. The window updates (and re-hides anything already revealed) whenever you load a
+different chain.
+
+| Preset | Scenario |
+|---|---|
+| `HOMEWORK_01_closed_eye_no_tx_eq` | TX FFE left flat against an 18 dB channel - the "is the board bad?" false alarm |
+| `HOMEWORK_02_ffe_wrong_direction` | Real FFE tap values, applied backwards (Reverse on) - worse than no EQ at all |
+| `HOMEWORK_03_missing_termination` | Receiver-end termination effectively missing - reflections that look fine on one shot, bad with real traffic |
+| `HOMEWORK_04_cdr_too_slow` | CDR loop gains too low to track reference-clock jitter - the receiver won't hold lock |
+| `HOMEWORK_05_aggressor_crosstalk` | Trace routed hugging a noisy neighbour lane - fails only when it's active |
+| `HOMEWORK_06_ctle_overboost` | CTLE boost cranked far past what the channel needs - amplifies noise more than signal |
+| `HOMEWORK_07_bad_connector` | Both terminations matched; the echo is from a mid-trace connector/via mismatch instead |
+| `HOMEWORK_08_margin_stackup` | No single broken setting - several individually-mild impairments stack up past the BER budget |
+
+A `HostEngine::Homework` struct (title/prompt/hint/explanation) round-trips through `createChainXml`/
+`loadChain` as an optional `<HOMEWORK>` element, so resaving a homework chain keeps its exercise attached.
+There's no UI to author one - `Assets/generate_homework.cpp` (a one-off generator, not part of the app
+build; its own header comment has the throwaway CMakeLists to build/run it) is how these eight were written
+and measured live before being committed.
+
 ## The stages as VST3 / AU plugins
 
 Every stage is also built as a plugin, so a chain can be assembled in any DAW:
