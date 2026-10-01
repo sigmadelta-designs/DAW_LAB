@@ -247,12 +247,25 @@ different chain.
 | `HOMEWORK_06_ctle_overboost` | CTLE boost cranked far past what the channel needs - amplifies noise more than signal |
 | `HOMEWORK_07_bad_connector` | Both terminations matched; the echo is from a mid-trace connector/via mismatch instead |
 | `HOMEWORK_08_margin_stackup` | No single broken setting - several individually-mild impairments stack up past the BER budget |
+| `HOMEWORK_09_dfe_wrong_sign` | A hand-entered DFE tap with the wrong sign - fighting ISI instead of cancelling it |
+| `HOMEWORK_10_stale_calibration` | TX FFE and RX CTLE both still tuned for a board revision that no longer exists - double over-equalization |
+| `HOMEWORK_11_sparam_wrong_ports` | A real measured Touchstone file, read with the wrong port-pair mapping for how the fixture was cabled |
+| `HOMEWORK_12_wrong_probe_point` | Receiver's Output set to the pre-DFE node - the eye looks unconvincing but the BER is actually fine |
+| `HOMEWORK_13_dfe_step_too_large` | DFE adaptation step too large - it hunts around the optimum instead of settling |
+
+Presets 9-13 use fuller, more realistic chains (every stage that's actually relevant to the fault's domain
+is present and switched on - if the problem is on the receiver, the Receiver stage is there, not modelled
+as a side-effect of an earlier stage's parameter) and were added after a design note: an earlier version of
+09/05 modelled an RX-side fault (termination, crosstalk feeding into a BER claim) without actually including
+the Receiver stage. Both were corrected to include it.
 
 A `HostEngine::Homework` struct (title/prompt/hint/explanation) round-trips through `createChainXml`/
 `loadChain` as an optional `<HOMEWORK>` element, so resaving a homework chain keeps its exercise attached.
 There's no UI to author one - `Assets/generate_homework.cpp` (a one-off generator, not part of the app
-build; its own header comment has the throwaway CMakeLists to build/run it) is how these eight were written
-and measured live before being committed.
+build; its own header comment has the throwaway CMakeLists to build/run it) is how these thirteen were
+written and measured live before being committed; several needed real parameter tuning (and, in one case,
+a corrected sign-convention assumption, found by directly comparing measured eye height with and without
+the "fix") to actually demonstrate the failure they claim, not just sound plausible.
 
 ## The stages as VST3 / AU plugins
 

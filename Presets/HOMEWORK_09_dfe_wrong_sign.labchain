@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_09_dfe_wrong_sign" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="342.VMjLgzT....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXsAGaoQWcjUlHfXWXrUWY8HBLtHSMh7hO7.UPRETSfjFY8HBYiQlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPlboYWYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBbgQGckImah.hcgwVck0iHz3BLh7hO7.UPRETSfjFY8HhboMWYh.hcgwVck0iHv3BMv.CLv.CLvTSN1.CM1PSMh7hO7.UPRETSfjFY8HhbpIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHyoVXsAmHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhLmZlIWYwIBH1EFa0UVOhTiKv.CLv.CLzbiM3LyMwTCNh7hO77xTTEDUE4C.">
+    <PARAM id="pattern" value="0.5"/>
+    <PARAM id="drive" value="0.0"/>
+    <PARAM id="amplitude" value="0.4791666865348816"/>
+    <PARAM id="rise" value="0.3684210479259491"/>
+    <PARAM id="rj" value="0.0"/>
+    <PARAM id="sjamp" value="0.0"/>
+    <PARAM id="sjfreq" value="0.3502276241779327"/>
+    <PARAM id="dcd" value="0.0"/>
+    <PLUGIN name="SerDes Signal Generator" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.generator" uniqueId="7f6fc3b2"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="7f6fc3b2"/>
+  </SLOT>
+  <SLOT bypassed="0" state="480.VMjLgbc....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXjEFbzIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHsEVZtIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHv81bzEiHfXWXrUWY8HRKy3xMxTiL4.iL4fCM1DSNwPSYsfiHu3COPEjTA0DHoQVOh.2ayQmLh.hcgwVck0iHsLiK2HSMxjCLxjCNzXSL4DCMk0BNh7hO7.UPRETSfjFY8HBbuMGcyHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHvIWYwHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHvIWYxHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHvIWYyHBH1EFa0UVOhzxLtbiL0HSNvHSN3PiMwjSLzTVK3HxK9vCTAIUPMARZj0iHxUlckI2bkIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHzgWauQVYh.hcgwVck0iHw3BLh7hO77xTTEDUE4C.">
+    <PARAM id="pre3" value="0.4999999403953552"/>
+    <PARAM id="pre2" value="0.4999999403953552"/>
+    <PARAM id="pre1" value="0.4999999403953552"/>
+    <PARAM id="main" value="0.6666666865348816"/>
+    <PARAM id="post1" value="0.4999999403953552"/>
+    <PARAM id="post2" value="0.4999999403953552"/>
+    <PARAM id="post3" value="0.4999999403953552"/>
+    <PARAM id="txmode" value="1.0"/>
+    <PARAM id="reverse" value="0.0"/>
+    <PARAM id="adapt" value="0.0"/>
+    <PLUGIN name="SerDes FFE" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ffe" uniqueId="fc2287c4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="fc2287c4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="127.VMjLgXG....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRYtElXrUFYh.hcgwVck0iHw3BLh7hO7.UPRETSfjFY8HBauM2bh.hcgwVck0iHwXiKvHxK9vyKSQUPTUjO..">
+    <PARAM id="enabled" value="1.0"/>
+    <PARAM id="loss" value="0.4000000059604645"/>
+    <PLUGIN name="SerDes Lossy Channel" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.channel" uniqueId="f90351a2"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="f90351a2"/>
+  </SLOT>
+  <SLOT bypassed="0" state="813.VMjLgPx....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXjI2ZoIBH1EFa0UVOhLCLt.iHu3COPEjTA0DHoQVOhLFYxsFbh.hcgwVck0iHy3BLh7hO7.UPRETSfjFY8HxXr81XqAGbsIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHiQGakEFYgAGch.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXzwVYh81ayQmHfXWXrUWY8HRMt.iHu3COPEjTA0DHoQVOhLFcrUFYiIBH1EFa0UVOhDiK2fCNwLSNyPyLxXSL2DSNk0xMh7hO7.UPRETSfjFY8HxXzwVYv8FakIiHfXWXrUWY8HRL13BLh7hO7.UPRETSfjFY8HxXzwVY5UlbuIBH1EFa0UVOhHiKvHxK9vCTAIUPMARZj0iHjYVYwHBH1EFa0UVOhzBLtLSN4jSN4jyM1DSM3DCMxDiHu3COPEjTA0DHoQVOhPlYkIiHfXWXrUWY8HBMtbCM4bCM0DyLvTyL3jCMk0BNh7hO7.UPRETSfjFY8HBYlU1Lh.hcgwVck0iHz3xMzjyMzTSLy.SMyfSNzTVK3HxK9vCTAIUPMARZj0iHjYVYzHBH1EFa0UVOhPiK2PSN2PSMwLCL0LCN4PSYsfiHu3COPEjTA0DHoQVOhPlYkUiHfXWXrUWY8HBMtbCM4bCM0DyLvTyL3jCMk0BNh7hO7.UPRETSfjFY8HBYlUVXjEFbzIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYyQWYvIBH1EFa0UVOh.iKv.CL4jSN4jSN4LSLvfiLwHSN0HxK9vCTAIUPMARZj0iHk4VXhwVYjIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHlUVYjQmbgklakImHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOh7VczAWczIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFch.hcgwVck0iHv3hL4jSN4jSN3HSLwfiMvXiMh7hO77xTTEDUE4C.">
+    <PARAM id="enabled" value="1.0"/>
+    <PARAM id="output" value="0.5"/>
+    <PARAM id="target" value="0.2631578743457794"/>
+    <PARAM id="ctleboost" value="0.2777777910232544"/>
+    <PARAM id="ctlezero" value="0.2000000029802322"/>
+    <PARAM id="ctlepole2" value="0.4615384638309479"/>
+    <PARAM id="ctledc" value="0.6666666865348816"/>
+    <PARAM id="ctleadapt" value="0.0"/>
+    <PARAM id="dfeadapt" value="0.0"/>
+    <PARAM id="dfestep" value="0.3015113472938538"/>
+    <PARAM id="dfe1" value="0.300000011920929"/>
+    <PARAM id="dfe2" value="0.5"/>
+    <PARAM id="dfe3" value="0.5"/>
+    <PARAM id="dfe4" value="0.5"/>
+    <PARAM id="dfe5" value="0.5"/>
+    <PARAM id="cdrkp" value="0.376050740480423"/>
+    <PARAM id="cdrki" value="0.2449489682912827"/>
+    <PARAM id="clockppm" value="0.5"/>
+    <PARAM id="feedtrainer" value="0.0"/>
+    <PLUGIN name="SerDes Receiver" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.rx" uniqueId="bdcf9247"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="bdcf9247"/>
+  </SLOT>
+  <SLOT bypassed="0" state="240.VMjLgbN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzglb0IBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzIWXo4VYxIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1kVY2IBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1M2XgwVYh.hcgwVck0iHv3RM4jSN4jSN1PiLybiLwLSLh7hO77xTTEDUE4C.">
+    <PARAM id="vscale" value="0.4488795399665833"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="trainer" value="0.0"/>
+    <PARAM id="view" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="SerDes Eye Scope" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.eyescope" uniqueId="81882a04"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="81882a04"/>
+  </SLOT>
+  <HOMEWORK title="Homework 9: The DFE is dialed in, but it's not helping"
+            prompt="Someone hand-entered this receiver's DFE taps instead of letting it adapt, and the eye is worse than with the DFE simply switched off. The tap magnitudes look like they came from a real characterization. What's wrong with them?"
+            hint="Compare the sign of the DFE tap(s) to the sign of the actual post-cursor ISI the channel leaves behind. A DFE tap is a cancellation term - does its sign cancel the ISI, or add to it?"
+            explanation="The DFE's auto-adapt is off and tap h1 was hand-set with the wrong sign - negative instead of positive. A DFE tap works by subtracting a scaled copy of the previous decision from the current sample to cancel that decision's leftover ISI contribution; with the sign flipped, it adds that contribution back in rather than removing it, making the ISI worse than doing nothing. This is a real, easy mistake when taps are copied by hand from a datasheet, a different board revision, or a different sign convention than the one this receiver actually uses - always double-check the sign convention, or just turn auto-adapt back on."/>
+</LABCHAIN>
