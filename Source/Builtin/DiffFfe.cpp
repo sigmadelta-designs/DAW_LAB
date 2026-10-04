@@ -1,5 +1,6 @@
 #include "DiffFfe.h"
 #include "FfeEditor.h"
+#include "RegisterResolution.h"
 
 static const char* const tapIds[DiffFfe::numTaps] = { "pre3", "pre2", "pre1", "main", "post1", "post2", "post3" };
 
@@ -51,9 +52,19 @@ DiffFfe::Taps DiffFfe::getSliderValues() const
     return values;
 }
 
+// What computeTaps() returns is what the sliders ask for; what a real transmitter can actually hold in
+// its tap registers is a quantized version of that, so that's what's applied and what's drawn.
 DiffFfe::Taps DiffFfe::getEffectiveTaps() const
 {
-    return computeTaps (getSliderValues(), getParam ("txmode") > 0.5f, getParam ("reverse") > 0.5f);
+    auto taps = computeTaps (getSliderValues(), getParam ("txmode") > 0.5f, getParam ("reverse") > 0.5f);
+
+    for (int tap = 0; tap < numTaps; ++tap)
+    {
+        const float lo = tap == mainTap ? 0.0f : -0.6f, hi = tap == mainTap ? 1.5f : 0.6f;
+        taps[(size_t) tap] = RegisterResolution::quantize (taps[(size_t) tap], lo, hi, RegisterResolution::ffeTapBits);
+    }
+
+    return taps;
 }
 
 DiffFfe::Taps DiffFfe::computeTaps (const Taps& sliders, bool txMode, bool reverse)

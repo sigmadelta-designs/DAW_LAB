@@ -1,5 +1,6 @@
 #include "SerdesReceiver.h"
 #include "ReceiverEditor.h"
+#include "RegisterResolution.h"
 
 namespace
 {
@@ -46,10 +47,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout SerdesReceiver::createLayout
     return layout;
 }
 
+// What the boost slider asks for, quantized to what a real CTLE's boost register can actually hold.
 Ctle::Settings SerdesReceiver::getCtleSettings() const
 {
     Ctle::Settings s;
-    s.boostDb = getParam ("ctleboost");
+    s.boostDb = RegisterResolution::quantize (getParam ("ctleboost"), 0.0f, 18.0f, RegisterResolution::ctleBoostBits);
     s.zeroGHz = getParam ("ctlezero");
     s.pole2GHz = getParam ("ctlepole2");
     s.dcGainDb = getParam ("ctledc");
@@ -168,9 +170,12 @@ void SerdesReceiver::handleEvent()
         decisions[k] = decisions[k - 1];
     decisions[0] = level;
 
+    // What the sign-sign LMS loop (or a hand-set slider) asks for, quantized to what a real DFE's tap
+    // register can actually hold; the adaptation accumulator above stays full precision, the way a real
+    // adaptive equalizer's internal state is usually wider than the DAC it eventually drives.
     feedbackNext = 0.0;
     for (int k = 0; k < dfeTaps; ++k)
-        feedbackNext += taps[k] * decisions[k];
+        feedbackNext += RegisterResolution::quantize ((float) taps[k], -1.0f, 1.0f, RegisterResolution::dfeTapBits) * decisions[k];
     feedbackNext *= target;
 
     // the analog feedback takes effect at the start of the next symbol's window
@@ -197,7 +202,7 @@ void SerdesReceiver::handleEvent()
         status.agcGain = (float) agc;
         status.edgeLevel = (float) edgeAverage;
         for (int k = 0; k < dfeTaps; ++k)
-            status.dfe[k] = (float) taps[k];
+            status.dfe[k] = RegisterResolution::quantize ((float) taps[k], -1.0f, 1.0f, RegisterResolution::dfeTapBits);
 
         if (getParam ("feedtrainer") > 0.5f)
         {

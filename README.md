@@ -42,6 +42,18 @@ and share one **line rate** and **NRZ / PAM4** setting, chosen in the main windo
 
 Typical chain: `Signal Generator -> FFE -> Lossy Channel -> Eye Scope` (put the FFE after the channel to model an RX FFE).
 
+**Register resolution.** On real silicon, the FFE's taps, the receiver's CTLE boost and its DFE taps aren't
+continuous values - they're register fields driving a DAC, a fixed number of discrete codes over a fixed
+range. The FFE and the receiver quantize to that automatically and always (not a setting - it models the
+hardware, not a choice about the simulation): FFE and DFE taps snap to 64 codes (6-bit) across their range,
+CTLE boost to 32 codes (5-bit, coarser, matching how real CTLEs are usually a broad analog shape that
+doesn't reward fine steps). This happens at `getEffectiveTaps()`/`getCtleSettings()`, so what gets applied
+and what the FFE's tap plot or the receiver's DFE readout show are both already the quantized value -
+there's no separate "ideal" number hiding underneath. Auto-adapt (FFE training, CTLE auto-adapt) sees the
+same quantized landscape a real link-training loop would, including its occasional consequence: a
+coordinate search can converge to a slightly worse code if the ideal value sits between two quantization
+steps (`Source/Builtin/RegisterResolution.h`).
+
 - **Signal Generator** - PRBS7/9/11/13/15/23/31, clock 1010, clock 11001100; NRZ or PAM4 (Gray coded); amplitude and
   edge time (raised-cosine, in UI). Ignores its input. `Drive`: differential (default), + leg only, - leg only, or common-mode. **Jitter** is applied to each edge:
   *random* RJ (Gaussian, UI rms) and *deterministic* SJ (sinusoidal, UI pk-pk, frequency in real-world MHz, so 5 MHz runs as 5 Hz)
@@ -173,6 +185,11 @@ More receiver presets (chain: generator, FFE, channel, noise, receiver, eye scop
 | `NRZ_10G_40_rx_cdr_tracks_1000ppm_offset` | reference clock 1000 ppm off, the CDR follows it | no errors |
 | `NRZ_10G_41_rx_cdr_too_slow_loses_lock` | 3000 ppm offset with the CDR gains turned down | never locks, BER about 0.4 |
 | `PAM4_10G_5_rx_sparam_fr4_8in_ctle_dfe`, `PAM4_10G_6_rx_trace_game21_ctle_dfe`, `PAM4_10G_7_tx_ffe_plus_rx_lossy_8dB` | PAM4 through an S-parameter channel, a solved trace, and TX FFE + receiver | no errors |
+
+The exact eye-height/width figures above (and in "What the eye shows" below) were measured before FFE/CTLE/
+DFE register resolution was added and can drift a few points now that taps and boost are quantized - spot-
+checked after adding it and every pass/fail result above still held (zero-error presets stayed zero-error),
+but the specific percentages are approximate, not exact, for presets measured before that change.
 
 ### What the eye shows (10 GBd NRZ, 12 dB channel; `Presets/`, images in `docs/eyes/`)
 
