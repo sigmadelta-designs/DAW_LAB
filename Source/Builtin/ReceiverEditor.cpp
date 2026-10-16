@@ -1,7 +1,8 @@
 #include "ReceiverEditor.h"
+#include "RegisterResolution.h"
 
 ReceiverEditor::SliderRow& ReceiverEditor::addSlider (const char* parameterId, const juce::String& text,
-                                                     ControlTip::Domain domain, const juce::String& reason, bool vertical)
+                                                     ControlTip::Domain domain, const juce::String& reason, bool vertical, int registerBits)
 {
     auto row = std::make_unique<SliderRow>();
     row->slider.setSliderStyle (vertical ? juce::Slider::LinearVertical : juce::Slider::LinearHorizontal);
@@ -13,9 +14,30 @@ ReceiverEditor::SliderRow& ReceiverEditor::addSlider (const char* parameterId, c
     row->attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (receiver.getParameterTree(), parameterId, row->slider);
     addAndMakeVisible (row->slider);
     addAndMakeVisible (row->label);
+    row->registerBits = registerBits;
+    if (registerBits > 0)
+    {
+        row->bitsLabel.setJustificationType (vertical ? juce::Justification::centred : juce::Justification::centredLeft);
+        row->bitsLabel.setFont (juce::FontOptions (vertical ? 9.0f : 11.0f));
+        row->bitsLabel.setColour (juce::Label::textColourId, juce::Colours::lightgrey);
+        row->bitsLabel.setTooltip ("This control's actual register contents: the raw bits, then the code and its "
+                                    "maximum (code/max) for a " + juce::String (registerBits) + "-bit field.");
+        addAndMakeVisible (row->bitsLabel);
+        updateBitsLabel (*row);
+    }
     byId[parameterId] = row.get();
     rows.push_back (std::move (row));
     return *rows.back();
+}
+
+void ReceiverEditor::updateBitsLabel (SliderRow& row)
+{
+    if (row.registerBits <= 0)
+        return;
+
+    const auto range = row.slider.getRange();
+    row.bitsLabel.setText (RegisterResolution::codeText ((float) row.slider.getValue(), (float) range.getStart(), (float) range.getEnd(), row.registerBits),
+                           juce::dontSendNotification);
 }
 
 ReceiverEditor::ReceiverEditor (SerdesReceiver& receiverToEdit)
@@ -24,27 +46,37 @@ ReceiverEditor::ReceiverEditor (SerdesReceiver& receiverToEdit)
     setLookAndFeel (&lookAndFeel);
 
     using D = ControlTip::Domain;
+    namespace RR = RegisterResolution;
     addSlider ("target", "Target level", D::dut,
-        "The signal level the receiver's automatic gain control aims for at its input - a real AGC target register.");
+        "The signal level the receiver's automatic gain control aims for at its input - a real AGC target register.",
+        false, RR::agcTargetBits);
     addSlider ("ctleboost", "CTLE boost dB", D::dut,
-        "High-frequency boost the continuous-time linear equalizer applies - a real receiver's CTLE gain register.");
+        "High-frequency boost the continuous-time linear equalizer applies - a real receiver's CTLE gain register.",
+        false, RR::ctleBoostBits);
     addSlider ("ctlezero", "Zero GHz", D::dut,
-        "Where the CTLE's boost starts rising - a real CTLE's zero-frequency setting.");
+        "Where the CTLE's boost starts rising - a real CTLE's zero-frequency setting.",
+        false, RR::ctleZeroBits);
     addSlider ("ctlepole2", "High pole GHz", D::dut,
-        "Where the CTLE's response rolls back off above the boost - a real CTLE's second-pole setting.");
+        "Where the CTLE's response rolls back off above the boost - a real CTLE's second-pole setting.",
+        false, RR::ctlePole2Bits);
     addSlider ("ctledc", "DC gain dB", D::dut,
-        "Overall gain the CTLE applies at DC, before its high-frequency boost - a real CTLE's DC gain register.");
+        "Overall gain the CTLE applies at DC, before its high-frequency boost - a real CTLE's DC gain register.",
+        false, RR::ctleDcGainBits);
     addSlider ("dfestep", "DFE step", D::dut,
         "How big a correction the DFE's sign-sign LMS loop makes per symbol - a real adaptive DFE's loop-gain register. "
-        "Larger settles faster but tracks noisier; smaller is steadier but slower to adapt.");
+        "Larger settles faster but tracks noisier; smaller is steadier but slower to adapt.",
+        false, RR::dfeStepBits);
     for (int k = 1; k <= SerdesReceiver::dfeTaps; ++k)
         addSlider (("dfe" + juce::String (k)).toRawUTF8(), "h" + juce::String (k), D::dut,
             "A decision-feedback equalizer tap - cancels this much of the residual ISI from " + juce::String (k)
-                + " symbol" + (k == 1 ? "" : "s") + " ago. A real DFE's tap register; when auto-adapt is on, the loop sets it for you.", true);
+                + " symbol" + (k == 1 ? "" : "s") + " ago. A real DFE's tap register; when auto-adapt is on, the loop sets it for you.",
+            true, RR::dfeTapBits);
     addSlider ("cdrkp", "Kp (mUI)", D::dut,
-        "The clock-recovery loop's proportional step - how hard it corrects clock phase per bang-bang decision. A real CDR's loop-filter register.");
+        "The clock-recovery loop's proportional step - how hard it corrects clock phase per bang-bang decision. A real CDR's loop-filter register.",
+        false, RR::cdrGainBits);
     addSlider ("cdrki", "Ki (uUI)", D::dut,
-        "The clock-recovery loop's integral step - how fast it corrects a steady frequency offset. A real CDR's loop-filter register.");
+        "The clock-recovery loop's integral step - how fast it corrects a steady frequency offset. A real CDR's loop-filter register.",
+        false, RR::cdrGainBits);
     addSlider ("clockppm", "Ref. offset ppm", ControlTip::Domain::simulation,
         "Mistunes the transmitter's clock away from the receiver's nominal rate, to see how much frequency offset this "
         "simulated CDR can pull in and track. A stress condition you dial in to characterise the receiver, not a setting on it.");
@@ -81,7 +113,7 @@ ReceiverEditor::ReceiverEditor (SerdesReceiver& receiverToEdit)
         "this measurement setup, not a signal-path property."));
     resetButton.setTooltip ("Zeroes the bit-error counters below and restarts the sent/received alignment search.");
 
-    setSize (1010, 840);
+    setSize (1010, 950);
     startTimerHz (20);
 }
 
@@ -95,6 +127,8 @@ void ReceiverEditor::timerCallback()
 {
     auto& link = receiver.getLink();
     compare.update (link.txBits, link.rxBits, (++ticks % 8) == 0);   // the alignment search is the expensive part
+    for (auto& row : rows)
+        updateBitsLabel (*row);
     repaint();
 }
 
@@ -102,26 +136,34 @@ void ReceiverEditor::resized()
 {
     auto area = getLocalBounds().reduced (10);
 
-    auto top = area.removeFromTop (28);
-    enabledButton.setBounds (top.removeFromLeft (150));
-    outputLabel.setBounds (top.removeFromLeft (52));
-    outputBox.setBounds (top.removeFromLeft (210));
-    top.removeFromLeft (16);
-    byId["target"]->label.setBounds (top.removeFromLeft (84));
-    byId["target"]->slider.setBounds (top.removeFromLeft (230));
-    trainerButton.setBounds (top.removeFromRight (190));
+    auto top = area.removeFromTop (44);
+    auto topRow = top.removeFromTop (28);
+    enabledButton.setBounds (topRow.removeFromLeft (150));
+    outputLabel.setBounds (topRow.removeFromLeft (52));
+    outputBox.setBounds (topRow.removeFromLeft (210));
+    topRow.removeFromLeft (16);
+    byId["target"]->label.setBounds (topRow.removeFromLeft (84));
+    const auto targetSliderBounds = topRow.removeFromLeft (230);
+    byId["target"]->slider.setBounds (targetSliderBounds);
+    trainerButton.setBounds (topRow.removeFromRight (190));
+    byId["target"]->bitsLabel.setBounds (targetSliderBounds.withY (top.getY()).withHeight (top.getHeight()));
 
     area.removeFromTop (8);
-    auto upper = area.removeFromTop (470);
+    auto upper = area.removeFromTop (580);
     auto left = upper.removeFromLeft (490);
     upper.removeFromLeft (12);
     auto right = upper;
 
+    // Rows for a register-resolution control reserve an extra thin line below the slider for its bit
+    // code readout (RegisterResolution::codeText); plain continuous controls (clockppm) stay single-line.
     const auto place = [] (juce::Rectangle<int>& column, SliderRow& row)
     {
-        auto line = column.removeFromTop (26);
-        row.label.setBounds (line.removeFromLeft (110));
-        row.slider.setBounds (line);
+        auto line = column.removeFromTop (row.registerBits > 0 ? 40 : 26);
+        auto sliderLine = line.removeFromTop (26);
+        row.label.setBounds (sliderLine.removeFromLeft (110));
+        row.slider.setBounds (sliderLine);
+        if (row.registerBits > 0)
+            row.bitsLabel.setBounds (line.withTrimmedLeft (110));
     };
 
     // CTLE
@@ -151,6 +193,7 @@ void ReceiverEditor::resized()
         auto column = taps.removeFromLeft (columnWidth);
         auto& row = *byId[("dfe" + juce::String (k)).toRawUTF8()];
         row.label.setBounds (column.removeFromTop (18));
+        row.bitsLabel.setBounds (column.removeFromBottom (14));
         row.slider.setBounds (column);
     }
     right.removeFromTop (6);

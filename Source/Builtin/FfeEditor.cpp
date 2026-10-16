@@ -1,4 +1,5 @@
 #include "FfeEditor.h"
+#include "RegisterResolution.h"
 
 FfeEditor::FfeEditor (DiffFfe& ffeToEdit)
     : juce::AudioProcessorEditor (ffeToEdit), ffe (ffeToEdit)
@@ -20,6 +21,14 @@ FfeEditor::FfeEditor (DiffFfe& ffeToEdit)
         label.setText (DiffFfe::getTapName (tap), juce::dontSendNotification);
         label.setJustificationType (juce::Justification::centred);
         addAndMakeVisible (label);
+
+        auto& bitsLabel = bitsLabels[(size_t) tap];
+        bitsLabel.setJustificationType (juce::Justification::centred);
+        bitsLabel.setFont (juce::FontOptions (9.0f));
+        bitsLabel.setColour (juce::Label::textColourId, juce::Colours::lightgrey);
+        bitsLabel.setTooltip ("This tap's actual register contents: the raw bits, then the code and its maximum "
+                              "(code/max) for a " + juce::String (RegisterResolution::ffeTapBits) + "-bit field.");
+        addAndMakeVisible (bitsLabel);
 
         attachments[(size_t) tap] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (
             ffe.getParameterTree(), DiffFfe::getTapParamId (tap), slider);
@@ -52,6 +61,7 @@ FfeEditor::FfeEditor (DiffFfe& ffeToEdit)
 
     setSize (640, 620);
     startTimerHz (15);
+    timerCallback();   // populate the bit-code labels immediately, instead of leaving them blank for one tick
 }
 
 FfeEditor::~FfeEditor()
@@ -62,6 +72,13 @@ FfeEditor::~FfeEditor()
 
 void FfeEditor::timerCallback()
 {
+    for (int tap = 0; tap < DiffFfe::numTaps; ++tap)
+    {
+        const auto range = sliders[(size_t) tap].getRange();
+        bitsLabels[(size_t) tap].setText (
+            RegisterResolution::codeText ((float) sliders[(size_t) tap].getValue(), (float) range.getStart(), (float) range.getEnd(), RegisterResolution::ffeTapBits),
+            juce::dontSendNotification);
+    }
     repaint();
 }
 
@@ -88,6 +105,7 @@ void FfeEditor::resized()
     {
         auto column = area.removeFromLeft (columnWidth);
         labels[(size_t) tap].setBounds (column.removeFromTop (20));
+        bitsLabels[(size_t) tap].setBounds (column.removeFromBottom (14));
         sliders[(size_t) tap].setBounds (column);
     }
 }

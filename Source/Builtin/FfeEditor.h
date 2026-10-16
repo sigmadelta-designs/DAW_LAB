@@ -21,6 +21,7 @@ private:
     DiffFfe& ffe;
     std::array<juce::Slider, DiffFfe::numTaps> sliders;
     std::array<juce::Label, DiffFfe::numTaps> labels;
+    std::array<juce::Label, DiffFfe::numTaps> bitsLabels;   // "101010 (42/63)" - this tap's actual register code
     std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>, DiffFfe::numTaps> attachments;
     juce::ToggleButton txModeButton { "TX mode: main = 1 - sum|other taps| (constant swing)" };
     juce::ToggleButton reverseButton { "Reverse tap direction (pre <-> post)" };

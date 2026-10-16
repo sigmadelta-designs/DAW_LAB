@@ -19,12 +19,15 @@ private:
     {
         juce::Slider slider;
         juce::Label label;
+        juce::Label bitsLabel;   // "101010 (42/63)" - only shown/updated when registerBits > 0
+        int registerBits = 0;
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> attachment;   // last: destroyed first
     };
 
     void timerCallback() override;
     SliderRow& addSlider (const char* parameterId, const juce::String& text, ControlTip::Domain domain,
-                         const juce::String& reason, bool vertical = false);
+                         const juce::String& reason, bool vertical = false, int registerBits = 0);
+    void updateBitsLabel (SliderRow&);
     void drawCtle (juce::Graphics&, juce::Rectangle<int>);
     void drawCompare (juce::Graphics&, juce::Rectangle<int>);
 

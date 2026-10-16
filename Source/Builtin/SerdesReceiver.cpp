@@ -26,38 +26,40 @@ juce::AudioProcessorValueTreeState::ParameterLayout SerdesReceiver::createLayout
     layout.add (std::make_unique<juce::AudioParameterBool> (P { "enabled", 1 }, "Receiver enabled", true));
     layout.add (std::make_unique<juce::AudioParameterChoice> (P { "output", 1 }, "Output",
                                                               juce::StringArray { "CTLE output (analog)", "Slicer input (after DFE)", "Recovered data (retimed)" }, 1));
-    flt ("target", "Target level (diff FS)", 0.05f, 1.0f, 0.005f, 0.3f);
-
     // Interval = the real register's step size, so the slider (and host automation) can only ever
-    // land on one of its legal codes - matches what getCtleSettings()/handleEvent() quantize to anyway.
-    flt ("ctleboost", "CTLE boost (dB)", 0.0f, 18.0f, RegisterResolution::stepFor (0.0f, 18.0f, RegisterResolution::ctleBoostBits), 6.0f);
-    flt ("ctlezero", "CTLE zero (GHz)", 0.5f, 8.0f, 0.05f, 2.0f);
-    flt ("ctlepole2", "CTLE high pole (GHz)", 4.0f, 30.0f, 0.1f, 16.0f);
-    flt ("ctledc", "CTLE DC gain (dB)", -12.0f, 6.0f, 0.1f, 0.0f);
+    // land on one of its legal codes - matches what getCtleSettings()/processBlock() quantize to anyway.
+    namespace RR = RegisterResolution;
+    flt ("target", "Target level (diff FS)", 0.05f, 1.0f, RR::stepFor (0.05f, 1.0f, RR::agcTargetBits), 0.3f);
+
+    flt ("ctleboost", "CTLE boost (dB)", 0.0f, 18.0f, RR::stepFor (0.0f, 18.0f, RR::ctleBoostBits), 6.0f);
+    flt ("ctlezero", "CTLE zero (GHz)", 0.5f, 8.0f, RR::stepFor (0.5f, 8.0f, RR::ctleZeroBits), 2.0f);
+    flt ("ctlepole2", "CTLE high pole (GHz)", 4.0f, 30.0f, RR::stepFor (4.0f, 30.0f, RR::ctlePole2Bits), 16.0f);
+    flt ("ctledc", "CTLE DC gain (dB)", -12.0f, 6.0f, RR::stepFor (-12.0f, 6.0f, RR::ctleDcGainBits), 0.0f);
     layout.add (std::make_unique<juce::AudioParameterBool> (P { "ctleadapt", 1 }, "Auto-adapt CTLE boost", false));
 
     layout.add (std::make_unique<juce::AudioParameterBool> (P { "dfeadapt", 1 }, "Auto-adapt DFE taps", true));
-    flt ("dfestep", "DFE adaptation step", 0.0001f, 0.01f, 0.0001f, 0.001f, 0.5f);
+    flt ("dfestep", "DFE adaptation step", 0.0001f, 0.01f, RR::stepFor (0.0001f, 0.01f, RR::dfeStepBits), 0.001f, 0.5f);
     for (int k = 0; k < dfeTaps; ++k)
         flt (("dfe" + juce::String (k + 1)).toRawUTF8(), ("DFE tap " + juce::String (k + 1)).toRawUTF8(), -1.0f, 1.0f,
-             RegisterResolution::stepFor (-1.0f, 1.0f, RegisterResolution::dfeTapBits), 0.0f);
+             RR::stepFor (-1.0f, 1.0f, RR::dfeTapBits), 0.0f);
 
-    flt ("cdrkp", "CDR proportional step (mUI)", 0.2f, 20.0f, 0.1f, 3.0f, 0.5f);
-    flt ("cdrki", "CDR integral step (uUI)", 0.0f, 500.0f, 1.0f, 30.0f, 0.5f);
+    flt ("cdrkp", "CDR proportional step (mUI)", 0.2f, 20.0f, RR::stepFor (0.2f, 20.0f, RR::cdrGainBits), 3.0f, 0.5f);
+    flt ("cdrki", "CDR integral step (uUI)", 0.0f, 500.0f, RR::stepFor (0.0f, 500.0f, RR::cdrGainBits), 30.0f, 0.5f);
     flt ("clockppm", "Reference clock offset (ppm)", -5000.0f, 5000.0f, 1.0f, 0.0f);
 
     layout.add (std::make_unique<juce::AudioParameterBool> (P { "feedtrainer", 1 }, "Feed the FFE trainer with the slicer error", false));
     return layout;
 }
 
-// What the boost slider asks for, quantized to what a real CTLE's boost register can actually hold.
+// What the CTLE sliders ask for, quantized to what each real CTLE register can actually hold.
 Ctle::Settings SerdesReceiver::getCtleSettings() const
 {
+    namespace RR = RegisterResolution;
     Ctle::Settings s;
-    s.boostDb = RegisterResolution::quantize (getParam ("ctleboost"), 0.0f, 18.0f, RegisterResolution::ctleBoostBits);
-    s.zeroGHz = getParam ("ctlezero");
-    s.pole2GHz = getParam ("ctlepole2");
-    s.dcGainDb = getParam ("ctledc");
+    s.boostDb = RR::quantize (getParam ("ctleboost"), 0.0f, 18.0f, RR::ctleBoostBits);
+    s.zeroGHz = RR::quantize (getParam ("ctlezero"), 0.5f, 8.0f, RR::ctleZeroBits);
+    s.pole2GHz = RR::quantize (getParam ("ctlepole2"), 4.0f, 30.0f, RR::ctlePole2Bits);
+    s.dcGainDb = RR::quantize (getParam ("ctledc"), -12.0f, 6.0f, RR::ctleDcGainBits);
     return s;
 }
 
@@ -225,13 +227,16 @@ void SerdesReceiver::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiB
     if (getParam ("enabled") < 0.5f || buffer.getNumChannels() < 2)
         return;
 
-    // per-block settings
+    // per-block settings - each quantized to what its real register can actually hold (the parameters'
+    // own NormalisableRange intervals already force this, but quantize explicitly too so the applied
+    // value can never drift from it even if a host sends an unsnapped automation value).
+    namespace RR = RegisterResolution;
     pam4 = link->isPam4();
     unitInterval = link->samplesPerUI (sampleRate);
-    target = getParam ("target");
-    kp = getParam ("cdrkp") * 1.0e-3;
-    ki = getParam ("cdrki") * 1.0e-6;
-    step = getParam ("dfestep");
+    target = RR::quantize (getParam ("target"), 0.05f, 1.0f, RR::agcTargetBits);
+    kp = RR::quantize (getParam ("cdrkp"), 0.2f, 20.0f, RR::cdrGainBits) * 1.0e-3;
+    ki = RR::quantize (getParam ("cdrki"), 0.0f, 500.0f, RR::cdrGainBits) * 1.0e-6;
+    step = RR::quantize (getParam ("dfestep"), 0.0001f, 0.01f, RR::dfeStepBits);
     clockOffset = getParam ("clockppm") * 1.0e-6;
 
     const auto settings = getCtleSettings();

@@ -42,21 +42,27 @@ and share one **line rate** and **NRZ / PAM4** setting, chosen in the main windo
 
 Typical chain: `Signal Generator -> FFE -> Lossy Channel -> Eye Scope` (put the FFE after the channel to model an RX FFE).
 
-**Register resolution.** On real silicon, the FFE's taps, the receiver's CTLE boost and its DFE taps aren't
-continuous values - they're register fields driving a DAC, a fixed number of discrete codes over a fixed
-range. The FFE and the receiver quantize to that automatically and always (not a setting - it models the
-hardware, not a choice about the simulation): FFE and DFE taps snap to 64 codes (6-bit) across their range,
-CTLE boost to 32 codes (5-bit, coarser, matching how real CTLEs are usually a broad analog shape that
-doesn't reward fine steps). This happens at `getEffectiveTaps()`/`getCtleSettings()`, so what gets applied
-and what the FFE's tap plot or the receiver's DFE readout show are both already the quantized value -
-there's no separate "ideal" number hiding underneath. Auto-adapt (FFE training, CTLE auto-adapt) sees the
-same quantized landscape a real link-training loop would, including its occasional consequence: a
-coordinate search can converge to a slightly worse code if the ideal value sits between two quantization
-steps (`Source/Builtin/RegisterResolution.h`). The sliders themselves snap too - each tap/boost parameter's
-own range has its interval set to the register's step size, so dragging one can only ever land on a legal
-code, and the number in its text box always matches what's actually applied (`RegisterResolution::quantize()`
+**Register resolution.** On real silicon, none of a receiver or TX FFE's knobs are continuous values -
+they're register fields driving a DAC or an analog-shape selector, a fixed number of discrete codes over a
+fixed range. Every control that models one quantizes to that automatically and always (not a setting - it
+models the hardware, not a choice about the simulation): FFE and DFE taps to 64 codes (6-bit), CTLE boost
+and DC gain to 32 codes (5-bit), CTLE zero/second-pole and the CDR's Kp/Ki loop gains to 16 codes (4-bit,
+these are typically a small bank of selectable corners/gear-shifted gains on real silicon rather than a fine
+DAC), the AGC target level to 128 codes (7-bit), and the DFE's LMS adaptation step to 16 codes (4-bit,
+approximating the power-of-two "mu select" fields real sign-sign LMS loops often use). This happens at the
+point each value is read for real use (`getEffectiveTaps()`, `getCtleSettings()`, `processBlock()`), so
+what gets applied and what each readout shows are both already the quantized value - there's no separate
+"ideal" number hiding underneath. Auto-adapt (FFE training, CTLE auto-adapt) sees the same quantized
+landscape a real link-training loop would, including its occasional consequence: a coordinate search can
+converge to a slightly worse code if the ideal value sits between two quantization steps
+(`Source/Builtin/RegisterResolution.h`). The sliders themselves snap too - each quantized parameter's own
+range has its interval set to the register's step size, so dragging one can only ever land on a legal code,
+and the number in its text box always matches what's actually applied (`RegisterResolution::quantize()`
 uses the exact same snap formula as `juce::NormalisableRange`, so the two can't disagree even at an exact
 tie, e.g. quantizing a tap's 0.0 default on a symmetric range that has no code sitting exactly at zero).
+Every one of these sliders also shows a small "bits" readout under or beside it - the control's actual
+register contents, as raw bits plus the code and its maximum (e.g. `101010 (42/63)`) - so it's visible
+at a glance that you're really setting a fixed-width digital field, not reading back a continuous number.
 
 - **Signal Generator** - PRBS7/9/11/13/15/23/31, clock 1010, clock 11001100; NRZ or PAM4 (Gray coded); amplitude and
   edge time (raised-cosine, in UI). Ignores its input. `Drive`: differential (default), + leg only, - leg only, or common-mode. **Jitter** is applied to each edge:
