@@ -52,7 +52,11 @@ and what the FFE's tap plot or the receiver's DFE readout show are both already 
 there's no separate "ideal" number hiding underneath. Auto-adapt (FFE training, CTLE auto-adapt) sees the
 same quantized landscape a real link-training loop would, including its occasional consequence: a
 coordinate search can converge to a slightly worse code if the ideal value sits between two quantization
-steps (`Source/Builtin/RegisterResolution.h`).
+steps (`Source/Builtin/RegisterResolution.h`). The sliders themselves snap too - each tap/boost parameter's
+own range has its interval set to the register's step size, so dragging one can only ever land on a legal
+code, and the number in its text box always matches what's actually applied (`RegisterResolution::quantize()`
+uses the exact same snap formula as `juce::NormalisableRange`, so the two can't disagree even at an exact
+tie, e.g. quantizing a tap's 0.0 default on a symmetric range that has no code sitting exactly at zero).
 
 - **Signal Generator** - PRBS7/9/11/13/15/23/31, clock 1010, clock 11001100; NRZ or PAM4 (Gray coded); amplitude and
   edge time (raised-cosine, in UI). Ignores its input. `Drive`: differential (default), + leg only, - leg only, or common-mode. **Jitter** is applied to each edge:

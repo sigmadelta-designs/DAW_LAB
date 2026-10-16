@@ -28,7 +28,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout SerdesReceiver::createLayout
                                                               juce::StringArray { "CTLE output (analog)", "Slicer input (after DFE)", "Recovered data (retimed)" }, 1));
     flt ("target", "Target level (diff FS)", 0.05f, 1.0f, 0.005f, 0.3f);
 
-    flt ("ctleboost", "CTLE boost (dB)", 0.0f, 18.0f, 0.1f, 6.0f);
+    // Interval = the real register's step size, so the slider (and host automation) can only ever
+    // land on one of its legal codes - matches what getCtleSettings()/handleEvent() quantize to anyway.
+    flt ("ctleboost", "CTLE boost (dB)", 0.0f, 18.0f, RegisterResolution::stepFor (0.0f, 18.0f, RegisterResolution::ctleBoostBits), 6.0f);
     flt ("ctlezero", "CTLE zero (GHz)", 0.5f, 8.0f, 0.05f, 2.0f);
     flt ("ctlepole2", "CTLE high pole (GHz)", 4.0f, 30.0f, 0.1f, 16.0f);
     flt ("ctledc", "CTLE DC gain (dB)", -12.0f, 6.0f, 0.1f, 0.0f);
@@ -37,7 +39,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout SerdesReceiver::createLayout
     layout.add (std::make_unique<juce::AudioParameterBool> (P { "dfeadapt", 1 }, "Auto-adapt DFE taps", true));
     flt ("dfestep", "DFE adaptation step", 0.0001f, 0.01f, 0.0001f, 0.001f, 0.5f);
     for (int k = 0; k < dfeTaps; ++k)
-        flt (("dfe" + juce::String (k + 1)).toRawUTF8(), ("DFE tap " + juce::String (k + 1)).toRawUTF8(), -1.0f, 1.0f, 0.001f, 0.0f);
+        flt (("dfe" + juce::String (k + 1)).toRawUTF8(), ("DFE tap " + juce::String (k + 1)).toRawUTF8(), -1.0f, 1.0f,
+             RegisterResolution::stepFor (-1.0f, 1.0f, RegisterResolution::dfeTapBits), 0.0f);
 
     flt ("cdrkp", "CDR proportional step (mUI)", 0.2f, 20.0f, 0.1f, 3.0f, 0.5f);
     flt ("cdrki", "CDR integral step (uUI)", 0.0f, 500.0f, 1.0f, 30.0f, 0.5f);

@@ -28,10 +28,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout DiffFfe::createLayout()
     for (int tap = 0; tap < numTaps; ++tap)
     {
         const bool isMain = tap == mainTap;
+        const float lo = isMain ? 0.0f : -0.6f, hi = isMain ? 1.5f : 0.6f;
+        // Interval = the real tap register's step size, so the slider (and host automation) can only
+        // ever land on one of its 64 legal codes - matches what getEffectiveTaps() quantizes to anyway.
         layout.add (std::make_unique<juce::AudioParameterFloat> (
             juce::ParameterID { tapIds[tap], 1 }, getTapName (tap),
-            isMain ? juce::NormalisableRange<float> (0.0f, 1.5f, 0.005f)
-                   : juce::NormalisableRange<float> (-0.6f, 0.6f, 0.005f),
+            juce::NormalisableRange<float> (lo, hi, RegisterResolution::stepFor (lo, hi, RegisterResolution::ffeTapBits)),
             isMain ? 1.0f : 0.0f));
     }
 
