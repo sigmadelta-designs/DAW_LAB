@@ -278,19 +278,31 @@ void JitterScopeEditor::drawSpectrum (juce::Graphics& g, juce::Rectangle<float> 
     g.setFont (juce::FontOptions (10.0f));
     for (double decade = std::pow (10.0, std::floor (loLog)); decade <= std::pow (10.0, std::ceil (hiLog)); decade *= 10.0)
     {
+        // x() clamps anything below loHz to the left edge, so a decade below the plot's actual lower
+        // bound would draw its gridline/label stacked on top of the real leftmost one instead of off
+        // to the left where it belongs - skip it instead of drawing a false line at the edge.
+        if (decade < loHz)
+            continue;
+
         const float px = x (decade);
         g.setColour (juce::Colours::white.withAlpha (0.12f));
         g.drawVerticalLine ((int) px, area.getY(), area.getBottom());
         g.setColour (juce::Colours::white.withAlpha (0.5f));
         const juce::String label = decade >= 1000.0 ? juce::String (decade / 1000.0, 0) + " kHz" : juce::String (decade, 0) + " Hz";
-        g.drawText (label, (int) px - 30, (int) area.getBottom() - 12, 60, 12, juce::Justification::centred);
+        const int labelX = juce::jmax ((int) area.getX(), (int) px - 30);
+        g.drawText (label, labelX, (int) area.getBottom() - 12, 60, 12, juce::Justification::centred);
     }
     for (float db = dbLo; db <= dbHi; db += 20.0f)
     {
         g.setColour (juce::Colours::white.withAlpha (db == 0.0f ? 0.3f : 0.1f));
         g.drawHorizontalLine ((int) yOf (db), area.getX(), area.getRight());
-        g.setColour (juce::Colours::white.withAlpha (0.5f));
-        g.drawText (juce::String ((int) db), (int) area.getX() + 2, (int) yOf (db) - 11, 40, 12, juce::Justification::left);
+        // Skip the bottom-most line's own label - it sits right where the lowest frequency decade's
+        // label lives too, and the line itself is right at the plot's border anyway.
+        if (db > dbLo)
+        {
+            g.setColour (juce::Colours::white.withAlpha (0.5f));
+            g.drawText (juce::String ((int) db), (int) area.getX() + 2, (int) yOf (db) - 11, 40, 12, juce::Justification::left);
+        }
     }
 
     if (spectrum.size() > 2)
