@@ -1,6 +1,7 @@
 #include "BuiltInFormat.h"
 #include "DiffFfe.h"
 #include "EyeScope.h"
+#include "JitterScope.h"
 #include "LossyChannel.h"
 #include "NoiseInjector.h"
 #include "SerdesReceiver.h"
@@ -21,6 +22,7 @@ namespace
         if (identifier == NoiseInjector::id)   return std::make_unique<NoiseInjector> (link);
         if (identifier == SerdesReceiver::id)  return std::make_unique<SerdesReceiver> (link);
         if (identifier == EyeScope::id)        return std::make_unique<EyeScope> (link);
+        if (identifier == JitterScope::id)     return std::make_unique<JitterScope> (link);
         return nullptr;
     }
 }
@@ -36,7 +38,7 @@ juce::Array<juce::PluginDescription> BuiltInFormat::getDescriptions()
     juce::Array<juce::PluginDescription> descriptions;
     auto scratch = std::make_shared<LinkSettings>();
 
-    for (auto* identifier : { SignalGenerator::id, DiffFfe::id, LossyChannel::id, TraceChannel::id, SParamChannel::id, NoiseInjector::id, SerdesReceiver::id, EyeScope::id })
+    for (auto* identifier : { SignalGenerator::id, DiffFfe::id, LossyChannel::id, TraceChannel::id, SParamChannel::id, NoiseInjector::id, SerdesReceiver::id, EyeScope::id, JitterScope::id })
     {
         juce::PluginDescription description;
         create (identifier, scratch)->fillInPluginDescription (description);

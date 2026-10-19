@@ -35,7 +35,7 @@ un-tooltipped parameter list - now have small dedicated editors (`GeneratorEdito
 
 ## SerDes / TxRx stages (built in)
 
-The chain list starts with four built-in stages. They are ordinary chain members (bypass, reorder, presets all work),
+The chain list starts with the built-in stages below. They are ordinary chain members (bypass, reorder, presets all work),
 and share one **line rate** and **NRZ / PAM4** setting, chosen in the main window. Real time is scaled by 1,000,000:
 **1 GBd on the wire runs as 1 kBd here, and a 5 GHz Nyquist tone is 5 kHz.** Every signal is a differential pair:
 **R = +, L = -**; the eye scope looks at R - L.
@@ -173,6 +173,23 @@ at a glance that you're really setting a fixed-width digital field, not reading 
   even-mode RMS and peak-to-peak and their ratio. Persistence eye diagram over 2 UI, timing recovered from the zero crossings
   (Re-lock if you change something upstream), plus eye height / width readouts and the decision error (NMSE, dB).
   Open its editor to see the eye; the probe runs (and the FFE can train against it) even with the editor closed.
+- **Jitter / Phase Noise Scope** - the timing counterpart to the Eye Scope: same pass-through/View controls, but measures
+  the *time* each data edge actually crosses instead of the *voltage* a sample lands on. Zero crossings are found the
+  same way the Eye Scope's timing recovery does (Catmull-Rom interpolation + a locked reference phase), but here each
+  crossing's deviation from an ideal, evenly spaced clock becomes one time-interval-error (TIE) sample. That reference
+  clock isn't fixed: it tracks phase and frequency with a loop bandwidth deliberately far below anything the spectrum
+  plot can show (a few Hz vs. tens of Hz for its lowest FFT bin at a typical link rate) and over-damped (no peaking) -
+  like a real jitter analyzer's own internal reference, which is built to be transparent to the jitter it measures,
+  not to track it the way a receiver's CDR does. Its editor shows a scrolling TIE strip chart, a jitter histogram,
+  RMS/pk-pk jitter in real-world picoseconds, and a Welch-averaged jitter/phase-noise spectral density plot (log
+  frequency) that calls out the single strongest periodic component (frequency + RMS-equivalent amplitude) when one
+  stands out above the noise floor - so a sinusoidal jitter (SJ) source shows up as a line at its own frequency
+  instead of just inflating the RMS number the way it would on a simple jitter meter. A "Spectral integral check" line
+  cross-checks the two measurement paths against each other (Parseval's theorem: the PSD integrated over frequency
+  should equal the direct time-domain variance) - a good way to see the math is self-consistent, not just trust the
+  numbers. Verified against synthetic waveforms with known injected jitter (`Source/Builtin/JitterAnalyzer.cpp`):
+  measured RMS and detected tone frequency/amplitude matched the true injected values to within 1-3%, and a
+  jitter-free, SJ-free random-only signal correctly reported no dominant tone.
 
 Receiver presets: `NRZ_10G_24_rx_ctle_dfe_lossy_19dB` (a 19 dB channel the receiver equalises with CTLE 12 dB and the DFE; zero errors), `NRZ_10G_25_rx_trace_game21_ctle_autotrain`
 (the CTLE trains itself on load), `PAM4_10G_4_rx_pam4_6dB`, and `NRZ_10G_26_rx_noisy_ber_demo` (noise and jitter chosen to give a measurable BER, about 2e-3, so the
@@ -308,6 +325,7 @@ Every stage is also built as a plugin, so a chain can be assembled in any DAW:
 | DAW_LAB Noise Injector | Dl06 | noise |
 | DAW_LAB Receiver | Dl07 | CTLE / DFE / CDR / slicer, bit comparison |
 | DAW_LAB Eye Scope | Dl08 | eye scope |
+| DAW_LAB Jitter Scope | Dl09 | TIE strip chart, histogram, jitter/phase-noise spectrum |
 
 They are built by the same `cmake --build` and installed to `~/Library/Audio/Plug-Ins/VST3` and
 `.../Components`. Use them as a chain of inserts on one stereo track (R = +, L = -), generator first.

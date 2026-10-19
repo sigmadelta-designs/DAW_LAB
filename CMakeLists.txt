@@ -36,6 +36,9 @@ set(DAWLAB_STAGE_SOURCES
     Source/Builtin/EyeScopeEditor.cpp
     Source/Builtin/FfeEditor.cpp
     Source/Builtin/GeneratorEditor.cpp
+    Source/Builtin/JitterAnalyzer.cpp
+    Source/Builtin/JitterScope.cpp
+    Source/Builtin/JitterScopeEditor.cpp
     Source/Builtin/LossyChannel.cpp
     Source/Builtin/LossyEditor.cpp
     Source/Builtin/NoiseInjector.cpp
@@ -83,6 +86,7 @@ target_compile_definitions(DawLab
 target_link_libraries(DawLab
     PRIVATE
         juce::juce_audio_utils
+        juce::juce_dsp
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
@@ -94,7 +98,7 @@ target_link_libraries(DawLab
 # them in a DAW behaves like the built-in chain: line rate and modulation are set on the Signal Generator.
 # Each is installed to ~/Library/Audio/Plug-Ins after building on macOS (COPY_PLUGIN_AFTER_BUILD, as
 # elsewhere in this family); on Windows that lands in the common VST3 folder instead. Plugin codes
-# Dl01-Dl08 under manufacturer code Vstf. AU is macOS/iOS only, so Windows (and Linux) only get VST3.
+# Dl01-Dl09 under manufacturer code Vstf. AU is macOS/iOS only, so Windows (and Linux) only get VST3.
 if(APPLE)
     set(DAWLAB_STAGE_FORMATS AU VST3)
 else()
@@ -133,6 +137,7 @@ function(dawlab_add_stage target product code header class)
         PRIVATE
             juce::juce_audio_processors
             juce::juce_gui_basics
+            juce::juce_dsp
         PUBLIC
             juce::juce_recommended_config_flags
             juce::juce_recommended_warning_flags)
@@ -146,3 +151,4 @@ dawlab_add_stage(DawLabSParam    "DAW_LAB S-Param Channel"  Dl05 "Builtin/SParam
 dawlab_add_stage(DawLabNoise     "DAW_LAB Noise Injector"   Dl06 "Builtin/NoiseInjector.h"   NoiseInjector)
 dawlab_add_stage(DawLabReceiver  "DAW_LAB Receiver"         Dl07 "Builtin/SerdesReceiver.h"  SerdesReceiver)
 dawlab_add_stage(DawLabEyeScope  "DAW_LAB Eye Scope"        Dl08 "Builtin/EyeScope.h"        EyeScope)
+dawlab_add_stage(DawLabJitter    "DAW_LAB Jitter Scope"     Dl09 "Builtin/JitterScope.h"     JitterScope)
