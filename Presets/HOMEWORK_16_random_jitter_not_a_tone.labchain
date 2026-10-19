@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_16_random_jitter_not_a_tone" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="358.VMjLgzU....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXsAGaoQWcjUlHfXWXrUWY8HBLtHSMh7hO7.UPRETSfjFY8HBYiQlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPlboYWYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBbgQGckImah.hcgwVck0iHz3BLh7hO7.UPRETSfjFY8HhboMWYh.hcgwVck0iHv3BMv.CLv.CLvTSN1.CM1PSMh7hO7.UPRETSfjFY8HhbpIBH1EFa0UVOh.iKvXSMv.CLv.SMvXiMyjCM3DiHu3COPEjTA0DHoQVOhLmZg0Fbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxbpYlbkEmHfXWXrUWY8HRMt.CLv.CLvPyM1fyL2DSM3HxK9vyKSQUPTUjO..">
+    <PARAM id="pattern" value="0.5"/>
+    <PARAM id="drive" value="0.0"/>
+    <PARAM id="amplitude" value="0.4791666865348816"/>
+    <PARAM id="rise" value="0.3684210479259491"/>
+    <PARAM id="rj" value="0.4333333373069763"/>
+    <PARAM id="sjamp" value="0.0"/>
+    <PARAM id="sjfreq" value="0.3502276241779327"/>
+    <PARAM id="dcd" value="0.0"/>
+    <PLUGIN name="SerDes Signal Generator" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.generator" uniqueId="7f6fc3b2"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="7f6fc3b2"/>
+  </SLOT>
+  <SLOT bypassed="0" state="468.VMjLgrb....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXjEFbzIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHsEVZtIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHv81bzEiHfXWXrUWY8HBLt.CL4TiLyfCL3jSM1DCM1HCMh7hO7.UPRETSfjFY8HBbuMGcxHBH1EFa0UVOh.iKv.SN0HyL3.CN4TiMwPiMxPiHu3COPEjTA0DHoQVOh.2ayQ2Lh.hcgwVck0iHv3BLvjSMxLCNvfSN0XSLzXiLzHxK9vCTAIUPMARZj0iHvIWYwHBH1EFa0UVOh.iKv.SN0HyL3.CN4TiMwPiMxPiHu3COPEjTA0DHoQVOh.mbkIiHfXWXrUWY8HBLt.CL4TiLyfCL3jSM1DCM1HCMh7hO7.UPRETSfjFY8HBbxU1Lh.hcgwVck0iHv3BLvjSMxLCNvfSN0XSLzXiLzHxK9vCTAIUPMARZj0iHxUlckI2bkIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHzgWauQVYh.hcgwVck0iHw3BLh7hO77xTTEDUE4C.">
+    <PARAM id="pre3" value="0.5079364776611328"/>
+    <PARAM id="pre2" value="0.5079364776611328"/>
+    <PARAM id="pre1" value="0.5079364776611328"/>
+    <PARAM id="main" value="0.6666666865348816"/>
+    <PARAM id="post1" value="0.5079364776611328"/>
+    <PARAM id="post2" value="0.5079364776611328"/>
+    <PARAM id="post3" value="0.5079364776611328"/>
+    <PARAM id="txmode" value="1.0"/>
+    <PARAM id="reverse" value="0.0"/>
+    <PARAM id="adapt" value="1.0"/>
+    <PLUGIN name="SerDes FFE" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ffe" uniqueId="fc2287c4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="fc2287c4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="127.VMjLgXG....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRYtElXrUFYh.hcgwVck0iHw3BLh7hO7.UPRETSfjFY8HBauM2bh.hcgwVck0iHw.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="enabled" value="1.0"/>
+    <PARAM id="loss" value="0.25"/>
+    <PLUGIN name="SerDes Lossy Channel" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.channel" uniqueId="f90351a2"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="f90351a2"/>
+  </SLOT>
+  <SLOT bypassed="0" state="123.VMjLgHG....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBcnIWch.hcgwVck0iHw3BLh7hO7.UPRETSfjFY8HhcoU1ch.hcgwVck0iHv3BLh7hO77xTTEDUE4C.">
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="view" value="0.0"/>
+    <PLUGIN name="SerDes Jitter / Phase Noise Scope" format="DAW_LAB Built-in"
+            category="SerDes" manufacturer="DAW_LAB" version="1.0" file="lab.jitter"
+            uniqueId="3d5b6c6d" isInstrument="0" fileTime="0" infoUpdateTime="0"
+            numInputs="2" numOutputs="2" isShell="0" hasARAExtension="0"
+            uid="3d5b6c6d"/>
+  </SLOT>
+  <SLOT bypassed="0" state="870.VMjLgz0....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXjI2ZoIBH1EFa0UVOhLyLtLyLyLyLx.iMwbiM2TCNh7hO7.UPRETSfjFY8HxXjI2ZvIBH1EFa0UVOhHiK3LSN4jSN1bSM2TCL2LiLh7hO7.UPRETSfjFY8HxXr81XqAGbsIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHiQGakEFYgAGch.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXzwVYh81ayQmHfXWXrUWY8HBMt.iMzTSL1.iM2TCLzfCNyHxK9vCTAIUPMARZj0iHiQGakQ1Xh.hcgwVck0iHv3RL4LSMzfCLxLyMv.yMwPSLh7hO7.UPRETSfjFY8HxXzwVYv8FakIiHfXWXrUWY8HRL13RLyLyLyLiLvXSL2XyM1HxK9vCTAIUPMARZj0iHiQGakoWYx8lHfXWXrUWY8HhLt.iHu3COPEjTA0DHoQVOhPlYkEiHfXWXrUWY8HRKv3BLwTCN2HSN0jCLzbSM0TSNxHxK9vCTAIUPMARZj0iHjYVYxHBH1EFa0UVOhzBLt.SL0fyMxjSM4.CM2TSM0jiLh7hO7.UPRETSfjFY8HBYlU1Lh.hcgwVck0iHs.iKvDSM3biL4TSNvPyM0TSM4HiHu3COPEjTA0DHoQVOhPlYkQiHfXWXrUWY8HRKv3BLwTCN2HSN0jCLzbSM0TSNxHxK9vCTAIUPMARZj0iHjYVY0HBH1EFa0UVOhzBLt.SL0fyMxjSM4.CM2TSM0jiLh7hO7.UPRETSfjFY8HBYlUVXjEFbzIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHjYVYyQWYvIBH1EFa0UVOh.iKv.CL2TSN4jSN4XiMxPCN3XSN4HxK9vCTAIUPMARZj0iHk4VXhwVYjIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHlUVYjQmbgklakImHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOh7VczAWczIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFch.hcgwVck0iHv3hL4XCN0.yL3LiL3DyMvbCNh7hO77xTTEDUE4C.">
+    <PARAM id="enabled" value="1.0"/>
+    <PARAM id="output" value="0.5"/>
+    <PARAM id="target" value="0.2598425149917603"/>
+    <PARAM id="ctleboost" value="0.2258064448833466"/>
+    <PARAM id="ctlezero" value="0.2000000029802322"/>
+    <PARAM id="ctlepole2" value="0.4666666686534882"/>
+    <PARAM id="ctledc" value="0.6774193644523621"/>
+    <PARAM id="ctleadapt" value="0.0"/>
+    <PARAM id="dfeadapt" value="1.0"/>
+    <PARAM id="dfestep" value="0.2581988871097565"/>
+    <PARAM id="dfe1" value="0.4920635223388672"/>
+    <PARAM id="dfe2" value="0.4920635223388672"/>
+    <PARAM id="dfe3" value="0.4920635223388672"/>
+    <PARAM id="dfe4" value="0.4920635223388672"/>
+    <PARAM id="dfe5" value="0.4920635223388672"/>
+    <PARAM id="cdrkp" value="0.3651483654975891"/>
+    <PARAM id="cdrki" value="0.2581988871097565"/>
+    <PARAM id="clockppm" value="0.5"/>
+    <PARAM id="feedtrainer" value="0.0"/>
+    <PLUGIN name="SerDes Receiver" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.rx" uniqueId="bdcf9247"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="bdcf9247"/>
+  </SLOT>
+  <SLOT bypassed="0" state="240.VMjLgbN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzglb0IBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzIWXo4VYxIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1kVY2IBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1M2XgwVYh.hcgwVck0iHv3RM4jSN4jSN1PiLybiLwLSLh7hO77xTTEDUE4C.">
+    <PARAM id="vscale" value="0.4488795399665833"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="trainer" value="0.0"/>
+    <PARAM id="view" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="SerDes Eye Scope" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.eyescope" uniqueId="81882a04"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="81882a04"/>
+  </SLOT>
+  <HOMEWORK title="Homework 16: Chasing a tone that isn't there" prompt="BER on this link is worse than expected, and a colleague is already convinced it's a new EMI source coupling in from somewhere on the board - they want to start probing around with a near-field H-field probe to find it. Before spending a day chasing hardware, check whether there's actually a dominant periodic component to chase in the first place."
+            hint="Look at the Jitter / Phase Noise Scope's spectrum - is there a clear, narrow spike standing out above the noise floor, or does the whole plot look like a fairly flat, noisy floor? Check the TIE histogram's shape too."
+            explanation="There's no dominant tone here - the spectrum is broadly flat (noisy, but without a standout spike), and the TIE histogram has a smooth, bell-like (roughly Gaussian) shape rather than the sharper, more bounded shape a strong sinusoidal component would produce. This link's jitter is dominated by elevated broadband random jitter (RJ) - e.g. a noisier-than-expected reference clock synthesizer or wideband supply noise - not a specific coupled aggressor. This is a genuinely useful negative result: confirming the absence of a periodic/EMI cause before spending real lab time physically hunting for a phantom tone that was never there. The place to look instead is broadband noise sources - a clock synthesizer's phase-noise floor, supply ripple's noise floor, thermal effects - not a single coupled clock. The lesson isn't &quot;it's never EMI&quot; (homework 14 shows a case where it genuinely was) - it's that you look at the spectrum either way instead of assuming."/>
+</LABCHAIN>

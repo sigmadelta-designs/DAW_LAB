@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_15_jitter_tolerance_exceeded" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="345.VMjLg.U....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXsAGaoQWcjUlHfXWXrUWY8HBLtHSMh7hO7.UPRETSfjFY8HBYiQlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPlboYWYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBbgQGckImah.hcgwVck0iHz3BLh7hO7.UPRETSfjFY8HhboMWYh.hcgwVck0iHv3BMv.CLv.CLvTSN1.CM1PSMh7hO7.UPRETSfjFY8HhbpIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHyoVXsAmHfXWXrUWY8HBLtTCNv.CLv.CMxjSL0LCMzHiHu3COPEjTA0DHoQVOhLmZlIWYwIBH1EFa0UVOhDCLv3BLh7hO77xTTEDUE4C.">
+    <PARAM id="pattern" value="0.5"/>
+    <PARAM id="drive" value="0.0"/>
+    <PARAM id="amplitude" value="0.4791666865348816"/>
+    <PARAM id="rise" value="0.3684210479259491"/>
+    <PARAM id="rj" value="0.0"/>
+    <PARAM id="sjamp" value="0.9666666984558105"/>
+    <PARAM id="sjfreq" value="1.0"/>
+    <PARAM id="dcd" value="0.0"/>
+    <PLUGIN name="SerDes Signal Generator" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.generator" uniqueId="7f6fc3b2"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="7f6fc3b2"/>
+  </SLOT>
+  <SLOT bypassed="0" state="468.VMjLgrb....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXjEFbzIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHsEVZtIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHv81bzEiHfXWXrUWY8HBLt.CL4TiLyfCL3jSM1DCM1HCMh7hO7.UPRETSfjFY8HBbuMGcxHBH1EFa0UVOh.iKv.SN0HyL3.CN4TiMwPiMxPiHu3COPEjTA0DHoQVOh.2ayQ2Lh.hcgwVck0iHv3BLvjSMxLCNvfSN0XSLzXiLzHxK9vCTAIUPMARZj0iHvIWYwHBH1EFa0UVOh.iKv.SN0HyL3.CN4TiMwPiMxPiHu3COPEjTA0DHoQVOh.mbkIiHfXWXrUWY8HBLt.CL4TiLyfCL3jSM1DCM1HCMh7hO7.UPRETSfjFY8HBbxU1Lh.hcgwVck0iHv3BLvjSMxLCNvfSN0XSLzXiLzHxK9vCTAIUPMARZj0iHxUlckI2bkIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHzgWauQVYh.hcgwVck0iHw3BLh7hO77xTTEDUE4C.">
+    <PARAM id="pre3" value="0.5079364776611328"/>
+    <PARAM id="pre2" value="0.5079364776611328"/>
+    <PARAM id="pre1" value="0.5079364776611328"/>
+    <PARAM id="main" value="0.6666666865348816"/>
+    <PARAM id="post1" value="0.5079364776611328"/>
+    <PARAM id="post2" value="0.5079364776611328"/>
+    <PARAM id="post3" value="0.5079364776611328"/>
+    <PARAM id="txmode" value="1.0"/>
+    <PARAM id="reverse" value="0.0"/>
+    <PARAM id="adapt" value="1.0"/>
+    <PLUGIN name="SerDes FFE" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ffe" uniqueId="fc2287c4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="fc2287c4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="126.VMjLgTG....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRYtElXrUFYh.hcgwVck0iHw3BLh7hO7.UPRETSfjFY8HBauM2bh.hcgwVck0iH13BLh7hO77xTTEDUE4C.">
+    <PARAM id="enabled" value="1.0"/>
+    <PARAM id="loss" value="0.1500000059604645"/>
+    <PLUGIN name="SerDes Lossy Channel" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.channel" uniqueId="f90351a2"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="f90351a2"/>
+  </SLOT>
+  <SLOT bypassed="0" state="123.VMjLgHG....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBcnIWch.hcgwVck0iHw3BLh7hO7.UPRETSfjFY8HhcoU1ch.hcgwVck0iHv3BLh7hO77xTTEDUE4C.">
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="view" value="0.0"/>
+    <PLUGIN name="SerDes Jitter / Phase Noise Scope" format="DAW_LAB Built-in"
+            category="SerDes" manufacturer="DAW_LAB" version="1.0" file="lab.jitter"
+            uniqueId="3d5b6c6d" isInstrument="0" fileTime="0" infoUpdateTime="0"
+            numInputs="2" numOutputs="2" isShell="0" hasARAExtension="0"
+            uid="3d5b6c6d"/>
+  </SLOT>
+  <SLOT bypassed="0" state="870.VMjLgz0....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXjI2ZoIBH1EFa0UVOhLyLtLyLyLyLx.iMwbiM2TCNh7hO7.UPRETSfjFY8HxXjI2ZvIBH1EFa0UVOhHiK3LSN4jSN1bSM2TCL2LiLh7hO7.UPRETSfjFY8HxXr81XqAGbsIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHiQGakEFYgAGch.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXzwVYh81ayQmHfXWXrUWY8HhLtjCLyHiL0XiMvLiLz.SN2HxK9vCTAIUPMARZj0iHiQGakQ1Xh.hcgwVck0iHv3RL4LSMzfCLxLyMv.yMwPSLh7hO7.UPRETSfjFY8HxXzwVYv8FakIiHfXWXrUWY8HRL13RLyLyLyLiLvXSL2XyM1HxK9vCTAIUPMARZj0iHiQGakoWYx8lHfXWXrUWY8HhLt.iHu3COPEjTA0DHoQVOhPlYkEiHfXWXrUWY8HRKv3BLwTCN2HSN0jCLzbSM0TSNxHxK9vCTAIUPMARZj0iHjYVYxHBH1EFa0UVOhzBLt.SL0fyMxjSM4.CM2TSM0jiLh7hO7.UPRETSfjFY8HBYlU1Lh.hcgwVck0iHs.iKvDSM3biL4TSNvPyM0TSM4HiHu3COPEjTA0DHoQVOhPlYkQiHfXWXrUWY8HRKv3BLwTCN2HSN0jCLzbSM0TSNxHxK9vCTAIUPMARZj0iHjYVY0HBH1EFa0UVOhzBLt.SL0fyMxjSM4.CM2TSM0jiLh7hO7.UPRETSfjFY8HBYlUVXjEFbzIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHjYVYyQWYvIBH1EFa0UVOh.iKv.CL2TSN4jSN4XiMxPCN3XSN4HxK9vCTAIUPMARZj0iHk4VXhwVYjIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHlUVYjQmbgklakImHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOh7VczAWczIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFch.hcgwVck0iHv3hL4XCN0.yL3LiL3DyMvbCNh7hO77xTTEDUE4C.">
+    <PARAM id="enabled" value="1.0"/>
+    <PARAM id="output" value="0.5"/>
+    <PARAM id="target" value="0.2598425149917603"/>
+    <PARAM id="ctleboost" value="0.161290317773819"/>
+    <PARAM id="ctlezero" value="0.2000000029802322"/>
+    <PARAM id="ctlepole2" value="0.4666666686534882"/>
+    <PARAM id="ctledc" value="0.6774193644523621"/>
+    <PARAM id="ctleadapt" value="0.0"/>
+    <PARAM id="dfeadapt" value="1.0"/>
+    <PARAM id="dfestep" value="0.2581988871097565"/>
+    <PARAM id="dfe1" value="0.4920635223388672"/>
+    <PARAM id="dfe2" value="0.4920635223388672"/>
+    <PARAM id="dfe3" value="0.4920635223388672"/>
+    <PARAM id="dfe4" value="0.4920635223388672"/>
+    <PARAM id="dfe5" value="0.4920635223388672"/>
+    <PARAM id="cdrkp" value="0.3651483654975891"/>
+    <PARAM id="cdrki" value="0.2581988871097565"/>
+    <PARAM id="clockppm" value="0.5"/>
+    <PARAM id="feedtrainer" value="0.0"/>
+    <PLUGIN name="SerDes Receiver" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.rx" uniqueId="bdcf9247"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="bdcf9247"/>
+  </SLOT>
+  <SLOT bypassed="0" state="240.VMjLgbN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzglb0IBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzIWXo4VYxIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1kVY2IBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1M2XgwVYh.hcgwVck0iHv3RM4jSN4jSN1PiLybiLwLSLh7hO77xTTEDUE4C.">
+    <PARAM id="vscale" value="0.4488795399665833"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="trainer" value="0.0"/>
+    <PARAM id="view" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="SerDes Eye Scope" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.eyescope" uniqueId="81882a04"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="81882a04"/>
+  </SLOT>
+  <HOMEWORK title="Homework 15: Same jitter spec, different frequency, different result"
+            prompt="This link passed its jitter tolerance check comfortably at low offset frequency. For a compliance sweep, someone re-ran the same nominal sinusoidal jitter amplitude at a much higher offset frequency, and now the receiver can't hold a clean lock. Nobody touched the receiver's clock recovery settings between the two runs. What's actually different?"
+            hint="Measure the jitter actually hitting the receiver with the Jitter / Phase Noise Scope - read off the dominant tone's frequency. Then check the receiver's CDR loop gains (Kp/Ki) in its editor - are they unusually low, or just normal?"
+            explanation="The CDR's Kp/Ki are left at their normal defaults - this isn't a misconfigured receiver (contrast that with the earlier &quot;CDR too slow&quot; homework, where the gains themselves were the problem). The sinusoidal jitter here is simply at a much higher offset frequency than before, with the same amplitude - and every clock recovery loop has a limited tracking bandwidth no matter how well-tuned its gains are. Jitter well below that bandwidth gets tracked (the CDR's recovered phase just follows it, so bits still land in the right slot); the same amplitude far above it cannot be tracked, so the phase error eats directly into the slicer's margin instead. This is exactly the idea behind a real jitter-tolerance mask in SerDes compliance specs: tolerable sinusoidal jitter amplitude is large at low offset frequency and drops off sharply at high offset frequency, tracing out the receiver's own CDR bandwidth. Passing a jitter tolerance check once, at one frequency, doesn't prove it passes across the whole spec - you have to sweep frequency, not just amplitude, and the Jitter / Phase Noise Scope is how you confirm what frequency you actually stressed it at."/>
+</LABCHAIN>

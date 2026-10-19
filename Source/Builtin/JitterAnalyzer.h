@@ -26,7 +26,11 @@ public:
     static constexpr int tieHistoryLength = 2048;  // on-screen TIE strip-chart / histogram length
     static constexpr int fftOrder = 10;            // 2^10 = 1024-sample Welch segments
     static constexpr int fftSize = 1 << fftOrder;
-    static constexpr int segmentsAveraged = 6;     // Welch averaging - fewer, noisier bins vs more, smoother ones
+    // Welch averaging: more segments means a noticeably steadier noise floor (variance of each bin's
+    // power estimate falls roughly as 1/segmentsAveraged), which matters more than it first looks like -
+    // with too few averages, the single highest of ~500 noisy bins clears even a generous "stands out
+    // above the floor" threshold by pure chance often enough to false-positive a tone that isn't there.
+    static constexpr int segmentsAveraged = 20;
 
     struct Metrics
     {

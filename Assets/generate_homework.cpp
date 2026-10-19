@@ -16,6 +16,7 @@
 //   target_sources(GenerateHomework PRIVATE generate_homework.cpp
 //       ${E}/HostEngine.cpp ${B}/BuiltInFormat.cpp ${B}/BitCompare.cpp ${B}/DiffFfe.cpp ${B}/EyeAnalyzer.cpp
 //       ${B}/EyeScope.cpp ${B}/EyeScopeEditor.cpp ${B}/FfeEditor.cpp ${B}/GeneratorEditor.cpp
+//       ${B}/JitterAnalyzer.cpp ${B}/JitterScope.cpp ${B}/JitterScopeEditor.cpp
 //       ${B}/LossyChannel.cpp ${B}/LossyEditor.cpp ${B}/NoiseInjector.cpp ${B}/NoiseEditor.cpp
 //       ${B}/SignalGenerator.cpp ${B}/SimpleParamEditor.cpp ${B}/ReceiverEditor.cpp ${B}/SerdesReceiver.cpp
 //       ${B}/SParamChannel.cpp ${B}/SParamEditor.cpp ${B}/SParamSynthesis.cpp ${B}/Touchstone.cpp
@@ -23,7 +24,7 @@
 //       ${B}/TraceRouter.cpp ${B}/SymbolProbe.cpp)
 //   target_include_directories(GenerateHomework PRIVATE ${B} ${E})
 //   target_compile_definitions(GenerateHomework PRIVATE JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_MODAL_LOOPS_PERMITTED=1)
-//   target_link_libraries(GenerateHomework PRIVATE juce::juce_audio_utils juce::juce_recommended_config_flags)
+//   target_link_libraries(GenerateHomework PRIVATE juce::juce_audio_utils juce::juce_dsp juce::juce_recommended_config_flags)
 // then run the built binary with the preset directory as its one argument, e.g.
 //   DAW_LAB_MUTE=1 ./GenerateHomework /path/to/LAB_DAW/Presets
 
@@ -31,6 +32,7 @@
 #include "Builtin/BuiltInFormat.h"
 #include "Builtin/BitCompare.h"
 #include "Builtin/EyeAnalyzer.h"
+#include "Builtin/JitterAnalyzer.h"
 #include "Builtin/TraceRouter.h"
 #include "Builtin/SignalGenerator.h"
 #include "Builtin/DiffFfe.h"
@@ -40,6 +42,7 @@
 #include "Builtin/TraceChannel.h"
 #include "Builtin/SParamChannel.h"
 #include "Builtin/EyeScope.h"
+#include "Builtin/JitterScope.h"
 using namespace juce;
 
 static void pump (const std::function<bool()>& until, int ms = 20000)
@@ -83,6 +86,7 @@ struct Homework
     std::function<void (HostEngine&)> build;   // adds stages, sets params/board, in chain order
     int scopeSlot;                             // slot index of the Eye Scope, for the measurement pass
     int rxSlot = -1;                           // slot index of the Receiver, if present (-1: none)
+    int jitterSlot = -1;                       // slot index of the Jitter Scope, if present (-1: none)
 };
 
 int main (int argc, char** argv)
@@ -535,6 +539,120 @@ int main (int argc, char** argv)
             setParam (*e.getPlugin (4), "vscale", 0.6f); setParam (*e.getPlugin (4), "trainer", 0.0f);
         }, 4, 3 });
 
+    // --- 14: a strong, specific periodic jitter tone riding in on an otherwise reasonable-looking link -
+    // the Eye Scope alone can't tell you it's periodic, let alone its frequency; the Jitter Scope can.
+    set.push_back ({
+        "HOMEWORK_14_emi_coupled_jitter",
+        "Homework 14: The eye looks fine, BER isn't",
+        "This link's eye diagram looks reasonably open and the receiver is equalizing normally, but BER "
+            "testing still shows a measurable error rate that the eye alone doesn't explain. The bench next "
+            "to this one was recently set up with a board that uses a common 100 MHz reference oscillator. "
+            "Is that actually related, or a coincidence?",
+        "Add a Jitter / Phase Noise Scope to the chain and look at its spectral density plot. Is there a "
+            "narrow spike standing out above the noise floor - and if so, what frequency is it at?",
+        "The transmitted signal has a strong sinusoidal jitter component at exactly 100 MHz offset - the same "
+            "frequency as that neighbouring board's reference oscillator. A single, specific spectral line "
+            "like this is invisible as a distinguishable root cause from the eye diagram alone: the eye just "
+            "looks a little softer than expected, which could be blamed on dozens of things. The Jitter / "
+            "Phase Noise Scope's spectrum is the right tool here - a narrow, isolated line (not a broad, flat "
+            "noise floor) is the signature of a specific external aggressor, not generic random jitter, and "
+            "its exact frequency is often enough to identify the culprit by matching it against known clocks "
+            "and switching frequencies nearby, exactly like this 100 MHz coincidence. There's no setting to "
+            "flip here - the fix is physical (shielding, spacing, or a guard trace), but finding it starts "
+            "with recognising that spike and reading off its frequency, not guessing from the eye.",
+        [&] (HostEngine& e)
+        {
+            e.link->lineRateGBd = 10.0f; e.link->modulation = LinkSettings::nrz;
+            addStage (SignalGenerator::id); addStage (DiffFfe::id); addStage (LossyChannel::id);
+            addStage (JitterScope::id); addStage (SerdesReceiver::id); addStage (EyeScope::id);
+            setParam (*e.getPlugin (0), "pattern", (float) PrbsGenerator::prbs15);
+            setParam (*e.getPlugin (0), "rj", 0.03f);
+            setParam (*e.getPlugin (0), "sjamp", 0.42f); setParam (*e.getPlugin (0), "sjfreq", 100.0f);
+            setParam (*e.getPlugin (1), "txmode", 1.0f); setParam (*e.getPlugin (1), "adapt", 1.0f);
+            setParam (*e.getPlugin (2), "loss", 12.0f);
+            auto* rx = e.getPlugin (4);
+            setParam (*rx, "ctleboost", 3.3f); setParam (*rx, "dfeadapt", 1.0f);
+            setParam (*e.getPlugin (5), "vscale", 0.6f); setParam (*e.getPlugin (5), "trainer", 0.0f);
+        }, 5, 4, 3 });
+
+    // --- 15: a CDR with perfectly normal loop gains simply can't track sinusoidal jitter this fast - a
+    // jitter-tolerance-vs-frequency issue, not a misconfigured receiver (contrast with #4).
+    set.push_back ({
+        "HOMEWORK_15_jitter_tolerance_exceeded",
+        "Homework 15: Same jitter spec, different frequency, different result",
+        "This link passed its jitter tolerance check comfortably at low offset frequency. For a compliance "
+            "sweep, someone re-ran the same nominal sinusoidal jitter amplitude at a much higher offset "
+            "frequency, and now the receiver can't hold a clean lock. Nobody touched the receiver's clock "
+            "recovery settings between the two runs. What's actually different?",
+        "Measure the jitter actually hitting the receiver with the Jitter / Phase Noise Scope - read off the "
+            "dominant tone's frequency. Then check the receiver's CDR loop gains (Kp/Ki) in its editor - are "
+            "they unusually low, or just normal?",
+        "The CDR's Kp/Ki are left at their normal defaults - this isn't a misconfigured receiver (contrast "
+            "that with the earlier \"CDR too slow\" homework, where the gains themselves were the problem). "
+            "The sinusoidal jitter here is simply at a much higher offset frequency than before, with the "
+            "same amplitude - and every clock recovery loop has a limited tracking bandwidth no matter how "
+            "well-tuned its gains are. Jitter well below that bandwidth gets tracked (the CDR's recovered "
+            "phase just follows it, so bits still land in the right slot); the same amplitude far above it "
+            "cannot be tracked, so the phase error eats directly into the slicer's margin instead. This is "
+            "exactly the idea behind a real jitter-tolerance mask in SerDes compliance specs: tolerable "
+            "sinusoidal jitter amplitude is large at low offset frequency and drops off sharply at high "
+            "offset frequency, tracing out the receiver's own CDR bandwidth. Passing a jitter tolerance check "
+            "once, at one frequency, doesn't prove it passes across the whole spec - you have to sweep "
+            "frequency, not just amplitude, and the Jitter / Phase Noise Scope is how you confirm what "
+            "frequency you actually stressed it at.",
+        [&] (HostEngine& e)
+        {
+            e.link->lineRateGBd = 10.0f; e.link->modulation = LinkSettings::nrz;
+            addStage (SignalGenerator::id); addStage (DiffFfe::id); addStage (LossyChannel::id);
+            addStage (JitterScope::id); addStage (SerdesReceiver::id); addStage (EyeScope::id);
+            setParam (*e.getPlugin (0), "pattern", (float) PrbsGenerator::prbs15);
+            setParam (*e.getPlugin (0), "sjamp", 0.58f); setParam (*e.getPlugin (0), "sjfreq", 100.0f);
+            setParam (*e.getPlugin (1), "txmode", 1.0f); setParam (*e.getPlugin (1), "adapt", 1.0f);
+            setParam (*e.getPlugin (2), "loss", 6.0f);
+            auto* rx = e.getPlugin (4);
+            setParam (*rx, "ctleboost", 3.0f); setParam (*rx, "dfeadapt", 1.0f);
+            // cdrkp/cdrki deliberately left at their normal defaults (3.0 / 30.0) - the point is that even
+            // a properly-tuned loop has a bandwidth limit, not that this one is misconfigured.
+            setParam (*e.getPlugin (5), "vscale", 0.6f); setParam (*e.getPlugin (5), "trainer", 0.0f);
+        }, 5, 4, 3 });
+
+    // --- 16: elevated BER that's actually just broadband random jitter, not a periodic aggressor - the
+    // negative-result counterpart to #14: confirm there's no tone before spending a day chasing one.
+    set.push_back ({
+        "HOMEWORK_16_random_jitter_not_a_tone",
+        "Homework 16: Chasing a tone that isn't there",
+        "BER on this link is worse than expected, and a colleague is already convinced it's a new EMI source "
+            "coupling in from somewhere on the board - they want to start probing around with a near-field "
+            "H-field probe to find it. Before spending a day chasing hardware, check whether there's actually "
+            "a dominant periodic component to chase in the first place.",
+        "Look at the Jitter / Phase Noise Scope's spectrum - is there a clear, narrow spike standing out "
+            "above the noise floor, or does the whole plot look like a fairly flat, noisy floor? Check the "
+            "TIE histogram's shape too.",
+        "There's no dominant tone here - the spectrum is broadly flat (noisy, but without a standout spike), "
+            "and the TIE histogram has a smooth, bell-like (roughly Gaussian) shape rather than the sharper, "
+            "more bounded shape a strong sinusoidal component would produce. This link's jitter is dominated "
+            "by elevated broadband random jitter (RJ) - e.g. a noisier-than-expected reference clock "
+            "synthesizer or wideband supply noise - not a specific coupled aggressor. This is a genuinely "
+            "useful negative result: confirming the absence of a periodic/EMI cause before spending real lab "
+            "time physically hunting for a phantom tone that was never there. The place to look instead is "
+            "broadband noise sources - a clock synthesizer's phase-noise floor, supply ripple's noise floor, "
+            "thermal effects - not a single coupled clock. The lesson isn't \"it's never EMI\" (homework 14 "
+            "shows a case where it genuinely was) - it's that you look at the spectrum either way instead of "
+            "assuming.",
+        [&] (HostEngine& e)
+        {
+            e.link->lineRateGBd = 10.0f; e.link->modulation = LinkSettings::nrz;
+            addStage (SignalGenerator::id); addStage (DiffFfe::id); addStage (LossyChannel::id);
+            addStage (JitterScope::id); addStage (SerdesReceiver::id); addStage (EyeScope::id);
+            setParam (*e.getPlugin (0), "pattern", (float) PrbsGenerator::prbs15);
+            setParam (*e.getPlugin (0), "rj", 0.065f);
+            setParam (*e.getPlugin (1), "txmode", 1.0f); setParam (*e.getPlugin (1), "adapt", 1.0f);
+            setParam (*e.getPlugin (2), "loss", 10.0f);
+            auto* rx = e.getPlugin (4);
+            setParam (*rx, "ctleboost", 4.0f); setParam (*rx, "dfeadapt", 1.0f);
+            setParam (*e.getPlugin (5), "vscale", 0.6f); setParam (*e.getPlugin (5), "trainer", 0.0f);
+        }, 5, 4, 3 });
+
     // --- write ---
     for (auto& hw : set)
     {
@@ -606,6 +724,37 @@ int main (int argc, char** argv)
         {
             std::printf ("LIVE %-38s eye h=%5.1f%% w=%3.0f%% | NMSE %6.1f dB\n", hw.file, m.heightPct, m.widthPct,
                          LinkSettings::nmseToDb (engine.link->probe.nmse.load()));
+        }
+
+        if (hw.jitterSlot >= 0)
+        {
+            auto* jitter = dynamic_cast<JitterScope*> (engine.getPlugin ((size_t) hw.jitterSlot));
+            jitter->setCaptureActive (true);
+            JitterAnalyzer janalyzer;
+            janalyzer.setup (engine.link->samplesPerUI (jitter->getSampleRate()), engine.link->baudHz(), engine.link->isPam4());
+            std::vector<float> js; std::vector<double> jidx;
+            // Needs lockUI (1500) plus a full Welch average (fftSize * segmentsAveraged) worth of UI symbols
+            // to report a spectrum; at 10 GBd (10 kHz sim) that's a couple of seconds, so several more give
+            // comfortable margin.
+            for (int t = 0; t < 220; ++t)
+            {
+                wait (33); js.clear(); jidx.clear(); jitter->readCaptured (js, jidx);
+                size_t rs = 0;
+                for (size_t i = 1; i <= js.size(); ++i)
+                    if (i == js.size() || jidx[i] - jidx[i - 1] > 1.5)
+                    {
+                        if (i > rs) janalyzer.push (js.data() + rs, (int) (i - rs), jidx[rs]);
+                        rs = i;
+                    }
+            }
+            jitter->setCaptureActive (false);
+            auto jm = janalyzer.getMetrics();
+            const double ps = janalyzer.uiToRealPs();
+            std::printf ("     %-38s jitter locked=%d rms=%.2fps pk-pk=%.2fps | tone %s",
+                         "", (int) janalyzer.isLocked(), jm.rmsUI * ps, jm.ppUI * ps, jm.toneAboveNoise ? "YES" : "no");
+            if (jm.toneAboveNoise)
+                std::printf (" %.2fps rms at %.3f MHz", jm.toneUI * ps, jm.toneHzSim);
+            std::printf ("\n");
         }
     }
 

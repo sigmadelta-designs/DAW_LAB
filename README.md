@@ -296,6 +296,9 @@ different chain.
 | `HOMEWORK_11_sparam_wrong_ports` | A real measured Touchstone file, read with the wrong port-pair mapping for how the fixture was cabled |
 | `HOMEWORK_12_wrong_probe_point` | Receiver's Output set to the pre-DFE node - the eye looks unconvincing but the BER is actually fine |
 | `HOMEWORK_13_dfe_step_too_large` | DFE adaptation step too large - it hunts around the optimum instead of settling |
+| `HOMEWORK_14_emi_coupled_jitter` | A specific periodic jitter tone riding on the signal - the eye looks only a little soft, the Jitter Scope's spectrum shows a clear spike |
+| `HOMEWORK_15_jitter_tolerance_exceeded` | The same sinusoidal jitter amplitude as a passing test, at a much higher offset frequency - the CDR's perfectly normal gains simply can't track it |
+| `HOMEWORK_16_random_jitter_not_a_tone` | Elevated BER that's genuinely just broadband random jitter - confirming there's *no* periodic aggressor to chase |
 
 Presets 9-13 use fuller, more realistic chains (every stage that's actually relevant to the fault's domain
 is present and switched on - if the problem is on the receiver, the Receiver stage is there, not modelled
@@ -303,13 +306,28 @@ as a side-effect of an earlier stage's parameter) and were added after a design 
 09/05 modelled an RX-side fault (termination, crosstalk feeding into a BER claim) without actually including
 the Receiver stage. Both were corrected to include it.
 
+Presets 14-16 need the **Jitter / Phase Noise Scope** specifically - their symptom doesn't separate from
+"just noise" or "just a lossy channel" on the Eye Scope alone, only on a frequency-domain jitter measurement.
+14 and 16 are a deliberate contrasting pair: the same "is there an EMI source?" question, one where the
+spectrum says yes (a clear spike, read off its frequency) and one where it says no (a flat, noisy floor -
+don't go chasing a tone that isn't there). 15 is a frequency-domain idea some players may not have met
+before - a receiver's CDR jitter tolerance is frequency-dependent, so the *same* nominal jitter spec can
+pass at one offset frequency and fail at another with no setting changed.
+
 A `HostEngine::Homework` struct (title/prompt/hint/explanation) round-trips through `createChainXml`/
 `loadChain` as an optional `<HOMEWORK>` element, so resaving a homework chain keeps its exercise attached.
 There's no UI to author one - `Assets/generate_homework.cpp` (a one-off generator, not part of the app
-build; its own header comment has the throwaway CMakeLists to build/run it) is how these thirteen were
+build; its own header comment has the throwaway CMakeLists to build/run it) is how these sixteen were
 written and measured live before being committed; several needed real parameter tuning (and, in one case,
 a corrected sign-convention assumption, found by directly comparing measured eye height with and without
-the "fix") to actually demonstrate the failure they claim, not just sound plausible.
+the "fix") to actually demonstrate the failure they claim, not just sound plausible. The three jitter-scope
+scenarios needed more tuning iterations than most: an early attempt at #14 pushed the injected jitter so
+hard the receiver never synced at all (overshooting "measurable but subtle" into "total failure"), and #16
+initially - unintentionally - *did* trip a false positive on the dominant-tone detector, which turned out to
+be a real robustness gap in `JitterAnalyzer` (too few Welch-averaged segments gave a noisy enough per-bin
+estimate that the single highest of ~500 bins cleared the "stands out above the floor" threshold by chance
+often enough to matter); fixed by averaging more segments and raising the threshold, verified against 40
+different pure-random-jitter seeds (0 false positives after the fix, several before it).
 
 ## The stages as VST3 / AU plugins
 

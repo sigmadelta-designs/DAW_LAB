@@ -237,7 +237,7 @@ void JitterAnalyzer::finishAveraging()
 
         result.toneUI = std::sqrt (toneBinPower * binHzSim);
         result.toneHzSim = (double) peakBin * binHzSim;
-        result.toneAboveNoise = peakPower > 6.0 * juce::jmax (meanFloor, 1.0e-20);
+        result.toneAboveNoise = peakPower > 8.0 * juce::jmax (meanFloor, 1.0e-20);
     }
 
     // Direct time-domain stats over the same span the spectrum was just built from (one Welch average's
