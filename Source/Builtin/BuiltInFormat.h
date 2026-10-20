@@ -1,10 +1,14 @@
 #pragma once
 
 #include "BuiltInProcessor.h"
+#include "DdrLinkSettings.h"
 
-// Lets the SerDes stages be created through the ordinary plugin-format machinery,
-// so chains, presets and the host treat them exactly like AU/VST3 plugins.
-// They are not file based, so they are listed directly rather than scanned.
+// Lets the SerDes stages (and, alongside them, the DDR stages) be created through the ordinary
+// plugin-format machinery, so chains, presets and the host treat them exactly like AU/VST3 plugins. They
+// are not file based, so they are listed directly rather than scanned. The SerDes and DDR stages are two
+// independent domains that happen to share this one format/host infrastructure - each carries its own
+// link object (LinkSettings / DdrLinkSettings), since a DDR chain has no use for a line rate and
+// modulation choice, and a SerDes chain has no use for a chip-select bus.
 class BuiltInFormat : public juce::AudioPluginFormat
 {
 public:
@@ -28,4 +32,5 @@ private:
     void createPluginInstance (const juce::PluginDescription&, double, int, PluginCreationCallback) override;
 
     std::shared_ptr<LinkSettings> link;
+    std::shared_ptr<DdrLinkSettings> ddrLink = std::make_shared<DdrLinkSettings>();
 };

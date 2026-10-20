@@ -30,6 +30,8 @@ juce_add_gui_app(DawLab
 # The SerDes stages, shared by the host (which lists them as built-ins) and the plugins.
 set(DAWLAB_STAGE_SOURCES
     Source/Builtin/BitCompare.cpp
+    Source/Builtin/DdrChip.cpp
+    Source/Builtin/DdrController.cpp
     Source/Builtin/DiffFfe.cpp
     Source/Builtin/EyeAnalyzer.cpp
     Source/Builtin/EyeScope.cpp

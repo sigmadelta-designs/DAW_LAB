@@ -253,6 +253,70 @@ Mode / crosstalk presets: `NRZ_10G_15_trace_skewed_common_mode_view` (a skewed b
 More presets: `NRZ_10G_7_good_EQ_jitter` (RJ + SJ + DCD), `NRZ_10G_8_good_EQ_white_noise`, `NRZ_10G_9_good_EQ_crosstalk`,
 `NRZ_10G_11_no_channel` (channel disabled: a clean, jitter-free reference eye).
 
+## DDR stages (built in) - first pass, DDR now, HBM to follow
+
+A second, independent domain alongside the SerDes stages, sharing the same app shell, hover-tip/homework
+system, and plugin-format machinery, but with its own bus and its own shared link object
+(`DdrLinkSettings`, not `LinkSettings` - a DDR chain has no use for a line rate/modulation choice, and a
+SerDes chain has no use for a chip-select bus). `BuiltInProcessor` is now a template
+(`BuiltInProcessorBase<LinkSettingsType>`) parameterised on which link object a stage carries and how many
+channels its bus needs, specifically so this could be added without touching any of the 9 existing SerDes
+stages (`BuiltInProcessor` itself is just `BuiltInProcessorBase<LinkSettings>`, unchanged from their point
+of view).
+
+**The bus** (`Source/Builtin/DdrBus.h`) is one byte lane, modelled with real differential pairs where DDR
+actually has them (CK+/-, DQS+/-, matching this project's existing R+/L- convention) and one real wire per
+supported chip/rank for chip select (one-hot, up to 4 - the same way a real DIMM wires CS, not an encoded
+value): CK, 4x CS, a simplified command code, an address, 8x DQ, DQS. Command/address is deliberately a
+simplified stand-in for DDR's real multi-cycle CA bus (just enough to drive a write/read/idle protocol for
+training purposes, not a literal JEDEC DDR4/DDR5 command encoding), and "one data beat per bus cycle" is a
+placeholder for DDR's real double-pumped-per-clock timing.
+
+**DDR Controller** (`lab.ddrcontroller`) drives the bus and runs a small, continuously-repeating built-in
+self-test (BIST): write a pattern across an address sweep (All zero / All one / Address as data /
+Checkerboard), then read it back and compare, counting mismatches live - the same "run forever, show a
+live error count" idea as the SerDes side's BitCompare, just for memory words instead of a bitstream.
+**Target chip** picks which CS wire it asserts.
+
+**DDR Chip** (`lab.ddrchip`) is the memory side. Its **Chip number** is literally which CS wire it's
+strapped to (`DdrBus::csChannel(chipNumber)`) - the same kind of choice a real package/rank-select pin is -
+and it only ever responds while that wire is asserted, ignoring everything else on the bus exactly like
+real hardware. Writes are genuine signal-level simulation: a DQS edge is the capture clock, and each DQ bit
+is sliced against a trainable **Vref**, a real, common DDR mis-training bug. It never modifies or clears
+the bus - a real multi-drop bus has every chip just listen and pass the signals on, which is what lets
+several `DdrChip` stages (one per rank) sit one after another in an ordinary chain, the way several ranks
+share one real bus.
+
+**Phase 1 / Phase 2 - a deliberate, documented simplification.** DDR's DQ bus is bidirectional (the
+controller drives it on writes, the chip drives it back on reads), but this project's whole existing
+paradigm is a strictly feed-forward plugin chain - there's no clean way to make a chip "talk back upstream"
+without a graph cycle, which needs a host-level change this pass didn't make. So for now: the **write**
+path is real signal-level simulation (a channel stage and an eye/jitter scope placed between the controller
+and a chip mean something real there), and a **read**'s answer is fetched directly from a small shared
+object (`DdrLinkSettings::Readback`, tagged with which address it's actually answering - see the long
+comment on it for why that tagging matters) rather than driven back out through DQ/DQS and a simulated
+channel. True electrical loopback for reads is a planned next step, not an oversight.
+
+Verified directly (not just by inspection) before trusting it, the same discipline used everywhere else in
+this project: a console harness caught and fixed two real bugs before the logic was right - (1) a race
+where the controller's CAS-latency countdown could resolve its read compare before the addressed chip had
+even processed that block yet (several bus cycles happen inside one audio block; a chip's processBlock for
+a block runs strictly after the controller's), fixed by polling for a reply tagged with the actual address
+asked for, bounded by a timeout, instead of trusting a fixed UI count; and (2) the controller re-reading
+its "target chip" parameter live on every cycle, so changing it while a read was still in flight could
+retarget the poll to a different chip's reply slot mid-transaction, fixed by latching the target only when
+a command actually issues. After both fixes: chip-select gating is clean (an unaddressed chip, even with a
+badly wrong Vref, is never touched), the BIST genuinely catches a real fault (an attenuated signal with a
+stale Vref measured ~95% word errors, not a tautological always-pass), and a real chained topology
+(Controller -> Chip0 -> Chip1, addressing Chip1) works correctly.
+
+**Not done yet, by design, in this first pass:** GUI editors for either stage (parameters work, there's
+just no window yet); hooking the Eye Scope/Jitter Scope up to this bus (they currently assume a stereo R/L
+differential pair, same generalisation `BuiltInProcessor` just got); a channel/impairment stage placed on
+this bus; homework scenarios; standalone VST3/AU packaging (an 18-channel bus is unusual for a generic DAW
+insert, so these stay built-in-only for now); and HBM, which was always meant to follow DDR once this
+foundation was solid rather than be built in parallel.
+
 ## Chain presets
 
 Save Preset... / Load Preset... write `.labchain` files (XML, default folder
