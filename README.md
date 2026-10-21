@@ -343,6 +343,40 @@ an eye actually forms on and a Vref is trained against), leaving CK/CS/CMD/ADDR 
 scenario (see Homework 18 below) without yet modelling trace-length skew, reflections, or a fly-by/
 multi-drop topology.
 
+**DDR Eye Scope** (`lab.ddreyescope`) is the DDR-domain counterpart to the SerDes side's Eye Scope, letting
+a chain check a real eye diagram on **DQ0-7 or DQS** - directly answering the question of whether DQ/DQS
+can be examined like any other eye in this tool. A genuinely different stage rather than the existing
+EyeScope stretched to cover both domains, for three real reasons: DQ bits are single-ended (one real wire
+each, no second leg to form a differential odd-mode signal from the way the SerDes side's two-channel bus
+always has), DQS *is* a true differential pair so **Probe** can pick either one specific DQ bit or DQS
+(`dqsP - dqsN`), and there is no DDR-side equivalent of EyeScope's "Feed FFE trainer" probe (nothing on the
+DDR side adaptively trains against this measurement, and `DdrLinkSettings` carries no feedback object the
+way `LinkSettings::probe` does) - so that whole mechanism is simply absent, not stubbed out. Reuses
+`EyeAnalyzer` completely unchanged (it was already generic: a sample stream, a unit-interval length, a PAM4
+flag, nothing else).
+
+Two real, non-obvious things the verification pass for this stage found, not assumed going in:
+- DQ/DQS are only actually driven during a write burst - the controller holds them flat at 0 the rest of
+  the time (reads don't drive DQ back out at all, see Phase 1/Phase 2 below), which is correct bus
+  behaviour but would badly dilute a naively-captured eye (measured height dropped to ~50% in testing)
+  if those long idle stretches were fed to the analyzer along with real traffic. Fixed by only measuring
+  and forwarding samples when the command bus actually reads `write`, letting the sample index jump across
+  each idle stretch - the FIFO reader's existing gap-detection (any index step > 1.5) already splits that
+  into separate contiguous bursts automatically, the same mechanism it already used for ordinary FIFO drops.
+- DQS toggles every **half** of a DQ unit interval (it's the strobe, not the data), so probing it needs the
+  eye analyzer's own "one symbol period" halved, or its zero-crossing clock recovery locks to the wrong
+  rate and the eye collapses to nothing (measured 0% height/width before this fix, a clean, fully locked
+  93-100% eye after). The readout's "UI = ... samples" line reflects this - half the data UI specifically
+  when Probe is set to DQS, with a note explaining why.
+
+A separate, non-bug nuance surfaced the same way: a specific DQ bit's own eye can show "Locking to the data
+edges..." indefinitely under a BIST pattern that happens to toggle that particular bit only rarely (e.g.
+DQ3 under the default "Address as data" pattern only flips once every 8 addresses) - confirmed by switching
+to the Checkerboard pattern (every bit toggles every address) and watching the same bit lock cleanly to a
+full eye in the same test. Real lesson, not a tool limitation: which BIST pattern to run depends on which
+pin's margin you're actually trying to see, the same as choosing a transition-rich pattern (an MPR-based
+one, say) for real per-bit DQ training rather than assuming any pattern reveals every pin's eye equally.
+
 **Phase 1 / Phase 2 - a deliberate, documented simplification.** DDR's DQ bus is bidirectional (the
 controller drives it on writes, the chip drives it back on reads), but this project's whole existing
 paradigm is a strictly feed-forward plugin chain - there's no clean way to make a chip "talk back upstream"
@@ -367,9 +401,10 @@ stale Vref measured ~95% word errors, not a tautological always-pass), and a rea
 (Controller -> Chip0 -> Chip1, addressing Chip1) works correctly.
 
 **Not done yet, by design, in this pass:** GUI editors for the Controller or Lossy Channel stages (DDR
-Chip has one now - parameters work on the other two, there's just no window yet); hooking the Eye Scope/
-Jitter Scope up to this bus (they currently assume a stereo R/L differential pair, same generalisation
-`BuiltInProcessor` just got); a fly-by/multi-drop topology or per-trace length skew in DDR Lossy Channel
+Chip has one now - parameters work on the other two, there's just no window yet); a DDR-side Jitter Scope
+(DDR Eye Scope now exists, above, covering the eye-diagram half of this gap; a jitter/phase-noise view of
+DQS specifically would reuse `JitterAnalyzer` the same way, and is a natural next step rather than done);
+a fly-by/multi-drop topology or per-trace length skew in DDR Lossy Channel
 (DDR Chip's own ODT/ZQ reflection, above, is a single-tap, chip-local simplification, not a real
 multi-drop transmission-line model); real CA sampling against a trained Vref(CA) (this project's CMD/ADDR
 bus carries whole values held constant for a UI rather than a serialised, thresholded signal, so CS/CA
