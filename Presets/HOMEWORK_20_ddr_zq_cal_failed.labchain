@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_20_ddr_zq_cal_failed" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="238.VMjLgTN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhX0I2bzc2axQ1bh.hcgwVck0iH1PiKvHxK9vCTAIUPMARZj0iHiE1brEFck41X4IBH1EFa0UVOhPiKvHxK9vCTAIUPMARZj0iHvEFczUlbtIBH1EFa0UVOhHiKvHxK9vCTAIUPMARZj0iHxUmatklamIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFcigVZvIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="targetchip" value="0.0"/>
+    <PARAM id="pattern" value="0.6666666865348816"/>
+    <PARAM id="burstwords" value="0.2380952388048172"/>
+    <PARAM id="caslatency" value="0.2000000029802322"/>
+    <PARAM id="running" value="1.0"/>
+    <PLUGIN name="DDR Controller" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddrcontroller"
+            uniqueId="1c30c26d" isInstrument="0" fileTime="0" infoUpdateTime="0"
+            numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
+            uid="1c30c26d"/>
+  </SLOT>
+  <SLOT bypassed="0" state="535.VMjLg3f....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhMv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHv3BNwjSN4jSN4HCNzbCMzHiMh7hO7.UPRETSfjFY8HhdwUlbx8lbh.hcgwVck0iHzfiKvHxK9vyKSQUPTUjO..">
+    <PARAM id="chipnumber" value="0.0"/>
+    <PARAM id="vref" value="0.9555556178092957"/>
+    <PARAM id="odt" value="0.1428571492433548"/>
+    <PARAM id="zqerror" value="0.9800000190734863"/>
+    <PARAM id="cstiming" value="0.0"/>
+    <PARAM id="dqskew0" value="0.0"/>
+    <PARAM id="dqskew1" value="0.0"/>
+    <PARAM id="dqskew2" value="0.0"/>
+    <PARAM id="dqskew3" value="0.0"/>
+    <PARAM id="dqskew4" value="0.0"/>
+    <PARAM id="dqskew5" value="0.0"/>
+    <PARAM id="dqskew6" value="0.0"/>
+    <PARAM id="dqskew7" value="0.0"/>
+    <PARAM id="dfe" value="0.0"/>
+    <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
+            version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"
+            isShell="0" hasARAExtension="0" uid="2800a3dd"/>
+  </SLOT>
+  <HOMEWORK title="DDR Homework 4: ZQ calibration never finished cleanly"
+            prompt="This chip's on-die termination is programmed to a perfectly sensible 60 ohm - matched to the board's trace - and Vref was trained carefully, close to the real centre for this channel. The memory test still fails almost every word. Nothing about the *settings* looks wrong by themselves - what haven't you checked yet?"
+            hint="A programmed ODT value isn't the same thing as the chip's *actual* termination. Check whether ZQ calibration (against the external 240 ohm reference) actually landed on that target, or drifted well away from it."
+            explanation="The ODT target (60 ohm) and the trained Vref are both reasonable - the problem is that ZQ calibration itself never landed cleanly: the chip's real, effective termination ends up significantly off from the 60 ohm the mode register asked for. A mismatched termination reflects a scaled copy of the signal back into the same bit roughly a unit interval later - a real, physical echo, not a wrong number on a register readout - and against a Vref trained close to the edge of its margin (which looked fine for a clean channel), that echo is enough to flip bits almost every time data toggles. This is exactly why real DDR controllers re-run ZQ calibration periodically (including a poll after reset) rather than trusting it once: a *programmed* termination value tells you nothing about whether the calibration that was supposed to realise it in silicon actually worked. The fix is to re-run ZQ cal (here, bring the ZQ cal error back toward 0%), not to change the ODT setting that was already correct."/>
+</LABCHAIN>

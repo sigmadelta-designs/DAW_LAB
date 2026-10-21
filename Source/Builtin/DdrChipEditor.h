@@ -28,9 +28,15 @@ private:
 
     juce::ComboBox chipNumberBox;
     juce::Slider vrefSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight };
-    juce::Label chipNumberLabel { {}, "Chip number" }, vrefLabel { {}, "Vref" };
+    juce::Slider odtSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight };
+    juce::Slider zqSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight };
+    juce::Slider csTimingSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight };
+    juce::ToggleButton dfeToggle { "DFE enabled" };
+    juce::Label chipNumberLabel { {}, "Chip number" }, vrefLabel { {}, "Vref" },
+                odtLabel { {}, "ODT (ohm)" }, zqLabel { {}, "ZQ err (%)" }, csTimingLabel { {}, "CS skew (UI)" };
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> chipNumberAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vrefAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vrefAttachment, odtAttachment, zqAttachment, csTimingAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> dfeAttachment;
 
     juce::Rectangle<int> statusArea, columnHeaderArea;
 

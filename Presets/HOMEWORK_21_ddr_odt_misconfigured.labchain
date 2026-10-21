@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_21_ddr_odt_misconfigured" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="238.VMjLgTN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhX0I2bzc2axQ1bh.hcgwVck0iH1PiKvHxK9vCTAIUPMARZj0iHiE1brEFck41X4IBH1EFa0UVOhPiKvHxK9vCTAIUPMARZj0iHvEFczUlbtIBH1EFa0UVOhHiKvHxK9vCTAIUPMARZj0iHxUmatklamIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFcigVZvIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="targetchip" value="0.0"/>
+    <PARAM id="pattern" value="0.6666666865348816"/>
+    <PARAM id="burstwords" value="0.2380952388048172"/>
+    <PARAM id="caslatency" value="0.2000000029802322"/>
+    <PARAM id="running" value="1.0"/>
+    <PLUGIN name="DDR Controller" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddrcontroller"
+            uniqueId="1c30c26d" isInstrument="0" fileTime="0" infoUpdateTime="0"
+            numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
+            uid="1c30c26d"/>
+  </SLOT>
+  <SLOT bypassed="0" state="520.VMjLg7e....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhLz.iKvHxK9vCTAIUPMARZj0iH1IWYlIBH1EFa0UVOh.iK0HxK9vCTAIUPMARZj0iH5EWYxI2axIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="chipnumber" value="0.0"/>
+    <PARAM id="vref" value="0.7777777910232544"/>
+    <PARAM id="odt" value="0.7857142686843872"/>
+    <PARAM id="zqerror" value="0.5"/>
+    <PARAM id="cstiming" value="0.0"/>
+    <PARAM id="dqskew0" value="0.0"/>
+    <PARAM id="dqskew1" value="0.0"/>
+    <PARAM id="dqskew2" value="0.0"/>
+    <PARAM id="dqskew3" value="0.0"/>
+    <PARAM id="dqskew4" value="0.0"/>
+    <PARAM id="dqskew5" value="0.0"/>
+    <PARAM id="dqskew6" value="0.0"/>
+    <PARAM id="dqskew7" value="0.0"/>
+    <PARAM id="dfe" value="0.0"/>
+    <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
+            version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"
+            isShell="0" hasARAExtension="0" uid="2800a3dd"/>
+  </SLOT>
+  <HOMEWORK title="DDR Homework 5: ZQ cal is clean, and it still fails the same way"
+            prompt="This board's memory test fails almost every word, the same way DDR Homework 4's did - but this time, ZQ calibration reports 0% error: whatever the mode register asks for, the chip delivers exactly. If the calibration itself isn't the problem here, what is?"
+            hint="Check what the ODT mode register is actually asking the chip to be calibrated *to* - not whether the calibration hit that target, but whether the target itself makes sense for this bus."
+            explanation="ZQ calibration is genuinely clean here - the chip really does deliver whatever termination its mode register asks for. The register itself is just programmed wrong: it asks for on-die termination effectively off (a very high resistance), far from the bus's matched impedance, rather than a reasonable on value. The result is the identical reflection mechanism as DDR Homework 4 - a mismatched termination echoing a scaled copy of the signal back into later bits - just reached by a different real mistake: a bad ODT *setting*, not a bad *calibration* of an otherwise-correct setting. This is a genuinely useful distinction during bring-up: the same measured symptom (ZQ/ ODT-related data corruption) can come from either a calibration failure or a flat-out wrong mode register value, and you tell them apart by checking the calibration error itself before assuming the programmed target is fine. The fix here is to reprogram ODT to a sensible value, not to re-run a calibration that was never the problem."/>
+</LABCHAIN>

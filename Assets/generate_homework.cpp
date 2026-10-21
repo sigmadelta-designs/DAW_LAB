@@ -17,7 +17,7 @@
 //       ${E}/HostEngine.cpp ${B}/BuiltInFormat.cpp ${B}/BitCompare.cpp ${B}/DiffFfe.cpp ${B}/EyeAnalyzer.cpp
 //       ${B}/EyeScope.cpp ${B}/EyeScopeEditor.cpp ${B}/FfeEditor.cpp ${B}/GeneratorEditor.cpp
 //       ${B}/JitterAnalyzer.cpp ${B}/JitterScope.cpp ${B}/JitterScopeEditor.cpp
-//       ${B}/DdrController.cpp ${B}/DdrChip.cpp ${B}/DdrLossyChannel.cpp
+//       ${B}/DdrController.cpp ${B}/DdrChip.cpp ${B}/DdrChipEditor.cpp ${B}/DdrLossyChannel.cpp
 //       ${B}/LossyChannel.cpp ${B}/LossyEditor.cpp ${B}/NoiseInjector.cpp ${B}/NoiseEditor.cpp
 //       ${B}/SignalGenerator.cpp ${B}/SimpleParamEditor.cpp ${B}/ReceiverEditor.cpp ${B}/SerdesReceiver.cpp
 //       ${B}/SParamChannel.cpp ${B}/SParamEditor.cpp ${B}/SParamSynthesis.cpp ${B}/Touchstone.cpp
@@ -738,6 +738,212 @@ int main (int argc, char** argv)
             setParam (*e.getPlugin (0), "targetchip", 1.0f);   // testing the second rank...
             setParam (*e.getPlugin (1), "chipnumber", 0.0f);   // first chip: correctly chip 0
             setParam (*e.getPlugin (2), "chipnumber", 0.0f);   // ...but the second chip was ALSO left at 0
+        }, -1, -1, -1, 0 });
+
+    // --- 20 (DDR): ZQ calibration against the external 240 ohm reference never completed cleanly - the
+    // target ODT setting is fine, but the chip's *actual* termination lands well off it. Validation-sequence
+    // step: "ZQ calibration trims the DRAM's output driver and ODT resistors against the external 240 ohm
+    // reference."
+    set.push_back ({
+        "HOMEWORK_20_ddr_zq_cal_failed",
+        "DDR Homework 4: ZQ calibration never finished cleanly",
+        "This chip's on-die termination is programmed to a perfectly sensible 60 ohm - matched to the "
+            "board's trace - and Vref was trained carefully, close to the real centre for this channel. The "
+            "memory test still fails almost every word. Nothing about the *settings* looks wrong by "
+            "themselves - what haven't you checked yet?",
+        "A programmed ODT value isn't the same thing as the chip's *actual* termination. Check whether ZQ "
+            "calibration (against the external 240 ohm reference) actually landed on that target, or drifted "
+            "well away from it.",
+        "The ODT target (60 ohm) and the trained Vref are both reasonable - the problem is that ZQ "
+            "calibration itself never landed cleanly: the chip's real, effective termination ends up "
+            "significantly off from the 60 ohm the mode register asked for. A mismatched termination reflects "
+            "a scaled copy of the signal back into the same bit roughly a unit interval later - a real, "
+            "physical echo, not a wrong number on a register readout - and against a Vref trained close to "
+            "the edge of its margin (which looked fine for a clean channel), that echo is enough to flip bits "
+            "almost every time data toggles. This is exactly why real DDR controllers re-run ZQ calibration "
+            "periodically (including a poll after reset) rather than trusting it once: a *programmed* "
+            "termination value tells you nothing about whether the calibration that was supposed to realise "
+            "it in silicon actually worked. The fix is to re-run ZQ cal (here, bring the ZQ cal error back "
+            "toward 0%), not to change the ODT setting that was already correct.",
+        [&] (HostEngine& e)
+        {
+            addStage (DdrController::id); addStage (DdrChip::id);
+            setParam (*e.getPlugin (0), "targetchip", 0.0f);
+            auto* chip = e.getPlugin (1);
+            setParam (*chip, "chipnumber", 0.0f);
+            setParam (*chip, "vref", 0.82f);      // trained close to the edge, assuming a clean ZQ cal
+            setParam (*chip, "odt", 60.0f);       // the programmed target is fine...
+            setParam (*chip, "zqerror", 48.0f);   // ...but the calibration against it badly missed
+        }, -1, -1, -1, 0 });
+
+    // --- 21 (DDR): same reflection mechanism as #20, different real cause - the ODT target itself was
+    // programmed wrong (effectively disabled), with a perfectly clean ZQ calibration. Contrast deliberately
+    // mirrors the existing #17/#19 "same symptom, different cause" pairing.
+    set.push_back ({
+        "HOMEWORK_21_ddr_odt_misconfigured",
+        "DDR Homework 5: ZQ cal is clean, and it still fails the same way",
+        "This board's memory test fails almost every word, the same way DDR Homework 4's did - but this "
+            "time, ZQ calibration reports 0% error: whatever the mode register asks for, the chip delivers "
+            "exactly. If the calibration itself isn't the problem here, what is?",
+        "Check what the ODT mode register is actually asking the chip to be calibrated *to* - not whether "
+            "the calibration hit that target, but whether the target itself makes sense for this bus.",
+        "ZQ calibration is genuinely clean here - the chip really does deliver whatever termination its mode "
+            "register asks for. The register itself is just programmed wrong: it asks for on-die termination "
+            "effectively off (a very high resistance), far from the bus's matched impedance, rather than a "
+            "reasonable on value. The result is the identical reflection mechanism as DDR Homework 4 - a "
+            "mismatched termination echoing a scaled copy of the signal back into later bits - just reached "
+            "by a different real mistake: a bad ODT *setting*, not a bad *calibration* of an otherwise-correct "
+            "setting. This is a genuinely useful distinction during bring-up: the same measured symptom (ZQ/ "
+            "ODT-related data corruption) can come from either a calibration failure or a flat-out wrong mode "
+            "register value, and you tell them apart by checking the calibration error itself before assuming "
+            "the programmed target is fine. The fix here is to reprogram ODT to a sensible value, not to "
+            "re-run a calibration that was never the problem.",
+        [&] (HostEngine& e)
+        {
+            addStage (DdrController::id); addStage (DdrChip::id);
+            setParam (*e.getPlugin (0), "targetchip", 0.0f);
+            auto* chip = e.getPlugin (1);
+            setParam (*chip, "chipnumber", 0.0f);
+            setParam (*chip, "vref", 0.5f);        // an ordinary, well-centred Vref - not the issue this time
+            setParam (*chip, "odt", 240.0f);       // the mode register itself asks for ODT effectively off...
+            setParam (*chip, "zqerror", 0.0f);     // ...and calibration against that (wrong) target is clean
+        }, -1, -1, -1, 0 });
+
+    // --- 22 (DDR): CS/CA training never ran - this chip's own chip-select sampling lags the real signal by
+    // most of a unit interval. Validation-sequence step: "CA/CS training... CS timing, then CA sampling
+    // against the Vref(CA) point."
+    set.push_back ({
+        "HOMEWORK_22_ddr_cs_training_missing",
+        "DDR Homework 6: The controller thinks every read just times out",
+        "CK, the command bus, and chip select are all clearly toggling - a scope on the bus shows completely "
+            "normal-looking activity - but the built-in memory test reports almost nothing but timeouts: it "
+            "waits its full timeout budget on nearly every read, then gives up and counts it as a miss. "
+            "Writes look like they're happening. What would make a chip see activity but still miss its own "
+            "selection?",
+        "CS/CA training aligns *when* a chip samples chip-select against the rest of the command bus - it "
+            "isn't automatic. Check this chip's own CS timing-error setting: is its chip-select sampling "
+            "actually aligned with the real signal, or still lagging from before training ran?",
+        "CS/CA training was simply never run on this chip: its own chip-select sampling lags the real signal "
+            "by most of a unit interval. A read command is only asserted for a single unit interval before the "
+            "controller moves on - with CS sampling arriving this late, the chip's own \"am I selected\" check "
+            "doesn't catch up until that window has already closed, so it misses the read command outright, "
+            "the controller polls for a reply that will never come, and eventually times out and records a "
+            "mismatch. Note that writes do go through here: the write burst holds CS asserted continuously "
+            "across many consecutive unit intervals, so a timing lag that would miss a single brief pulse "
+            "doesn't matter once CS has been high for a while - which is exactly why \"writes look like "
+            "they're happening\" was a real clue, not a red herring. Real DDR5/LPDDR5 CA/CS training exists "
+            "precisely to find and correct this kind of per-chip sampling skew before relying on short, "
+            "individually-addressed commands like reads.",
+        [&] (HostEngine& e)
+        {
+            addStage (DdrController::id); addStage (DdrChip::id);
+            setParam (*e.getPlugin (0), "targetchip", 0.0f);
+            setParam (*e.getPlugin (0), "burstwords", 16.0f);
+            auto* chip = e.getPlugin (1);
+            setParam (*chip, "chipnumber", 0.0f);
+            setParam (*chip, "cstiming", 0.97f);   // CS/CA training never ran on this chip
+        }, -1, -1, -1, 0 });
+
+    // --- 23 (DDR): write levelling never ran - one shared DQS-to-byte-lane skew, all eight bits equally
+    // wrong. Validation-sequence step: "Write levelling aligns DQS to CK at each DRAM... The DRAM samples CK
+    // on the DQS edge and sends the result back on DQ."
+    set.push_back ({
+        "HOMEWORK_23_ddr_write_leveling_missing",
+        "DDR Homework 7: Every single bit of every word is wrong",
+        "This chip's memory test fails almost every word it checks - and when a word is wrong, it's not just "
+            "a bit or two off, the whole byte usually comes back looking unrelated to what was written. "
+            "There's no obvious per-pin pattern to it (it's not consistently one DQ line). What kind of "
+            "mistake corrupts an entire byte lane uniformly like that?",
+        "Check this chip's per-bit DQ deskew settings in its editor (the small indicator under each DQ "
+            "column, or the parameters themselves) - are all eight bits skewed by about the same amount, or "
+            "does one stand out from the rest?",
+        "All eight DQ bits are skewed by the same amount - a single, shared DQS-to-byte-lane timing error, "
+            "which is exactly what write levelling exists to correct and clearly never ran (or was undone by "
+            "a board/trace change since). Because every bit lags identically, the chip captures essentially "
+            "the *previous* word's data for the whole byte rather than the current one - a uniform, whole-byte "
+            "corruption, not an isolated-pin problem. This is the real, textbook write-levelling symptom: DQS "
+            "has to be aligned to CK at each individual DRAM to compensate for fly-by trace-length differences "
+            "between ranks, and until that alignment is trained, every bit in the lane is wrong together, not "
+            "just one troublesome pin. Contrast this with DDR Homework 8 (per-bit write-DQ deskew), where only "
+            "a couple of individual pins are off and the rest of the byte lane is fine - a different real "
+            "training step with a visibly different symptom.",
+        [&] (HostEngine& e)
+        {
+            addStage (DdrController::id); addStage (DdrChip::id);
+            setParam (*e.getPlugin (0), "targetchip", 0.0f);
+            auto* chip = e.getPlugin (1);
+            setParam (*chip, "chipnumber", 0.0f);
+            for (int b = 0; b < 8; ++b)
+                setParam (*chip, "dqskew" + String (b), 0.4f);   // write levelling: never ran, whole byte lane equally skewed
+        }, -1, -1, -1, 0 });
+
+    // --- 24 (DDR): write DQ per-bit deskew left incomplete on just two pins - a sparser, pattern-dependent
+    // symptom, deliberately contrasted with #23's uniform, near-total failure. Validation-sequence step:
+    // "Write DQ training, per-bit deskew plus centering DQ against DQS at the DRAM."
+    set.push_back ({
+        "HOMEWORK_24_ddr_per_bit_deskew_incomplete",
+        "DDR Homework 8: It only fails sometimes, and only on certain data",
+        "This chip's memory test mostly passes - most words check out clean - but a noticeable minority "
+            "consistently come back wrong, and it isn't random: the same handful of addresses keep failing "
+            "every run, while most others are completely solid. Write levelling looks fine (CK and DQS are "
+            "well aligned as a byte lane). What training step is this, if it's not write levelling?",
+        "Open the chip's editor and look at the per-bit DQ deskew indicators under each DQ column - is it "
+            "every bit, evenly, or just one or two that stand out from an otherwise well-trained byte lane?",
+        "Write levelling (the whole-byte-lane DQS-to-CK alignment) is genuinely fine here - the symptom is "
+            "narrower than that. Two individual DQ pins were left with real per-bit deskew error while the "
+            "rest of the byte lane is correctly centred - the training step real DDR calls per-bit write-DQ "
+            "deskew, centring each individual pin's data against DQS rather than the byte lane as a whole. "
+            "Because only two of eight bits are actually wrong, a captured byte is only corrupted on the "
+            "specific words where at least one of those two bits happens to differ from the previous word's "
+            "same bit - which, for ordinary address-counting data, only happens on a minority of addresses. "
+            "That's exactly why this looks \"intermittent\" and \"only on certain data\" rather than totally "
+            "broken: it's a real, sparser failure signature, and it's the reason real DDR training per-bit "
+            "deskews every single DQ pin individually rather than assuming one shared, byte-wide alignment "
+            "(write levelling) is enough.",
+        [&] (HostEngine& e)
+        {
+            addStage (DdrController::id); addStage (DdrChip::id);
+            setParam (*e.getPlugin (0), "targetchip", 0.0f);
+            auto* chip = e.getPlugin (1);
+            setParam (*chip, "chipnumber", 0.0f);
+            setParam (*chip, "dqskew3", 0.4f);   // only two of eight pins left untrained...
+            setParam (*chip, "dqskew6", 0.4f);   // ...the rest of the byte lane is correctly deskewed
+        }, -1, -1, -1, 0 });
+
+    // --- 25 (DDR): the same ODT-mismatch reflection as #21, but this time the intended fix is the chip's
+    // own DFE, not the ODT setting - demonstrating DQ receiver equalization as a real alternative mitigation,
+    // not just "reduce the reflection at its source". Validation-sequence step: "DFE/equalization. DDR5
+    // DRAMs have a 4-tap DFE on the DQ receivers."
+    set.push_back ({
+        "HOMEWORK_25_ddr_dfe_disabled",
+        "DDR Homework 9: There's a DFE right there, and it's off",
+        "This chip has the same ODT-mismatch reflection problem as DDR Homework 5 - the mode register asks "
+            "for termination effectively off - and the test fails almost every word the same way. This time, "
+            "assume the ODT setting itself can't be changed (it's fixed by another requirement on this "
+            "board). Is there anything else on this chip that could still clean this up?",
+        "Check the chip's own DFE control. DDR5 DRAMs carry a real decision-feedback equalizer on their DQ "
+            "receivers specifically to cancel known inter-symbol interference like this - is it actually "
+            "turned on?",
+        "The chip's single-tap DFE is sitting disabled. A DFE cancels inter-symbol interference using the "
+            "receiver's own prior decision - here, specifically the kind of reflection-driven echo an ODT "
+            "mismatch creates - and with it enabled, the same ODT problem that broke DDR Homework 5 is fully "
+            "absorbed: the test passes cleanly even though nothing about the termination itself changed. This "
+            "mirrors a real DDR5 capability: DQ receivers on the DRAM carry their own (4-tap, in a real part) "
+            "DFE for exactly this reason, so a signal-integrity problem that can't be fixed at its physical "
+            "source (board respin required, a fixed ODT requirement elsewhere, etc.) can sometimes still be "
+            "absorbed downstream by turning on equalization that was simply left off. It's not a substitute "
+            "for fixing a real root cause when you can (see DDR Homework 5) - but it's a genuine, real option "
+            "when you can't.",
+        [&] (HostEngine& e)
+        {
+            addStage (DdrController::id); addStage (DdrChip::id);
+            setParam (*e.getPlugin (0), "targetchip", 0.0f);
+            auto* chip = e.getPlugin (1);
+            setParam (*chip, "chipnumber", 0.0f);
+            setParam (*chip, "vref", 0.5f);
+            setParam (*chip, "odt", 240.0f);     // same fixed ODT problem as DDR Homework 5...
+            setParam (*chip, "zqerror", 0.0f);
+            setParam (*chip, "dfe", 0.0f);       // ...but this chip's own DFE is simply left off
         }, -1, -1, -1, 0 });
 
     // --- write ---

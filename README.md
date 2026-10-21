@@ -302,8 +302,39 @@ writes and reads it - the most direct reading of what this simulation actually s
 here means address x bit-position, not a model of a real DRAM's row/column/bank addressing, which this
 simulation doesn't represent). Only the rows actually on screen are drawn, so scrolling through all
 `DdrChip::memoryWords` (4096) stays cheap even though a typical BIST sweep only ever touches a few dozen of
-them. Also exposes **Chip number** and **Vref** directly, and a status line (selected-at-least-once /
-never-selected, plus live words-written/words-read counts).
+them. Also exposes **Chip number** and **Vref** directly, plus the physical properties below, and a status
+line (selected-at-least-once / never-selected, plus live words-written/words-read counts).
+
+**DDR Chip's own trainable physical properties** (added alongside Homeworks 20-25 below, mapped to a real
+DDR/LPDDR5 validation sequence) each have a genuine signal-level consequence on the same write-capture path,
+the same discipline as every other DAW_LAB control:
+
+- **ODT target (ohm)** and **ZQ cal error (%)** model on-die termination and ZQ calibration. ZQ calibration
+  trims a chip's actual termination against an external 240 ohm reference; `effectiveOdt = odt * (1 +
+  zqerror/100)`, and the mismatch between that and the bus's nominal impedance (`DdrBus::nominalImpedanceOhms`,
+  a representative 60 ohm) becomes a real reflection coefficient, `Gamma = (Z-Z0)/(Z+Z0)` - the same formula
+  the SerDes side's Trace Reflections uses, simplified here to a single tap: a scaled echo of the signal
+  fed back roughly one unit interval later. A single bounded reflection (|Gamma| < 1) can never by itself
+  flip an otherwise perfect, full-swing, noiseless bit against a dead-centre Vref - a real finding from this
+  pass's verification harness, not an assumption - so a measurable ODT/ZQ homework always pairs it with a
+  Vref that isn't trivially centred (exactly how real Vref training interacts with whatever reflection
+  environment is actually present).
+- **CS timing error (UI)** models CS/CA training: how many unit intervals late this chip's own chip-select
+  sampling lags the real signal (look-back only, to avoid needing to simulate the future). Untrained CS
+  timing can miss a short, individually-addressed command (like a read) outright, while a long write burst
+  (CS held continuously for many UI) mostly still gets through - a real and useful distinguishing symptom.
+- **DQ0-7 skew (UI)** (`dqskew0..7`) are per-bit deskew: all eight equal models write levelling left undone
+  (a byte-wide DQS-to-CK/lane skew, corrupting essentially every word); only some of them nonzero models
+  per-bit write-DQ deskew training left incomplete (a sparser, data-pattern-dependent symptom - only
+  addresses where that specific bit happens to differ from the previous word's same bit are wrong). The
+  `DdrChipEditor` grid shows a thin colour-coded indicator under each DQ column header (grey at 0, reddening
+  towards the 0.5 UI range limit) so a mis-trained pin is visible at a glance without needing eight more
+  sliders.
+- **DFE enabled** is a single shared-tap decision-feedback equalizer that cancels the *known* ODT/ZQ
+  reflection using the chip's own prior decision - the same sign-sign idea (simplified from DDR5's real
+  4-tap-per-pin reality, and simplified further to use the known Gamma directly rather than adapting to it,
+  since the lesson here is "DFE on vs. off", not convergence speed) as this project's existing SerDes
+  receiver DFE.
 
 **DDR Lossy Channel** (`lab.ddrlossy`) is this bus's counterpart to the SerDes side's LossyChannel, and
 just as deliberately a placeholder: one **DQ/DQS swing** parameter attenuates only those signals (the ones
@@ -338,11 +369,19 @@ stale Vref measured ~95% word errors, not a tautological always-pass), and a rea
 **Not done yet, by design, in this pass:** GUI editors for the Controller or Lossy Channel stages (DDR
 Chip has one now - parameters work on the other two, there's just no window yet); hooking the Eye Scope/
 Jitter Scope up to this bus (they currently assume a stereo R/L differential pair, same generalisation
-`BuiltInProcessor` just got); trace-length skew,
-reflections or a fly-by/multi-drop topology in DDR Lossy Channel; standalone VST3/AU packaging (an
-18-channel bus is unusual for a generic DAW insert, so these stay built-in-only for now); and HBM, which
-was always meant to follow DDR once this foundation was solid rather than be built in parallel. Homework
-scenarios (17-19) do exist now - see "Homework" below.
+`BuiltInProcessor` just got); a fly-by/multi-drop topology or per-trace length skew in DDR Lossy Channel
+(DDR Chip's own ODT/ZQ reflection, above, is a single-tap, chip-local simplification, not a real
+multi-drop transmission-line model); real CA sampling against a trained Vref(CA) (this project's CMD/ADDR
+bus carries whole values held constant for a UI rather than a serialised, thresholded signal, so CS/CA
+training is represented narrowly as a CS-timing-only skew - see Homework 22); read-path training (read
+gate/receive-enable training and read DQ per-bit deskew/centering both need the Phase 2 electrical
+loopback below, which doesn't exist yet); and duty-cycle training (this project's "one data beat per bus
+cycle" placeholder has no independent rising/falling-edge timing for duty-cycle distortion to act on -
+needs the real double-pumped-per-clock timing upgrade first). Vref's own 2D (Vref x timing) joint-training
+nature is covered already, if not literally as a 2D sweep, by Homework 18. Standalone VST3/AU packaging (an
+18-channel bus is unusual for a generic DAW insert) and HBM, which was always meant to follow DDR once this
+foundation was solid rather than be built in parallel, also remain future work. Homework scenarios (17-25)
+do exist now - see "Homework" below.
 
 ## Chain presets
 
@@ -393,6 +432,12 @@ different chain.
 | `HOMEWORK_17_ddr_wrong_chip_targeted` | DDR: controller's Target chip and the only populated chip's Chip number simply disagree - a pure CS strapping/addressing mismatch |
 | `HOMEWORK_18_ddr_vref_not_retrained` | DDR: Vref trained on a near-ideal bench fixture, never retrained for the real board's lossier trace |
 | `HOMEWORK_19_ddr_duplicate_chip_select` | DDR: two populated chips both strapped as chip 0 - a board-assembly mistake with the same symptom as #17 but a different root cause |
+| `HOMEWORK_20_ddr_zq_cal_failed` | DDR: ZQ calibration against the 240 ohm reference never landed cleanly - a real termination mismatch and reflection, not a bad setting |
+| `HOMEWORK_21_ddr_odt_misconfigured` | DDR: ZQ cal is clean, but the ODT mode-register target itself is wrong - the same symptom as #20, a different real cause |
+| `HOMEWORK_22_ddr_cs_training_missing` | DDR: CS/CA training never ran - this chip's own chip-select sampling lags the real signal, missing short commands like reads |
+| `HOMEWORK_23_ddr_write_leveling_missing` | DDR: write levelling never ran - all eight DQ bits skewed equally, corrupting almost every word uniformly |
+| `HOMEWORK_24_ddr_per_bit_deskew_incomplete` | DDR: per-bit write-DQ deskew left incomplete on two pins only - a sparser, data-pattern-dependent failure, contrasted with #23 |
+| `HOMEWORK_25_ddr_dfe_disabled` | DDR: the same ODT problem as #21, fixed a different way - the chip's own DQ receiver DFE is simply left off |
 
 Presets 9-13 use fuller, more realistic chains (every stage that's actually relevant to the fault's domain
 is present and switched on - if the problem is on the receiver, the Receiver stage is there, not modelled
@@ -434,6 +479,28 @@ after the fix (chip stayed silent before, answered correctly - and landed at 98.
 then re-running the full measurement pass across all 19 presets to confirm no regression on the SerDes
 side (whose stages are all 2-channel already, so `min(2, 2)` is unchanged) and that 17/19 still show the
 right symptom for the right reason now.
+
+Presets 20-25 map directly onto a real DDR/LPDDR5 validation/training sequence (ZQ calibration; CA/CS
+training; write levelling; read gate/receive-enable training; read DQ training; write DQ training; Vref
+training as a 2D sweep; DFE/equalization; duty-cycle training), and needed three new trainable physical
+properties on DDR Chip that didn't exist before this pass - **ODT**, **ZQ cal error**, **CS timing error**,
+plus turning the existing per-bit `dqskew0..7` parameters and a new **DFE** toggle into genuine signal-level
+mechanisms (see "DDR stages" above for the Gamma/reflection math). 20/21 are a deliberate pair in the same
+spirit as 17/19: identical ~98% word-error symptom, two different real causes (a calibration that missed
+its target vs. a target that was simply programmed wrong). 23/24 are a deliberate contrast the other way -
+the *same* kind of mistake (per-bit DQ skew) at two different scopes gives two visibly different failure
+rates: write levelling (all eight bits, ~98% of words wrong) vs. incomplete per-bit deskew (two bits,
+~11% of words wrong, and only on the addresses where those specific bits happen to toggle) - a real
+verification-harness finding, not a chosen number: the default BIST pattern is "address as data", not
+checkerboard, so only a fraction of consecutive addresses actually flip any one given bit. 25 reuses 21's
+exact broken setup to make a different point - that a signal-integrity problem a board can't fix at its
+physical source can sometimes still be absorbed by turning on equalization that was simply left disabled.
+Of the nine validation-sequence steps, three are deliberately not represented as homeworks yet, for reasons
+recorded in "DDR stages" above rather than silently skipped: read gate/receive-enable training and read DQ
+training both need the Phase 2 electrical read loopback; duty-cycle training needs the real
+double-pumped-per-clock timing upgrade; and Vref's 2D (Vref x timing) joint-training nature is already
+covered, if not literally as a 2D sweep, by Homework 18. The full validation-sequence reference text this
+pass was built from is kept in this project's memory (`ddr_training_procedures.md`), not duplicated here.
 
 A `HostEngine::Homework` struct (title/prompt/hint/explanation) round-trips through `createChainXml`/
 `loadChain` as an optional `<HOMEWORK>` element, so resaving a homework chain keeps its exercise attached.

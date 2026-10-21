@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_25_ddr_dfe_disabled" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="238.VMjLgTN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhX0I2bzc2axQ1bh.hcgwVck0iH1PiKvHxK9vCTAIUPMARZj0iHiE1brEFck41X4IBH1EFa0UVOhPiKvHxK9vCTAIUPMARZj0iHvEFczUlbtIBH1EFa0UVOhHiKvHxK9vCTAIUPMARZj0iHxUmatklamIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFcigVZvIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="targetchip" value="0.0"/>
+    <PARAM id="pattern" value="0.6666666865348816"/>
+    <PARAM id="burstwords" value="0.2380952388048172"/>
+    <PARAM id="caslatency" value="0.2000000029802322"/>
+    <PARAM id="running" value="1.0"/>
+    <PLUGIN name="DDR Controller" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddrcontroller"
+            uniqueId="1c30c26d" isInstrument="0" fileTime="0" infoUpdateTime="0"
+            numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
+            uid="1c30c26d"/>
+  </SLOT>
+  <SLOT bypassed="0" state="520.VMjLg7e....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhLz.iKvHxK9vCTAIUPMARZj0iH1IWYlIBH1EFa0UVOh.iK0HxK9vCTAIUPMARZj0iH5EWYxI2axIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="chipnumber" value="0.0"/>
+    <PARAM id="vref" value="0.7777777910232544"/>
+    <PARAM id="odt" value="0.7857142686843872"/>
+    <PARAM id="zqerror" value="0.5"/>
+    <PARAM id="cstiming" value="0.0"/>
+    <PARAM id="dqskew0" value="0.0"/>
+    <PARAM id="dqskew1" value="0.0"/>
+    <PARAM id="dqskew2" value="0.0"/>
+    <PARAM id="dqskew3" value="0.0"/>
+    <PARAM id="dqskew4" value="0.0"/>
+    <PARAM id="dqskew5" value="0.0"/>
+    <PARAM id="dqskew6" value="0.0"/>
+    <PARAM id="dqskew7" value="0.0"/>
+    <PARAM id="dfe" value="0.0"/>
+    <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
+            version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"
+            isShell="0" hasARAExtension="0" uid="2800a3dd"/>
+  </SLOT>
+  <HOMEWORK title="DDR Homework 9: There's a DFE right there, and it's off"
+            prompt="This chip has the same ODT-mismatch reflection problem as DDR Homework 5 - the mode register asks for termination effectively off - and the test fails almost every word the same way. This time, assume the ODT setting itself can't be changed (it's fixed by another requirement on this board). Is there anything else on this chip that could still clean this up?"
+            hint="Check the chip's own DFE control. DDR5 DRAMs carry a real decision-feedback equalizer on their DQ receivers specifically to cancel known inter-symbol interference like this - is it actually turned on?"
+            explanation="The chip's single-tap DFE is sitting disabled. A DFE cancels inter-symbol interference using the receiver's own prior decision - here, specifically the kind of reflection-driven echo an ODT mismatch creates - and with it enabled, the same ODT problem that broke DDR Homework 5 is fully absorbed: the test passes cleanly even though nothing about the termination itself changed. This mirrors a real DDR5 capability: DQ receivers on the DRAM carry their own (4-tap, in a real part) DFE for exactly this reason, so a signal-integrity problem that can't be fixed at its physical source (board respin required, a fixed ODT requirement elsewhere, etc.) can sometimes still be absorbed downstream by turning on equalization that was simply left off. It's not a substitute for fixing a real root cause when you can (see DDR Homework 5) - but it's a genuine, real option when you can't."/>
+</LABCHAIN>

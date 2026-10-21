@@ -18,6 +18,13 @@ namespace DdrBus
 {
     constexpr int maxChips = 4;   // one DIMM's worth of ranks, for a first version
 
+    // Representative nominal single-ended impedance this bus's DQ/DQS lines are designed around, used to
+    // turn a chip's actual (ZQ-calibrated) on-die termination into a reflection coefficient the way a real
+    // transmission line would: Gamma = (Z - Z0) / (Z + Z0). Real DDR termination/line impedances vary by
+    // standard and by ODT setting (DDR5 commonly trains to somewhere in the tens-of-ohms range); this is a
+    // representative round number for teaching the *mechanism*, not any one spec's exact value.
+    constexpr double nominalImpedanceOhms = 60.0;
+
     constexpr int ckP = 0, ckN = 1;
     constexpr int cs0 = 2;                        // cs0 .. cs0 + maxChips - 1, one wire per chip/rank
     constexpr int cmd = cs0 + maxChips;            // 6

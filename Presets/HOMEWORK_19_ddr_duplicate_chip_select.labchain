@@ -14,17 +14,41 @@
             numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
             uid="1c30c26d"/>
   </SLOT>
-  <SLOT bypassed="0" state="146.VMjLgjH....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHy3xMxTiL4.iL4fCM1DSNwPSYsjiHu3COuLEUAQUQ9..">
+  <SLOT bypassed="0" state="536.VMjLg7f....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhMv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHy3xMxTiL4.iL4fCM1DSNwPSYsjiHu3COPEjTA0DHoQVOhnWbkImbuImHfXWXrUWY8HBLt.iHu3COuLEUAQUQ9..">
     <PARAM id="chipnumber" value="0.0"/>
     <PARAM id="vref" value="0.5"/>
+    <PARAM id="odt" value="0.1428571492433548"/>
+    <PARAM id="zqerror" value="0.5"/>
+    <PARAM id="cstiming" value="0.0"/>
+    <PARAM id="dqskew0" value="0.0"/>
+    <PARAM id="dqskew1" value="0.0"/>
+    <PARAM id="dqskew2" value="0.0"/>
+    <PARAM id="dqskew3" value="0.0"/>
+    <PARAM id="dqskew4" value="0.0"/>
+    <PARAM id="dqskew5" value="0.0"/>
+    <PARAM id="dqskew6" value="0.0"/>
+    <PARAM id="dqskew7" value="0.0"/>
+    <PARAM id="dfe" value="0.0"/>
     <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
             version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
             fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"
             isShell="0" hasARAExtension="0" uid="2800a3dd"/>
   </SLOT>
-  <SLOT bypassed="0" state="146.VMjLgjH....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHy3xMxTiL4.iL4fCM1DSNwPSYsjiHu3COuLEUAQUQ9..">
+  <SLOT bypassed="0" state="536.VMjLg7f....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhMv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHy3xMxTiL4.iL4fCM1DSNwPSYsjiHu3COPEjTA0DHoQVOhnWbkImbuImHfXWXrUWY8HBLt.iHu3COuLEUAQUQ9..">
     <PARAM id="chipnumber" value="0.0"/>
     <PARAM id="vref" value="0.5"/>
+    <PARAM id="odt" value="0.1428571492433548"/>
+    <PARAM id="zqerror" value="0.5"/>
+    <PARAM id="cstiming" value="0.0"/>
+    <PARAM id="dqskew0" value="0.0"/>
+    <PARAM id="dqskew1" value="0.0"/>
+    <PARAM id="dqskew2" value="0.0"/>
+    <PARAM id="dqskew3" value="0.0"/>
+    <PARAM id="dqskew4" value="0.0"/>
+    <PARAM id="dqskew5" value="0.0"/>
+    <PARAM id="dqskew6" value="0.0"/>
+    <PARAM id="dqskew7" value="0.0"/>
+    <PARAM id="dfe" value="0.0"/>
     <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
             version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
             fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"

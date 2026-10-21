@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_23_ddr_write_leveling_missing" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="238.VMjLgTN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhX0I2bzc2axQ1bh.hcgwVck0iH1PiKvHxK9vCTAIUPMARZj0iHiE1brEFck41X4IBH1EFa0UVOhPiKvHxK9vCTAIUPMARZj0iHvEFczUlbtIBH1EFa0UVOhHiKvHxK9vCTAIUPMARZj0iHxUmatklamIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFcigVZvIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="targetchip" value="0.0"/>
+    <PARAM id="pattern" value="0.6666666865348816"/>
+    <PARAM id="burstwords" value="0.2380952388048172"/>
+    <PARAM id="caslatency" value="0.2000000029802322"/>
+    <PARAM id="running" value="1.0"/>
+    <PLUGIN name="DDR Controller" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddrcontroller"
+            uniqueId="1c30c26d" isInstrument="0" fileTime="0" infoUpdateTime="0"
+            numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
+            uid="1c30c26d"/>
+  </SLOT>
+  <SLOT bypassed="0" state="656.VMjLgbn....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhMv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHy3xMxTiL4.iL4fCM1DSNwPSYsjiHu3COPEjTA0DHoQVOhnWbkImbuImHfXWXrUWY8HBLt.iHu3COuLEUAQUQ9..">
+    <PARAM id="chipnumber" value="0.0"/>
+    <PARAM id="vref" value="0.5"/>
+    <PARAM id="odt" value="0.1428571492433548"/>
+    <PARAM id="zqerror" value="0.5"/>
+    <PARAM id="cstiming" value="0.0"/>
+    <PARAM id="dqskew0" value="0.7999999523162842"/>
+    <PARAM id="dqskew1" value="0.7999999523162842"/>
+    <PARAM id="dqskew2" value="0.7999999523162842"/>
+    <PARAM id="dqskew3" value="0.7999999523162842"/>
+    <PARAM id="dqskew4" value="0.7999999523162842"/>
+    <PARAM id="dqskew5" value="0.7999999523162842"/>
+    <PARAM id="dqskew6" value="0.7999999523162842"/>
+    <PARAM id="dqskew7" value="0.7999999523162842"/>
+    <PARAM id="dfe" value="0.0"/>
+    <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
+            version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"
+            isShell="0" hasARAExtension="0" uid="2800a3dd"/>
+  </SLOT>
+  <HOMEWORK title="DDR Homework 7: Every single bit of every word is wrong"
+            prompt="This chip's memory test fails almost every word it checks - and when a word is wrong, it's not just a bit or two off, the whole byte usually comes back looking unrelated to what was written. There's no obvious per-pin pattern to it (it's not consistently one DQ line). What kind of mistake corrupts an entire byte lane uniformly like that?"
+            hint="Check this chip's per-bit DQ deskew settings in its editor (the small indicator under each DQ column, or the parameters themselves) - are all eight bits skewed by about the same amount, or does one stand out from the rest?"
+            explanation="All eight DQ bits are skewed by the same amount - a single, shared DQS-to-byte-lane timing error, which is exactly what write levelling exists to correct and clearly never ran (or was undone by a board/trace change since). Because every bit lags identically, the chip captures essentially the *previous* word's data for the whole byte rather than the current one - a uniform, whole-byte corruption, not an isolated-pin problem. This is the real, textbook write-levelling symptom: DQS has to be aligned to CK at each individual DRAM to compensate for fly-by trace-length differences between ranks, and until that alignment is trained, every bit in the lane is wrong together, not just one troublesome pin. Contrast this with DDR Homework 8 (per-bit write-DQ deskew), where only a couple of individual pins are off and the rest of the byte lane is fine - a different real training step with a visibly different symptom."/>
+</LABCHAIN>
