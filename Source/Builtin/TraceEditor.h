@@ -55,18 +55,21 @@ private:
                  lossSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight },
                  couplingSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight },
                  aggressorSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight },
+                 extAggressorSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight },
                  reflectionSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight },
                  connectorSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight },
                  sourceSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight },
                  loadSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight };
     juce::Label velocityLabel { {}, "Delay ps/in" }, lossLabel { {}, "Loss x FR4" }, couplingLabel { {}, "Coupling x" }, aggressorLabel { {}, "Aggressor x" },
+                 extAggressorLabel { {}, "Ext. aggr. in" },
                  reflectionLabel { {}, "Reflect x" }, connectorLabel { {}, "Connector %" }, sourceLabel { {}, "Source ohm" }, loadLabel { {}, "Load ohm" };
     juce::TextButton readoutsTab { "Readouts" }, settingsTab { "Settings" }, tdrButton { "TDR" };
-    juce::ToggleButton enabledButton { "Channel enabled" };
+    juce::ToggleButton enabledButton { "Channel enabled" }, extAggressorButton { "Use external aggressor input" };
     // declared after the controls they drive, so they are destroyed first
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> velocityAttachment, lossAttachment, couplingAttachment, aggressorAttachment,
+                                                                                            extAggressorSliderAttachment,
                                                                                             reflectionAttachment, connectorAttachment, sourceAttachment, loadAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> enabledAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> enabledAttachment, extAggressorButtonAttachment;
 
     juce::Rectangle<int> panelArea, gameArea;
     int activeTrace = TraceBoard::plus;

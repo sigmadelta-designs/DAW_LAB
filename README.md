@@ -104,6 +104,17 @@ at a glance that you're really setting a fixed-width digital field, not reading 
     signal-to-crosstalk in dB) and the common-mode pickup. The game adds a crosstalk budget (relative to what the solver
     achieves, tighter with difficulty), and **Auto-solve routes around the lanes** (it pays a length cost for parallel
     runs beside them: about 85% less differential pickup for about 3% more length on average).
+  - **External aggressor input**: the stage's bus is actually 4 channels, not 2 - channels 3/4 are an optional real
+    aggressor input, there for whatever is placed earlier in the chain and happens to drive them (e.g. a second Signal
+    Generator positioned so its own output reaches this far unchanged - every other built-in stage today is 2 channels,
+    so nothing currently drives them without deliberately engineering a 4-wide path to here). **Use external aggressor
+    input** (off by default - every existing preset is unaffected) and **External aggressor coupling** (the same
+    spacing-weighted-inches units the drawn lanes use, hand-set since there is no drawing to derive it from here) couple
+    whatever real signal is actually present, injected as a pure differential disturbance. Left disconnected, or with
+    the toggle off, it has no effect at all - verified directly (0.000 FS measured deviation in both those cases, vs. a
+    real, correctly-sized disturbance only when both the toggle is on and something is actually driving it). Useful for
+    things the synthetic per-lane model can't represent: a specific real pattern instead of canned PRBS23, or jitter
+    correlated between the victim and the aggressor.
   - **Mode measurements** (the *Modes* block, at the link's Nyquist frequency, mixed-mode S-parameters with the usual
     unitary normalisation): odd-mode delay and insertion loss (Sdd21), even-mode delay and loss (Scc21), differential-to-common
     conversion (Sdc21, = Scd21) and the crosstalk when one trace is driven. They are computed from the model and agree

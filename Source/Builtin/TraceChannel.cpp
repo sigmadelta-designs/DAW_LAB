@@ -4,7 +4,7 @@
 #include "TraceEditor.h"
 
 TraceChannel::TraceChannel (std::shared_ptr<LinkSettings> linkSettings)
-    : BuiltInProcessor (id, "SerDes Trace Channel", std::move (linkSettings), createLayout())
+    : BuiltInProcessor (id, "SerDes Trace Channel", std::move (linkSettings), createLayout(), numChannels)
 {
     for (auto* r : { &ring[0], &ring[1], &oddRing, &evenRing, &latticeRing[0], &latticeRing[1] })
         r->assign ((size_t) ringSize, 0.0f);
@@ -32,6 +32,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout TraceChannel::createLayout()
                                                              juce::NormalisableRange<float> (0.0f, 4.0f, 0.01f), 1.0f));
     layout.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "aggressors", 1 }, "Aggressor pickup (x)",
                                                              juce::NormalisableRange<float> (0.0f, 4.0f, 0.01f), 1.0f));
+    layout.add (std::make_unique<juce::AudioParameterBool> (juce::ParameterID { "extaggressor", 1 },
+                                                             "Use external aggressor input", false));
+    layout.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "extaggressorinches", 1 },
+                                                             "External aggressor coupling (weighted in)",
+                                                             juce::NormalisableRange<float> (0.0f, 2.0f, 0.01f), 0.5f));
     layout.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "reflections", 1 }, "Reflection strength (x)",
                                                              juce::NormalisableRange<float> (0.0f, 3.0f, 0.01f), 1.0f));
     layout.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "connector", 1 }, "Pad/connector mismatch (%)",
@@ -170,6 +175,13 @@ void TraceChannel::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuf
         pickup[k][1] = (float) (pickupScale * laneInches[k][1].load());
     }
 
+    // external aggressor input (channels 2/3) - see the class header comment for why this exists and how
+    // it differs from the synthetic per-lane sources above. Silent (zero pickup) unless both the toggle
+    // is on and something upstream is actually driving those channels.
+    const bool extAggressorOn = getParam ("extaggressor") > 0.5f;
+    const float extPickup = (float) (pickupScale * getParam ("extaggressorinches"));
+    const float* extData[2] = { buffer.getReadPointer (extAggressorPlus), buffer.getReadPointer (extAggressorMinus) };
+
     // reflection lattice: pick up a new profile if there is one
     if (appliedProfile != profileVersion.load())
     {
@@ -265,6 +277,16 @@ void TraceChannel::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuf
             const float n = laneSource[k].next();
             data[0][i] += pickup[k][0] * n;
             data[1][i] += pickup[k][1] * n;
+        }
+
+        // external aggressor: whatever is actually driving channels 2/3, injected as a differential
+        // disturbance (opposite sign each leg) rather than scaled per-leg like the drawn lanes, since
+        // there is no drawn geometry here to derive an asymmetry from.
+        if (extAggressorOn)
+        {
+            const float extSample = extData[0][i] - extData[1][i];
+            data[0][i] += extPickup * extSample;
+            data[1][i] -= extPickup * extSample;
         }
     }
 }

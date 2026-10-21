@@ -25,12 +25,27 @@
 // delay of every discontinuity, with the loss of that longer path.
 //
 // The board (obstacles, traces, game state) is drawn in the editor and stored with the stage.
+//
+// Aggressor input: this stage's bus is 4 channels, not 2 - channels 2/3 are an optional external
+// aggressor input (R+/L-, same convention as everywhere else), there for whatever stage ahead of it in
+// the chain happens to drive a real signal onto them (e.g. a second Signal Generator positioned so its
+// own 4-channel-wide output reaches here unchanged). Left unconnected (the ordinary case - every other
+// built-in stage today is 2 channels), the host clears them to silence, "extaggressor" defaults off, and
+// every existing preset behaves exactly as before. Turned on, it couples that real signal onto the
+// victim pair the same way a drawn aggressor lane's simulated one does, except the amplitude and pattern
+// are whatever is actually driving it rather than a canned unit-RMS PRBS - useful for things the
+// synthetic model can't represent, like a specific real pattern, or correlated jitter between victim and
+// aggressor. It is injected as a pure differential disturbance (opposite sign on each leg) since that is
+// the dominant, most relevant crosstalk mode for a differential victim pair - a simplification, like the
+// synthetic lanes not modelling the aggressor's own reflections or loss.
 class TraceChannel : public BuiltInProcessor,
                      private juce::AudioProcessorValueTreeState::Listener,
                      private juce::AsyncUpdater
 {
 public:
     static constexpr const char* id = "lab.trace";
+    static constexpr int numChannels = 4;              // 0/1 the victim pair, 2/3 the external aggressor input
+    static constexpr int extAggressorPlus = 2, extAggressorMinus = 3;
 
     explicit TraceChannel (std::shared_ptr<LinkSettings> linkSettings);
 

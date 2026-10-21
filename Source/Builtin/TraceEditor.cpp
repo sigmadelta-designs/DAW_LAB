@@ -318,6 +318,9 @@ TraceEditor::TraceEditor (TraceChannel& channelToEdit)
     addAndMakeVisible (couplingLabel);
     addAndMakeVisible (aggressorSlider);
     addAndMakeVisible (aggressorLabel);
+    addAndMakeVisible (extAggressorButton);
+    addAndMakeVisible (extAggressorSlider);
+    addAndMakeVisible (extAggressorLabel);
     addAndMakeVisible (enabledButton);
     for (auto* c : std::initializer_list<juce::Component*> { &reflectionSlider, &connectorSlider, &sourceSlider, &loadSlider,
                                                              &reflectionLabel, &connectorLabel, &sourceLabel, &loadLabel,
@@ -352,6 +355,14 @@ TraceEditor::TraceEditor (TraceChannel& channelToEdit)
     aggressorSlider.setTooltip (ControlTip::make ("Aggressor pickup", D::dut,
         "Scales how strongly a neighbouring noisy lane's signal couples onto this pair - the same physical mechanism as "
         "Coupling strength, applied to the board's aggressor lanes."));
+    extAggressorButton.setTooltip (ControlTip::make ("Use external aggressor input", D::simulation,
+        "Couples a real signal from this stage's external aggressor input (channels 3/4 - fed by whatever's placed "
+        "earlier in the chain and happens to drive them) onto this pair, instead of only the drawn lanes' simulated "
+        "noise. A choice about how you've set up this test, not a property of the board. With nothing driving those "
+        "channels, this has no effect either way."));
+    extAggressorSlider.setTooltip (ControlTip::make ("External aggressor coupling", D::dut,
+        "How strongly the external aggressor input couples onto this pair, in the same spacing-weighted-inches terms "
+        "the drawn lanes use - there is no drawing to derive it from, so it is set directly here."));
     reflectionSlider.setTooltip (ControlTip::make ("Reflection strength", D::dut,
         "Scales how much the drawn geometry's impedance bumps (corners, close-run sections) actually perturb the line - "
         "a real board's sensitivity to those discontinuities."));
@@ -387,6 +398,8 @@ TraceEditor::TraceEditor (TraceChannel& channelToEdit)
     lossAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (channel.getParameterTree(), "lossscale", lossSlider);
     couplingAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (channel.getParameterTree(), "coupling", couplingSlider);
     aggressorAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (channel.getParameterTree(), "aggressors", aggressorSlider);
+    extAggressorButtonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (channel.getParameterTree(), "extaggressor", extAggressorButton);
+    extAggressorSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (channel.getParameterTree(), "extaggressorinches", extAggressorSlider);
     reflectionAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (channel.getParameterTree(), "reflections", reflectionSlider);
     connectorAttachment  = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (channel.getParameterTree(), "connector", connectorSlider);
     sourceAttachment     = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (channel.getParameterTree(), "sourcer", sourceSlider);
@@ -419,6 +432,7 @@ TraceEditor::TraceEditor (TraceChannel& channelToEdit)
     lossLabel.setJustificationType (juce::Justification::centredRight);
     couplingLabel.setJustificationType (juce::Justification::centredRight);
     aggressorLabel.setJustificationType (juce::Justification::centredRight);
+    extAggressorLabel.setJustificationType (juce::Justification::centredRight);
 
     refreshButtons();
     channel.boardChanged.addChangeListener (this);
@@ -534,6 +548,8 @@ void TraceEditor::resized()
     place (lossLabel, lossSlider);
     place (couplingLabel, couplingSlider);
     place (aggressorLabel, aggressorSlider);
+    extAggressorButton.setBounds (sliders.removeFromTop (26));
+    place (extAggressorLabel, extAggressorSlider);
     sliders.removeFromTop (10);
     place (reflectionLabel, reflectionSlider);
     place (connectorLabel, connectorSlider);
@@ -545,8 +561,9 @@ void TraceEditor::showPage (bool settings)
 {
     settingsPage = settings;
     for (auto* c : std::initializer_list<juce::Component*> { &enabledButton, &velocitySlider, &lossSlider, &couplingSlider, &aggressorSlider,
+                                                             &extAggressorButton, &extAggressorSlider,
                                                              &reflectionSlider, &connectorSlider, &sourceSlider, &loadSlider,
-                                                             &velocityLabel, &lossLabel, &couplingLabel, &aggressorLabel,
+                                                             &velocityLabel, &lossLabel, &couplingLabel, &aggressorLabel, &extAggressorLabel,
                                                              &reflectionLabel, &connectorLabel, &sourceLabel, &loadLabel })
         c->setVisible (settings);
     repaint();
@@ -707,7 +724,8 @@ void TraceEditor::paint (juce::Graphics& g)
                     panel.removeFromTop (17), juce::Justification::centredLeft);
     }
 
-    if (! board.aggressors.empty())
+    const bool extAggressorOn = channel.getParameterTree().getRawParameterValue ("extaggressor")->load() > 0.5f;
+    if (! board.aggressors.empty() || extAggressorOn)
     {
         const auto report = channel.getAggressorReport();
         panel.removeFromTop (6);
@@ -722,11 +740,22 @@ void TraceEditor::paint (juce::Graphics& g)
                             + juce::String (report.lanes[k].minusInches, 1) + " in",
                         panel.removeFromTop (17), juce::Justification::centredLeft);
 
-        g.setColour (report.sxrDb > 30.0 ? juce::Colours::lightgreen : (report.sxrDb > 20.0 ? juce::Colours::orange : juce::Colours::hotpink));
-        g.drawText ("Differential: " + juce::String (report.differentialRms * 1000.0, 1) + " mFS rms  (S/X " + juce::String (juce::roundToInt (report.sxrDb)) + " dB)",
-                    panel.removeFromTop (17), juce::Justification::centredLeft);
-        g.setColour (juce::Colours::lightgrey);
-        g.drawText ("Common-mode: " + juce::String (report.commonRms * 1000.0, 1) + " mFS rms", panel.removeFromTop (17), juce::Justification::centredLeft);
+        if (! report.lanes.empty())
+        {
+            g.setColour (report.sxrDb > 30.0 ? juce::Colours::lightgreen : (report.sxrDb > 20.0 ? juce::Colours::orange : juce::Colours::hotpink));
+            g.drawText ("Differential: " + juce::String (report.differentialRms * 1000.0, 1) + " mFS rms  (S/X " + juce::String (juce::roundToInt (report.sxrDb)) + " dB)",
+                        panel.removeFromTop (17), juce::Justification::centredLeft);
+            g.setColour (juce::Colours::lightgrey);
+            g.drawText ("Common-mode: " + juce::String (report.commonRms * 1000.0, 1) + " mFS rms", panel.removeFromTop (17), juce::Justification::centredLeft);
+        }
+
+        if (extAggressorOn)
+        {
+            g.setColour (juce::Colours::lightgrey);
+            g.drawFittedText ("+ external aggressor input active (not included in the numbers above - depends on "
+                              "whatever signal is actually driving it, not a fixed unit-RMS source)",
+                              panel.removeFromTop (28), juce::Justification::topLeft, 2);
+        }
     }
 
     // --- reflections
