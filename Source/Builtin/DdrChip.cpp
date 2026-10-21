@@ -1,4 +1,5 @@
 #include "DdrChip.h"
+#include "DdrChipEditor.h"
 
 DdrChip::DdrChip (std::shared_ptr<DdrLinkSettings> linkSettings)
     : BuiltInProcessorBase (id, "DDR Chip", std::move (linkSettings), createLayout(), DdrBus::numChannels)
@@ -68,7 +69,7 @@ void DdrChip::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
         if (selected && cmdValue == DdrBus::read && ! (prevSelected && prevCmd == DdrBus::read))
         {
             auto& rb = link->readback[(size_t) chipNumber];
-            rb.data = memory[(size_t) (addrValue & (memoryWords - 1))];
+            rb.data = memory[(size_t) (addrValue & (memoryWords - 1))].load();
             rb.answeredAddr = addrValue;
             rb.sequence.fetch_add (1);
             rb.valid = true;
@@ -86,4 +87,9 @@ void DdrChip::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
     // DdrLinkSettings, not by driving DQ/DQS back out - see DdrController.h). That's what lets a chain of
     // several DdrChip stages (one per rank, each with its own "chip number") sit one after another and
     // all see the identical bus, the way real chips on a shared bus actually work.
+}
+
+juce::AudioProcessorEditor* DdrChip::createEditor()
+{
+    return new DdrChipEditor (*this);
 }

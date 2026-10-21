@@ -296,7 +296,14 @@ real hardware. Writes are genuine signal-level simulation: a DQS edge is the cap
 is sliced against a trainable **Vref**, a real, common DDR mis-training bug. It never modifies or clears
 the bus - a real multi-drop bus has every chip just listen and pass the signals on, which is what lets
 several `DdrChip` stages (one per rank) sit one after another in an ordinary chain, the way several ranks
-share one real bus.
+share one real bus. Its editor (the first GUI anywhere in the DDR domain) shows the memory array
+"physically": one row per address, one column per DQ bit, a literal 0/1 digit per cell, live as the BIST
+writes and reads it - the most direct reading of what this simulation actually stores ("rows and columns"
+here means address x bit-position, not a model of a real DRAM's row/column/bank addressing, which this
+simulation doesn't represent). Only the rows actually on screen are drawn, so scrolling through all
+`DdrChip::memoryWords` (4096) stays cheap even though a typical BIST sweep only ever touches a few dozen of
+them. Also exposes **Chip number** and **Vref** directly, and a status line (selected-at-least-once /
+never-selected, plus live words-written/words-read counts).
 
 **DDR Lossy Channel** (`lab.ddrlossy`) is this bus's counterpart to the SerDes side's LossyChannel, and
 just as deliberately a placeholder: one **DQ/DQS swing** parameter attenuates only those signals (the ones
@@ -328,9 +335,10 @@ badly wrong Vref, is never touched), the BIST genuinely catches a real fault (an
 stale Vref measured ~95% word errors, not a tautological always-pass), and a real chained topology
 (Controller -> Chip0 -> Chip1, addressing Chip1) works correctly.
 
-**Not done yet, by design, in this pass:** GUI editors for any of the three stages (parameters work,
-there's just no window yet); hooking the Eye Scope/Jitter Scope up to this bus (they currently assume a
-stereo R/L differential pair, same generalisation `BuiltInProcessor` just got); trace-length skew,
+**Not done yet, by design, in this pass:** GUI editors for the Controller or Lossy Channel stages (DDR
+Chip has one now - parameters work on the other two, there's just no window yet); hooking the Eye Scope/
+Jitter Scope up to this bus (they currently assume a stereo R/L differential pair, same generalisation
+`BuiltInProcessor` just got); trace-length skew,
 reflections or a fly-by/multi-drop topology in DDR Lossy Channel; standalone VST3/AU packaging (an
 18-channel bus is unusual for a generic DAW insert, so these stay built-in-only for now); and HBM, which
 was always meant to follow DDR once this foundation was solid rather than be built in parallel. Homework

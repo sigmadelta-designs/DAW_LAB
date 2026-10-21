@@ -25,7 +25,14 @@ public:
     void prepareToPlay (double sampleRate, int) override;
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
-    // No editor yet - see the matching note in DdrController.h.
+    bool hasEditor() const override { return true; }
+    juce::AudioProcessorEditor* createEditor() override;
+
+    // The array's contents, for a GUI to show live - address x DQ-bit-position, the most direct "rows and
+    // columns" reading of what is actually stored (not a model of a real DRAM's row/column/bank addressing,
+    // which this simulation doesn't represent - see DdrChipEditor.h). Thread-safe: the audio thread writes
+    // with ordinary stores through std::atomic, the message thread reads the same way.
+    juce::uint8 getMemoryByte (int address) const noexcept { return memory[(size_t) (address & (memoryWords - 1))].load(); }
 
     struct Status
     {
@@ -40,7 +47,7 @@ private:
     int prevCmd = DdrBus::nop;
     bool prevSelected = false;
 
-    std::array<juce::uint8, memoryWords> memory {};
+    std::array<std::atomic<juce::uint8>, memoryWords> memory {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DdrChip)
 };

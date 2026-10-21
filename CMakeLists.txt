@@ -31,6 +31,7 @@ juce_add_gui_app(DawLab
 set(DAWLAB_STAGE_SOURCES
     Source/Builtin/BitCompare.cpp
     Source/Builtin/DdrChip.cpp
+    Source/Builtin/DdrChipEditor.cpp
     Source/Builtin/DdrController.cpp
     Source/Builtin/DdrLossyChannel.cpp
     Source/Builtin/DiffFfe.cpp
