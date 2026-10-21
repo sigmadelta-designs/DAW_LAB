@@ -17,6 +17,7 @@
 //       ${E}/HostEngine.cpp ${B}/BuiltInFormat.cpp ${B}/BitCompare.cpp ${B}/DiffFfe.cpp ${B}/EyeAnalyzer.cpp
 //       ${B}/EyeScope.cpp ${B}/EyeScopeEditor.cpp ${B}/FfeEditor.cpp ${B}/GeneratorEditor.cpp
 //       ${B}/JitterAnalyzer.cpp ${B}/JitterScope.cpp ${B}/JitterScopeEditor.cpp
+//       ${B}/DdrController.cpp ${B}/DdrChip.cpp ${B}/DdrLossyChannel.cpp
 //       ${B}/LossyChannel.cpp ${B}/LossyEditor.cpp ${B}/NoiseInjector.cpp ${B}/NoiseEditor.cpp
 //       ${B}/SignalGenerator.cpp ${B}/SimpleParamEditor.cpp ${B}/ReceiverEditor.cpp ${B}/SerdesReceiver.cpp
 //       ${B}/SParamChannel.cpp ${B}/SParamEditor.cpp ${B}/SParamSynthesis.cpp ${B}/Touchstone.cpp
@@ -43,6 +44,9 @@
 #include "Builtin/SParamChannel.h"
 #include "Builtin/EyeScope.h"
 #include "Builtin/JitterScope.h"
+#include "Builtin/DdrController.h"
+#include "Builtin/DdrChip.h"
+#include "Builtin/DdrLossyChannel.h"
 using namespace juce;
 
 static void pump (const std::function<bool()>& until, int ms = 20000)
@@ -84,9 +88,11 @@ struct Homework
     const char* file;
     String title, prompt, hint, explanation;
     std::function<void (HostEngine&)> build;   // adds stages, sets params/board, in chain order
-    int scopeSlot;                             // slot index of the Eye Scope, for the measurement pass
+    int scopeSlot = -1;                        // slot index of the Eye Scope, for the measurement pass
     int rxSlot = -1;                           // slot index of the Receiver, if present (-1: none)
     int jitterSlot = -1;                       // slot index of the Jitter Scope, if present (-1: none)
+    int ddrControllerSlot = -1;                // slot index of the DDR Controller - a wholly different
+                                                // measurement path (BIST word counters, not an eye/BER)
 };
 
 int main (int argc, char** argv)
@@ -653,6 +659,87 @@ int main (int argc, char** argv)
             setParam (*e.getPlugin (5), "vscale", 0.6f); setParam (*e.getPlugin (5), "trainer", 0.0f);
         }, 5, 4, 3 });
 
+    // --- 17 (DDR): controller and chip simply disagree on which CS line is in use - no signal problem
+    // at all, a pure protocol/strapping mismatch, the simplest possible DDR bring-up bug.
+    set.push_back ({
+        "HOMEWORK_17_ddr_wrong_chip_targeted",
+        "DDR Homework 1: Reads never come back",
+        "This board has exactly one DDR chip populated, but the built-in memory test never passes a "
+            "single word - every read comes back wrong, as if nothing is even there. CK and the command "
+            "bus are clearly toggling into the chip (you can see the activity), so it isn't dead or "
+            "unpowered. What's actually missing?",
+        "Check the controller's Target chip setting against the chip's own Chip number setting - do they "
+            "agree on which CS line is actually in use?",
+        "The controller's Target chip is set to chip 1, but the only chip on this board is strapped as "
+            "chip number 0 - the controller is asserting CS1, a line nothing on this board is wired to "
+            "answer. The chip isn't broken or unselected by a signal problem; it's faithfully ignoring "
+            "every command because CS1 was simply never its line. This is a real, easy bring-up mistake: a "
+            "rank-select register programmed for a populated slot that doesn't match the board, or a strap "
+            "wired to the wrong CS pin during assembly. Matching Target chip to the chip that's actually "
+            "there fixes it immediately - there's nothing to retrain or re-tune.",
+        [&] (HostEngine& e)
+        {
+            addStage (DdrController::id); addStage (DdrChip::id);
+            setParam (*e.getPlugin (0), "targetchip", 1.0f);   // asks for chip 1...
+            setParam (*e.getPlugin (1), "chipnumber", 0.0f);   // ...but the only chip here is strapped as 0
+        }, -1, -1, -1, 0 });
+
+    // --- 18 (DDR): Vref trained for a near-ideal bench connection, carried over unchanged to a real,
+    // lossier board trace - needs the new DDR Lossy Channel stage to be a genuine signal-level scenario.
+    set.push_back ({
+        "HOMEWORK_18_ddr_vref_not_retrained",
+        "DDR Homework 2: Passed on the bench, fails once installed",
+        "This chip was characterized and Vref-trained on an open bench fixture, where it tested perfectly. "
+            "Installed on the real board, with the real trace between the controller and the chip, the "
+            "memory test now fails almost every word. The chip tests fine again if you put it back on the "
+            "bench fixture. What changed?",
+        "Compare the DQ swing this board's trace actually delivers (the DDR Lossy Channel's setting) "
+            "against the Vref the chip is still using. Was Vref retrained for this board's real channel, "
+            "or carried over from somewhere else?",
+        "This board's real trace attenuates the DQ/DQS swing to about 30% of ideal, but the chip's Vref is "
+            "still 0.6 - left over from the bench fixture's essentially ideal, near-full-swing connection. "
+            "A Vref trained for a near-ideal swing sits far outside the real, attenuated eye, so almost "
+            "every bit slices to the same fixed value no matter what's actually driven. This is a real and "
+            "common bring-up lesson: Vref (like any receiver calibration) has to be retrained for the "
+            "ACTUAL channel a part will see in the field, not assumed to carry over from a bench or "
+            "reference setup - a part that tests perfectly in isolation can still fail once installed on "
+            "the real board it has to work on.",
+        [&] (HostEngine& e)
+        {
+            addStage (DdrController::id); addStage (DdrLossyChannel::id); addStage (DdrChip::id);
+            setParam (*e.getPlugin (0), "targetchip", 0.0f);
+            setParam (*e.getPlugin (1), "swing", 30.0f);       // this board's real trace: only 30% of ideal swing survives
+            setParam (*e.getPlugin (2), "chipnumber", 0.0f);
+            setParam (*e.getPlugin (2), "vref", 0.6f);         // trained for the bench fixture's near-ideal swing, not this
+        }, -1, -1, -1, 0 });
+
+    // --- 19 (DDR): two populated chips, but both strapped as the same chip number - a board-assembly
+    // mistake, not a missing/dead part, and a different root cause from #17 despite the same symptom.
+    set.push_back ({
+        "HOMEWORK_19_ddr_duplicate_chip_select",
+        "DDR Homework 3: Second rank never answers, first rank is fine",
+        "This board has two DDR chips populated as two separate ranks. The first rank's memory test runs "
+            "clean. The second rank's test never gets a single word back, as if it isn't populated at all "
+            "- but it physically is, and both chips show the same CK/command activity on a scope. What's "
+            "wrong?",
+        "Check each populated chip's own Chip number setting - do the two chips actually disagree with "
+            "each other, the way two separate ranks should?",
+        "Both chips are strapped Chip number = 0 - a board assembly mistake, not a missing or dead part: "
+            "the second chip's CS strap was never actually changed from the first rank's wiring. When the "
+            "controller addresses \"chip 1\" to test the second rank, nothing on the board answers CS1, "
+            "because nothing is actually wired to it - both chips are listening on CS0 instead. This is a "
+            "different root cause from the single-chip \"wrong target\" homework (DDR Homework 1) even "
+            "though the symptom looks identical: a populated-but-silent rank means check chip-select "
+            "strapping on every populated chip, not just assume the one you can't reach is faulty or "
+            "unpowered.",
+        [&] (HostEngine& e)
+        {
+            addStage (DdrController::id); addStage (DdrChip::id); addStage (DdrChip::id);
+            setParam (*e.getPlugin (0), "targetchip", 1.0f);   // testing the second rank...
+            setParam (*e.getPlugin (1), "chipnumber", 0.0f);   // first chip: correctly chip 0
+            setParam (*e.getPlugin (2), "chipnumber", 0.0f);   // ...but the second chip was ALSO left at 0
+        }, -1, -1, -1, 0 });
+
     // --- write ---
     for (auto& hw : set)
     {
@@ -679,6 +766,19 @@ int main (int argc, char** argv)
 
         if (! fails.isEmpty()) { std::printf ("LOAD PROBLEM %s: %s\n", hw.file, fails.joinIntoString ("; ").toRawUTF8()); continue; }
         if (! engine.homework.present) { std::printf ("HOMEWORK LOST ON RELOAD %s\n", hw.file); continue; }
+
+        // DDR homeworks are a wholly different measurement: BIST word counters, not an eye/BER - skip the
+        // SerDes-side measurement entirely rather than reach for an EyeScope that isn't in this chain.
+        if (hw.ddrControllerSlot >= 0)
+        {
+            auto* controller = dynamic_cast<DdrController*> (engine.getPlugin ((size_t) hw.ddrControllerSlot));
+            wait (5000);
+            const auto checked = controller->status.wordsChecked.load(), errors = controller->status.errors.load();
+            std::printf ("LIVE %-38s BIST words checked=%6llu errors=%6llu (%.1f%%)\n", hw.file,
+                         (unsigned long long) checked, (unsigned long long) errors,
+                         checked == 0 ? 0.0 : 100.0 * (double) errors / (double) checked);
+            continue;
+        }
 
         auto* scope = dynamic_cast<EyeScope*> (engine.getPlugin ((size_t) hw.scopeSlot));
         wait (6000);

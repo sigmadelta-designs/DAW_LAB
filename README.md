@@ -287,6 +287,13 @@ the bus - a real multi-drop bus has every chip just listen and pass the signals 
 several `DdrChip` stages (one per rank) sit one after another in an ordinary chain, the way several ranks
 share one real bus.
 
+**DDR Lossy Channel** (`lab.ddrlossy`) is this bus's counterpart to the SerDes side's LossyChannel, and
+just as deliberately a placeholder: one **DQ/DQS swing** parameter attenuates only those signals (the ones
+an eye actually forms on and a Vref is trained against), leaving CK/CS/CMD/ADDR untouched. Enough to make
+"a real channel has loss, and Vref has to be trained for the swing it actually sees" a genuine, measurable
+scenario (see Homework 18 below) without yet modelling trace-length skew, reflections, or a fly-by/
+multi-drop topology.
+
 **Phase 1 / Phase 2 - a deliberate, documented simplification.** DDR's DQ bus is bidirectional (the
 controller drives it on writes, the chip drives it back on reads), but this project's whole existing
 paradigm is a strictly feed-forward plugin chain - there's no clean way to make a chip "talk back upstream"
@@ -310,12 +317,13 @@ badly wrong Vref, is never touched), the BIST genuinely catches a real fault (an
 stale Vref measured ~95% word errors, not a tautological always-pass), and a real chained topology
 (Controller -> Chip0 -> Chip1, addressing Chip1) works correctly.
 
-**Not done yet, by design, in this first pass:** GUI editors for either stage (parameters work, there's
-just no window yet); hooking the Eye Scope/Jitter Scope up to this bus (they currently assume a stereo R/L
-differential pair, same generalisation `BuiltInProcessor` just got); a channel/impairment stage placed on
-this bus; homework scenarios; standalone VST3/AU packaging (an 18-channel bus is unusual for a generic DAW
-insert, so these stay built-in-only for now); and HBM, which was always meant to follow DDR once this
-foundation was solid rather than be built in parallel.
+**Not done yet, by design, in this pass:** GUI editors for any of the three stages (parameters work,
+there's just no window yet); hooking the Eye Scope/Jitter Scope up to this bus (they currently assume a
+stereo R/L differential pair, same generalisation `BuiltInProcessor` just got); trace-length skew,
+reflections or a fly-by/multi-drop topology in DDR Lossy Channel; standalone VST3/AU packaging (an
+18-channel bus is unusual for a generic DAW insert, so these stay built-in-only for now); and HBM, which
+was always meant to follow DDR once this foundation was solid rather than be built in parallel. Homework
+scenarios (17-19) do exist now - see "Homework" below.
 
 ## Chain presets
 
@@ -363,6 +371,9 @@ different chain.
 | `HOMEWORK_14_emi_coupled_jitter` | A specific periodic jitter tone riding on the signal - the eye looks only a little soft, the Jitter Scope's spectrum shows a clear spike |
 | `HOMEWORK_15_jitter_tolerance_exceeded` | The same sinusoidal jitter amplitude as a passing test, at a much higher offset frequency - the CDR's perfectly normal gains simply can't track it |
 | `HOMEWORK_16_random_jitter_not_a_tone` | Elevated BER that's genuinely just broadband random jitter - confirming there's *no* periodic aggressor to chase |
+| `HOMEWORK_17_ddr_wrong_chip_targeted` | DDR: controller's Target chip and the only populated chip's Chip number simply disagree - a pure CS strapping/addressing mismatch |
+| `HOMEWORK_18_ddr_vref_not_retrained` | DDR: Vref trained on a near-ideal bench fixture, never retrained for the real board's lossier trace |
+| `HOMEWORK_19_ddr_duplicate_chip_select` | DDR: two populated chips both strapped as chip 0 - a board-assembly mistake with the same symptom as #17 but a different root cause |
 
 Presets 9-13 use fuller, more realistic chains (every stage that's actually relevant to the fault's domain
 is present and switched on - if the problem is on the receiver, the Receiver stage is there, not modelled
@@ -378,10 +389,37 @@ don't go chasing a tone that isn't there). 15 is a frequency-domain idea some pl
 before - a receiver's CDR jitter tolerance is frequency-dependent, so the *same* nominal jitter spec can
 pass at one offset frequency and fail at another with no setting changed.
 
+Presets 17-19 are the first homework scenarios on the **DDR** side (see "DDR stages" above) - no eye, no
+BER, no jitter spectrum; the Homework Hint window's prompt/hint/explanation are the same, but what you
+measure is the DDR Controller's live BIST word/error counters instead. 17 and 19 land on the identical
+symptom (the targeted chip never answers a single word) from two different real causes - a simple
+wrong-target mistake vs. two populated chips both left strapped to the same chip-select line - a
+deliberate pair, the same idea as 14/16 on the jitter side: the same measured result can have more than
+one real explanation, so the fix has to come from checking the actual cause, not just matching a symptom
+to a familiar story. 18 is the Vref-training lesson (see "DDR stages" above) and needed the new **DDR
+Lossy Channel** stage to be a genuine signal-level scenario rather than just a parameter mismatch.
+
+Building 17-19 caught a real, and significant, pre-existing bug - not in the new DDR stages, in
+`HostEngine::rebuildConnections()` itself, which every stage in every chain goes through: it hard-coded 2
+channels for every stage-to-stage connection, which happens to be exactly right for a SerDes differential
+pair but silently truncated a DDR chain's 18-channel bus down to just its first 2 (CK+/-) - every chip past
+the first one in a chain would see clock activity and nothing else, with no error or warning. It was found
+because homework 18 measured the exact same "100% of words checked, chip never selected" signature as 17
+and 19 (`DdrChip::status.everSelected` stayed false even with Target chip and Chip number correctly
+matching) - not the ~95-98% Vref-mismatch error rate it was written to demonstrate. That coincidence (a
+Vref homework measuring identically to two unrelated chip-select homeworks) is exactly the kind of thing
+this project's "verify every claim by live measurement, not inspection" discipline exists to catch. Fixed
+by connecting as many channels as the narrower side of each connection actually has, instead of a fixed
+count; confirmed by reloading the exact saved preset through the real `HostEngine` in isolation before and
+after the fix (chip stayed silent before, answered correctly - and landed at 98.3% word errors - after),
+then re-running the full measurement pass across all 19 presets to confirm no regression on the SerDes
+side (whose stages are all 2-channel already, so `min(2, 2)` is unchanged) and that 17/19 still show the
+right symptom for the right reason now.
+
 A `HostEngine::Homework` struct (title/prompt/hint/explanation) round-trips through `createChainXml`/
 `loadChain` as an optional `<HOMEWORK>` element, so resaving a homework chain keeps its exercise attached.
 There's no UI to author one - `Assets/generate_homework.cpp` (a one-off generator, not part of the app
-build; its own header comment has the throwaway CMakeLists to build/run it) is how these sixteen were
+build; its own header comment has the throwaway CMakeLists to build/run it) is how these nineteen were
 written and measured live before being committed; several needed real parameter tuning (and, in one case,
 a corrected sign-convention assumption, found by directly comparing measured eye height with and without
 the "fix") to actually demonstrate the failure they claim, not just sound plausible. The three jitter-scope
@@ -391,7 +429,9 @@ initially - unintentionally - *did* trip a false positive on the dominant-tone d
 be a real robustness gap in `JitterAnalyzer` (too few Welch-averaged segments gave a noisy enough per-bin
 estimate that the single highest of ~500 bins cleared the "stands out above the floor" threshold by chance
 often enough to matter); fixed by averaging more segments and raising the threshold, verified against 40
-different pure-random-jitter seeds (0 false positives after the fix, several before it).
+different pure-random-jitter seeds (0 false positives after the fix, several before it) - though a live
+regeneration pass after the DDR work below still tripped it once more, so treat #16 as "usually, not
+guaranteed, shows no tone" until that gets tightened further.
 
 ## The stages as VST3 / AU plugins
 

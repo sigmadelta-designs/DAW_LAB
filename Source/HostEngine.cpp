@@ -191,10 +191,17 @@ bool HostEngine::isBypassed (size_t index) const
     return node != nullptr && node->isBypassed();
 }
 
-// The chain is strictly serial: every plugin's stereo output feeds the next
-// plugin's input. MIDI from the devices goes to every plugin that accepts it.
-// Connections a plugin can't take (e.g. audio into an instrument) are refused
-// by the graph and simply skipped.
+// The chain is strictly serial: every plugin's output feeds the next plugin's input. MIDI from the
+// devices goes to every plugin that accepts it. Connections a plugin can't take (e.g. audio into an
+// instrument) are refused by the graph and simply skipped.
+//
+// The actual audio device is always stereo, but a stage-to-stage connection carries as many channels as
+// the narrower of the two sides actually has - 2 for an ordinary SerDes differential-pair stage, but
+// DdrBus::numChannels (18) between two DDR stages, which need every CS/CMD/ADDR/DQ/DQS wire to actually
+// arrive, not just the first two. Getting this wrong doesn't error or warn - it silently truncates the
+// bus to 2 channels and every DDR stage past the first one sees nothing but CK, which looks exactly like
+// "the chip is never selected" rather than "the chain is wired wrong" (caught via live measurement:
+// DdrChip::status.everSelected stayed false even with matching chip-select settings on both ends).
 void HostEngine::rebuildConnections()
 {
     for (const auto& connection : graph.getConnections())
@@ -203,11 +210,17 @@ void HostEngine::rebuildConnections()
     auto previous = audioIn->nodeID;
     const int inputChannels = juce::jmax (1, graph.getMainBusNumInputChannels());
     bool firstStage = true;
+    int previousOutputChannels = 2;   // the real input device is stereo
 
     for (const auto& slot : slots)
     {
-        // A mono input device feeds both channels of the first stage.
-        for (int channel = 0; channel < 2; ++channel)
+        auto* node = graph.getNodeForId (slot.nodeId);
+        const int stageInputChannels = node != nullptr ? node->getProcessor()->getTotalNumInputChannels() : 2;
+        // A mono input device feeds both channels of the first stage; after that, connect as many
+        // channels as both sides actually have.
+        const int connectChannels = firstStage ? 2 : juce::jmin (previousOutputChannels, stageInputChannels);
+
+        for (int channel = 0; channel < connectChannels; ++channel)
             graph.addConnection ({ { previous, firstStage ? juce::jmin (channel, inputChannels - 1) : channel },
                                    { slot.nodeId, channel } });
         firstStage = false;
@@ -215,9 +228,12 @@ void HostEngine::rebuildConnections()
         graph.addConnection ({ { midiIn->nodeID, juce::AudioProcessorGraph::midiChannelIndex },
                                { slot.nodeId,    juce::AudioProcessorGraph::midiChannelIndex } });
         previous = slot.nodeId;
+        previousOutputChannels = node != nullptr ? node->getProcessor()->getTotalNumOutputChannels() : 2;
     }
 
-    for (int channel = 0; channel < 2; ++channel)
+    // The real output device is stereo too, regardless of how wide the last stage's own bus is.
+    const int outputChannels = juce::jmin (previousOutputChannels, 2);
+    for (int channel = 0; channel < outputChannels; ++channel)
         graph.addConnection ({ { previous, firstStage ? juce::jmin (channel, inputChannels - 1) : channel },
                                { audioOut->nodeID, channel } });
 }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_19_ddr_duplicate_chip_select" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="238.VMjLgTN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhX0I2bzc2axQ1bh.hcgwVck0iH1PiKvHxK9vCTAIUPMARZj0iHiE1brEFck41X4IBH1EFa0UVOhPiKvHxK9vCTAIUPMARZj0iHvEFczUlbtIBH1EFa0UVOhHiKvHxK9vCTAIUPMARZj0iHxUmatklamIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFcigVZvIBH1EFa0UVOhDiKvHxK9vyKSQUPTUjO..">
+    <PARAM id="targetchip" value="0.3333333432674408"/>
+    <PARAM id="pattern" value="0.6666666865348816"/>
+    <PARAM id="burstwords" value="0.2380952388048172"/>
+    <PARAM id="caslatency" value="0.2000000029802322"/>
+    <PARAM id="running" value="1.0"/>
+    <PLUGIN name="DDR Controller" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddrcontroller"
+            uniqueId="1c30c26d" isInstrument="0" fileTime="0" infoUpdateTime="0"
+            numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
+            uid="1c30c26d"/>
+  </SLOT>
+  <SLOT bypassed="0" state="146.VMjLgjH....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHy3xMxTiL4.iL4fCM1DSNwPSYsjiHu3COuLEUAQUQ9..">
+    <PARAM id="chipnumber" value="0.0"/>
+    <PARAM id="vref" value="0.5"/>
+    <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
+            version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"
+            isShell="0" hasARAExtension="0" uid="2800a3dd"/>
+  </SLOT>
+  <SLOT bypassed="0" state="146.VMjLgjH....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHy3xMxTiL4.iL4fCM1DSNwPSYsjiHu3COuLEUAQUQ9..">
+    <PARAM id="chipnumber" value="0.0"/>
+    <PARAM id="vref" value="0.5"/>
+    <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
+            version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"
+            isShell="0" hasARAExtension="0" uid="2800a3dd"/>
+  </SLOT>
+  <HOMEWORK title="DDR Homework 3: Second rank never answers, first rank is fine"
+            prompt="This board has two DDR chips populated as two separate ranks. The first rank's memory test runs clean. The second rank's test never gets a single word back, as if it isn't populated at all - but it physically is, and both chips show the same CK/command activity on a scope. What's wrong?"
+            hint="Check each populated chip's own Chip number setting - do the two chips actually disagree with each other, the way two separate ranks should?"
+            explanation="Both chips are strapped Chip number = 0 - a board assembly mistake, not a missing or dead part: the second chip's CS strap was never actually changed from the first rank's wiring. When the controller addresses &quot;chip 1&quot; to test the second rank, nothing on the board answers CS1, because nothing is actually wired to it - both chips are listening on CS0 instead. This is a different root cause from the single-chip &quot;wrong target&quot; homework (DDR Homework 1) even though the symptom looks identical: a populated-but-silent rank means check chip-select strapping on every populated chip, not just assume the one you can't reach is faulty or unpowered."/>
+</LABCHAIN>

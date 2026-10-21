@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_18_ddr_vref_not_retrained" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="238.VMjLgTN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhX0I2bzc2axQ1bh.hcgwVck0iH1PiKvHxK9vCTAIUPMARZj0iHiE1brEFck41X4IBH1EFa0UVOhPiKvHxK9vCTAIUPMARZj0iHvEFczUlbtIBH1EFa0UVOhHiKvHxK9vCTAIUPMARZj0iHxUmatklamIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFcigVZvIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="targetchip" value="0.0"/>
+    <PARAM id="pattern" value="0.6666666865348816"/>
+    <PARAM id="burstwords" value="0.2380952388048172"/>
+    <PARAM id="caslatency" value="0.2000000029802322"/>
+    <PARAM id="running" value="1.0"/>
+    <PLUGIN name="DDR Controller" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddrcontroller"
+            uniqueId="1c30c26d" isInstrument="0" fileTime="0" infoUpdateTime="0"
+            numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
+            uid="1c30c26d"/>
+  </SLOT>
+  <SLOT bypassed="0" state="95.VMjLgXE....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8Hxb2klamIBH1EFa0UVOhLCLt.iHu3COuLEUAQUQ9..">
+    <PARAM id="swing" value="0.2631579041481018"/>
+    <PLUGIN name="DDR Lossy Channel" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddrlossy" uniqueId="d8960045"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="18"
+            numOutputs="18" isShell="0" hasARAExtension="0" uid="d8960045"/>
+  </SLOT>
+  <SLOT bypassed="0" state="144.VMjLgbH....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHv3RM4jSN4jSN1PiLybiLwLSLh7hO77xTTEDUE4C.">
+    <PARAM id="chipnumber" value="0.0"/>
+    <PARAM id="vref" value="0.8333333730697632"/>
+    <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
+            version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"
+            isShell="0" hasARAExtension="0" uid="2800a3dd"/>
+  </SLOT>
+  <HOMEWORK title="DDR Homework 2: Passed on the bench, fails once installed"
+            prompt="This chip was characterized and Vref-trained on an open bench fixture, where it tested perfectly. Installed on the real board, with the real trace between the controller and the chip, the memory test now fails almost every word. The chip tests fine again if you put it back on the bench fixture. What changed?"
+            hint="Compare the DQ swing this board's trace actually delivers (the DDR Lossy Channel's setting) against the Vref the chip is still using. Was Vref retrained for this board's real channel, or carried over from somewhere else?"
+            explanation="This board's real trace attenuates the DQ/DQS swing to about 30% of ideal, but the chip's Vref is still 0.6 - left over from the bench fixture's essentially ideal, near-full-swing connection. A Vref trained for a near-ideal swing sits far outside the real, attenuated eye, so almost every bit slices to the same fixed value no matter what's actually driven. This is a real and common bring-up lesson: Vref (like any receiver calibration) has to be retrained for the ACTUAL channel a part will see in the field, not assumed to carry over from a bench or reference setup - a part that tests perfectly in isolation can still fail once installed on the real board it has to work on."/>
+</LABCHAIN>

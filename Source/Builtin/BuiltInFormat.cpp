@@ -1,6 +1,7 @@
 #include "BuiltInFormat.h"
 #include "DdrChip.h"
 #include "DdrController.h"
+#include "DdrLossyChannel.h"
 #include "DiffFfe.h"
 #include "EyeScope.h"
 #include "JitterScope.h"
@@ -28,6 +29,7 @@ namespace
         if (identifier == JitterScope::id)     return std::make_unique<JitterScope> (link);
         if (identifier == DdrController::id)   return std::make_unique<DdrController> (ddrLink);
         if (identifier == DdrChip::id)         return std::make_unique<DdrChip> (ddrLink);
+        if (identifier == DdrLossyChannel::id) return std::make_unique<DdrLossyChannel> (ddrLink);
         return nullptr;
     }
 }
@@ -46,7 +48,7 @@ juce::Array<juce::PluginDescription> BuiltInFormat::getDescriptions()
     auto ddrScratch = std::make_shared<DdrLinkSettings>();
 
     for (auto* identifier : { SignalGenerator::id, DiffFfe::id, LossyChannel::id, TraceChannel::id, SParamChannel::id, NoiseInjector::id,
-                             SerdesReceiver::id, EyeScope::id, JitterScope::id, DdrController::id, DdrChip::id })
+                             SerdesReceiver::id, EyeScope::id, JitterScope::id, DdrController::id, DdrLossyChannel::id, DdrChip::id })
     {
         juce::PluginDescription description;
         create (identifier, scratch, ddrScratch)->fillInPluginDescription (description);
