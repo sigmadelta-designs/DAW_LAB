@@ -17,7 +17,8 @@
 //       ${E}/HostEngine.cpp ${B}/BuiltInFormat.cpp ${B}/BitCompare.cpp ${B}/DiffFfe.cpp ${B}/EyeAnalyzer.cpp
 //       ${B}/EyeScope.cpp ${B}/EyeScopeEditor.cpp ${B}/FfeEditor.cpp ${B}/GeneratorEditor.cpp
 //       ${B}/JitterAnalyzer.cpp ${B}/JitterScope.cpp ${B}/JitterScopeEditor.cpp
-//       ${B}/DdrController.cpp ${B}/DdrChip.cpp ${B}/DdrChipEditor.cpp ${B}/DdrLossyChannel.cpp
+//       ${B}/DdrController.cpp ${B}/DdrChip.cpp ${B}/DdrChipEditor.cpp ${B}/DdrEyeScope.cpp
+//       ${B}/DdrEyeScopeEditor.cpp ${B}/DdrLossyChannel.cpp
 //       ${B}/LossyChannel.cpp ${B}/LossyEditor.cpp ${B}/NoiseInjector.cpp ${B}/NoiseEditor.cpp
 //       ${B}/SignalGenerator.cpp ${B}/SimpleParamEditor.cpp ${B}/ReceiverEditor.cpp ${B}/SerdesReceiver.cpp
 //       ${B}/SParamChannel.cpp ${B}/SParamEditor.cpp ${B}/SParamSynthesis.cpp ${B}/Touchstone.cpp
@@ -46,6 +47,7 @@
 #include "Builtin/JitterScope.h"
 #include "Builtin/DdrController.h"
 #include "Builtin/DdrChip.h"
+#include "Builtin/DdrEyeScope.h"
 #include "Builtin/DdrLossyChannel.h"
 using namespace juce;
 
@@ -93,6 +95,8 @@ struct Homework
     int jitterSlot = -1;                       // slot index of the Jitter Scope, if present (-1: none)
     int ddrControllerSlot = -1;                // slot index of the DDR Controller - a wholly different
                                                 // measurement path (BIST word counters, not an eye/BER)
+    int ddrScopeSlot = -1;                     // slot index of the DDR Eye Scope, if present (-1: none) -
+                                                // a DIFFERENT measurement from scopeSlot/EyeScope above
 };
 
 int main (int argc, char** argv)
@@ -669,20 +673,26 @@ int main (int argc, char** argv)
             "bus are clearly toggling into the chip (you can see the activity), so it isn't dead or "
             "unpowered. What's actually missing?",
         "Check the controller's Target chip setting against the chip's own Chip number setting - do they "
-            "agree on which CS line is actually in use?",
+            "agree on which CS line is actually in use? A DDR Eye Scope on the bus confirms this isn't a "
+            "signal-integrity question, though notice how long it takes to build any picture at all.",
         "The controller's Target chip is set to chip 1, but the only chip on this board is strapped as "
             "chip number 0 - the controller is asserting CS1, a line nothing on this board is wired to "
             "answer. The chip isn't broken or unselected by a signal problem; it's faithfully ignoring "
             "every command because CS1 was simply never its line. This is a real, easy bring-up mistake: a "
             "rank-select register programmed for a populated slot that doesn't match the board, or a strap "
             "wired to the wrong CS pin during assembly. Matching Target chip to the chip that's actually "
-            "there fixes it immediately - there's nothing to retrain or re-tune.",
+            "there fixes it immediately - there's nothing to retrain or re-tune. (A DDR Eye Scope dropped "
+            "into this chain eventually shows a wide-open DQ/DQS eye - the bus itself was never the "
+            "problem - but it takes unusually long to get there: every read here times out waiting for an "
+            "answer that will never come, and with no write traffic in between, the scope sees almost "
+            "nothing but dead air. That sluggishness is itself a clue worth noticing, not just an "
+            "inconvenience.)",
         [&] (HostEngine& e)
         {
-            addStage (DdrController::id); addStage (DdrChip::id);
+            addStage (DdrController::id); addStage (DdrEyeScope::id); addStage (DdrChip::id);
             setParam (*e.getPlugin (0), "targetchip", 1.0f);   // asks for chip 1...
-            setParam (*e.getPlugin (1), "chipnumber", 0.0f);   // ...but the only chip here is strapped as 0
-        }, -1, -1, -1, 0 });
+            setParam (*e.getPlugin (2), "chipnumber", 0.0f);   // ...but the only chip here is strapped as 0
+        }, -1, -1, -1, 0, 1 });
 
     // --- 18 (DDR): Vref trained for a near-ideal bench connection, carried over unchanged to a real,
     // lossier board trace - needs the new DDR Lossy Channel stage to be a genuine signal-level scenario.
@@ -695,7 +705,8 @@ int main (int argc, char** argv)
             "bench fixture. What changed?",
         "Compare the DQ swing this board's trace actually delivers (the DDR Lossy Channel's setting) "
             "against the Vref the chip is still using. Was Vref retrained for this board's real channel, "
-            "or carried over from somewhere else?",
+            "or carried over from somewhere else? A DDR Eye Scope placed after the trace will show the "
+            "real, attenuated swing directly rather than making you infer it from a setting.",
         "This board's real trace attenuates the DQ/DQS swing to about 30% of ideal, but the chip's Vref is "
             "still 0.6 - left over from the bench fixture's essentially ideal, near-full-swing connection. "
             "A Vref trained for a near-ideal swing sits far outside the real, attenuated eye, so almost "
@@ -703,15 +714,22 @@ int main (int argc, char** argv)
             "common bring-up lesson: Vref (like any receiver calibration) has to be retrained for the "
             "ACTUAL channel a part will see in the field, not assumed to carry over from a bench or "
             "reference setup - a part that tests perfectly in isolation can still fail once installed on "
-            "the real board it has to work on.",
+            "the real board it has to work on. This is the one DDR homework in this set where a DDR Eye "
+            "Scope actually shows something degraded on the bus itself - though read the right number: the "
+            "eye's own \"% of ideal\" quality readout still says 100%, because nothing else is wrong with "
+            "its shape; what actually shows the attenuation is the absolute swing (\"Outer swing at sample "
+            "point\"), which reads about 0.6 FS here against this bus's normal 2.0 FS, and the trace itself "
+            "renders visibly small against the scope's fixed graticule. Contrast every other DDR homework "
+            "here, where the fault is inside the chip's own trained settings and the bus eye - both its "
+            "shape and its absolute swing - looks perfectly normal regardless.",
         [&] (HostEngine& e)
         {
-            addStage (DdrController::id); addStage (DdrLossyChannel::id); addStage (DdrChip::id);
+            addStage (DdrController::id); addStage (DdrLossyChannel::id); addStage (DdrEyeScope::id); addStage (DdrChip::id);
             setParam (*e.getPlugin (0), "targetchip", 0.0f);
             setParam (*e.getPlugin (1), "swing", 30.0f);       // this board's real trace: only 30% of ideal swing survives
-            setParam (*e.getPlugin (2), "chipnumber", 0.0f);
-            setParam (*e.getPlugin (2), "vref", 0.6f);         // trained for the bench fixture's near-ideal swing, not this
-        }, -1, -1, -1, 0 });
+            setParam (*e.getPlugin (3), "chipnumber", 0.0f);
+            setParam (*e.getPlugin (3), "vref", 0.6f);         // trained for the bench fixture's near-ideal swing, not this
+        }, -1, -1, -1, 0, 2 });
 
     // --- 19 (DDR): two populated chips, but both strapped as the same chip number - a board-assembly
     // mistake, not a missing/dead part, and a different root cause from #17 despite the same symptom.
@@ -723,7 +741,8 @@ int main (int argc, char** argv)
             "- but it physically is, and both chips show the same CK/command activity on a scope. What's "
             "wrong?",
         "Check each populated chip's own Chip number setting - do the two chips actually disagree with "
-            "each other, the way two separate ranks should?",
+            "each other, the way two separate ranks should? (The DDR Eye Scope sees a clean bus here too, "
+            "once it builds a picture - see the note on how slowly that happens in DDR Homework 1.)",
         "Both chips are strapped Chip number = 0 - a board assembly mistake, not a missing or dead part: "
             "the second chip's CS strap was never actually changed from the first rank's wiring. When the "
             "controller addresses \"chip 1\" to test the second rank, nothing on the board answers CS1, "
@@ -731,14 +750,16 @@ int main (int argc, char** argv)
             "different root cause from the single-chip \"wrong target\" homework (DDR Homework 1) even "
             "though the symptom looks identical: a populated-but-silent rank means check chip-select "
             "strapping on every populated chip, not just assume the one you can't reach is faulty or "
-            "unpowered.",
+            "unpowered. (Same timeout-dominated eye-scope behaviour as DDR Homework 1, for the identical "
+            "reason: every read to the untargeted CS1 line times out before the scope ever sees another "
+            "write.)",
         [&] (HostEngine& e)
         {
-            addStage (DdrController::id); addStage (DdrChip::id); addStage (DdrChip::id);
+            addStage (DdrController::id); addStage (DdrEyeScope::id); addStage (DdrChip::id); addStage (DdrChip::id);
             setParam (*e.getPlugin (0), "targetchip", 1.0f);   // testing the second rank...
-            setParam (*e.getPlugin (1), "chipnumber", 0.0f);   // first chip: correctly chip 0
-            setParam (*e.getPlugin (2), "chipnumber", 0.0f);   // ...but the second chip was ALSO left at 0
-        }, -1, -1, -1, 0 });
+            setParam (*e.getPlugin (2), "chipnumber", 0.0f);   // first chip: correctly chip 0
+            setParam (*e.getPlugin (3), "chipnumber", 0.0f);   // ...but the second chip was ALSO left at 0
+        }, -1, -1, -1, 0, 1 });
 
     // --- 20 (DDR): ZQ calibration against the external 240 ohm reference never completed cleanly - the
     // target ODT setting is fine, but the chip's *actual* termination lands well off it. Validation-sequence
@@ -764,17 +785,20 @@ int main (int argc, char** argv)
             "periodically (including a poll after reset) rather than trusting it once: a *programmed* "
             "termination value tells you nothing about whether the calibration that was supposed to realise "
             "it in silicon actually worked. The fix is to re-run ZQ cal (here, bring the ZQ cal error back "
-            "toward 0%), not to change the ODT setting that was already correct.",
+            "toward 0%), not to change the ODT setting that was already correct. (A DDR Eye Scope on the "
+            "bus here would show a perfectly open eye the whole time - the reflection this homework models "
+            "happens entirely inside the chip's own capture logic, not as a channel-level distortion a scope "
+            "upstream of it could ever see.)",
         [&] (HostEngine& e)
         {
-            addStage (DdrController::id); addStage (DdrChip::id);
+            addStage (DdrController::id); addStage (DdrEyeScope::id); addStage (DdrChip::id);
             setParam (*e.getPlugin (0), "targetchip", 0.0f);
-            auto* chip = e.getPlugin (1);
+            auto* chip = e.getPlugin (2);
             setParam (*chip, "chipnumber", 0.0f);
             setParam (*chip, "vref", 0.82f);      // trained close to the edge, assuming a clean ZQ cal
             setParam (*chip, "odt", 60.0f);       // the programmed target is fine...
             setParam (*chip, "zqerror", 48.0f);   // ...but the calibration against it badly missed
-        }, -1, -1, -1, 0 });
+        }, -1, -1, -1, 0, 1 });
 
     // --- 21 (DDR): same reflection mechanism as #20, different real cause - the ODT target itself was
     // programmed wrong (effectively disabled), with a perfectly clean ZQ calibration. Contrast deliberately
@@ -797,17 +821,19 @@ int main (int argc, char** argv)
             "ODT-related data corruption) can come from either a calibration failure or a flat-out wrong mode "
             "register value, and you tell them apart by checking the calibration error itself before assuming "
             "the programmed target is fine. The fix here is to reprogram ODT to a sensible value, not to "
-            "re-run a calibration that was never the problem.",
+            "re-run a calibration that was never the problem. (Same as DDR Homework 4: a DDR Eye Scope on "
+            "the bus shows a perfectly open eye - this reflection lives entirely inside the chip's own "
+            "capture logic, invisible to anything watching the bus from outside.)",
         [&] (HostEngine& e)
         {
-            addStage (DdrController::id); addStage (DdrChip::id);
+            addStage (DdrController::id); addStage (DdrEyeScope::id); addStage (DdrChip::id);
             setParam (*e.getPlugin (0), "targetchip", 0.0f);
-            auto* chip = e.getPlugin (1);
+            auto* chip = e.getPlugin (2);
             setParam (*chip, "chipnumber", 0.0f);
             setParam (*chip, "vref", 0.5f);        // an ordinary, well-centred Vref - not the issue this time
             setParam (*chip, "odt", 240.0f);       // the mode register itself asks for ODT effectively off...
             setParam (*chip, "zqerror", 0.0f);     // ...and calibration against that (wrong) target is clean
-        }, -1, -1, -1, 0 });
+        }, -1, -1, -1, 0, 1 });
 
     // --- 22 (DDR): CS/CA training never ran - this chip's own chip-select sampling lags the real signal by
     // most of a unit interval. Validation-sequence step: "CA/CS training... CS timing, then CA sampling
@@ -833,16 +859,22 @@ int main (int argc, char** argv)
             "doesn't matter once CS has been high for a while - which is exactly why \"writes look like "
             "they're happening\" was a real clue, not a red herring. Real DDR5/LPDDR5 CA/CS training exists "
             "precisely to find and correct this kind of per-chip sampling skew before relying on short, "
-            "individually-addressed commands like reads.",
+            "individually-addressed commands like reads. (Checking a DDR Eye Scope here is a genuinely "
+            "useful first step, just not the one that solves it: the write traffic that does get through is "
+            "perfectly clean, since CS timing has nothing to do with the data signal's own quality - but "
+            "notice the scope struggles to build any picture at all, the same timeout-dominated symptom as "
+            "DDR Homeworks 1 and 3, because every read here times out before answering. That slow, "
+            "struggling eye is itself part of the signature: a clean channel that can barely keep the scope "
+            "fed points at a timing/protocol problem, not a signal-integrity one.)",
         [&] (HostEngine& e)
         {
-            addStage (DdrController::id); addStage (DdrChip::id);
+            addStage (DdrController::id); addStage (DdrEyeScope::id); addStage (DdrChip::id);
             setParam (*e.getPlugin (0), "targetchip", 0.0f);
             setParam (*e.getPlugin (0), "burstwords", 16.0f);
-            auto* chip = e.getPlugin (1);
+            auto* chip = e.getPlugin (2);
             setParam (*chip, "chipnumber", 0.0f);
             setParam (*chip, "cstiming", 0.97f);   // CS/CA training never ran on this chip
-        }, -1, -1, -1, 0 });
+        }, -1, -1, -1, 0, 1 });
 
     // --- 23 (DDR): write levelling never ran - one shared DQS-to-byte-lane skew, all eight bits equally
     // wrong. Validation-sequence step: "Write levelling aligns DQS to CK at each DRAM... The DRAM samples CK
@@ -866,16 +898,18 @@ int main (int argc, char** argv)
             "between ranks, and until that alignment is trained, every bit in the lane is wrong together, not "
             "just one troublesome pin. Contrast this with DDR Homework 8 (per-bit write-DQ deskew), where only "
             "a couple of individual pins are off and the rest of the byte lane is fine - a different real "
-            "training step with a visibly different symptom.",
+            "training step with a visibly different symptom. (A DDR Eye Scope on the bus shows a perfectly "
+            "open eye regardless - write levelling is about *when* the chip samples an otherwise-clean "
+            "signal, not whether the signal itself is clean.)",
         [&] (HostEngine& e)
         {
-            addStage (DdrController::id); addStage (DdrChip::id);
+            addStage (DdrController::id); addStage (DdrEyeScope::id); addStage (DdrChip::id);
             setParam (*e.getPlugin (0), "targetchip", 0.0f);
-            auto* chip = e.getPlugin (1);
+            auto* chip = e.getPlugin (2);
             setParam (*chip, "chipnumber", 0.0f);
             for (int b = 0; b < 8; ++b)
                 setParam (*chip, "dqskew" + String (b), 0.4f);   // write levelling: never ran, whole byte lane equally skewed
-        }, -1, -1, -1, 0 });
+        }, -1, -1, -1, 0, 1 });
 
     // --- 24 (DDR): write DQ per-bit deskew left incomplete on just two pins - a sparser, pattern-dependent
     // symptom, deliberately contrasted with #23's uniform, near-total failure. Validation-sequence step:
@@ -888,7 +922,9 @@ int main (int argc, char** argv)
             "every run, while most others are completely solid. Write levelling looks fine (CK and DQS are "
             "well aligned as a byte lane). What training step is this, if it's not write levelling?",
         "Open the chip's editor and look at the per-bit DQ deskew indicators under each DQ column - is it "
-            "every bit, evenly, or just one or two that stand out from an otherwise well-trained byte lane?",
+            "every bit, evenly, or just one or two that stand out from an otherwise well-trained byte lane? "
+            "A DDR Eye Scope confirms the bus itself is healthy (any untouched pin, like DQ0, locks to a "
+            "clean, fully open eye) - whatever's wrong with the failing pins isn't visible as a bad signal.",
         "Write levelling (the whole-byte-lane DQS-to-CK alignment) is genuinely fine here - the symptom is "
             "narrower than that. Two individual DQ pins were left with real per-bit deskew error while the "
             "rest of the byte lane is correctly centred - the training step real DDR calls per-bit write-DQ "
@@ -899,16 +935,20 @@ int main (int argc, char** argv)
             "That's exactly why this looks \"intermittent\" and \"only on certain data\" rather than totally "
             "broken: it's a real, sparser failure signature, and it's the reason real DDR training per-bit "
             "deskews every single DQ pin individually rather than assuming one shared, byte-wide alignment "
-            "(write levelling) is enough.",
+            "(write levelling) is enough. (The per-bit skew lives entirely in how the chip times its own "
+            "sample of DQ3/DQ6, not in anything an external scope on the bus could flag as bad - which is "
+            "exactly why probing DQ0 here, rather than one of the actual failing pins, is the faster way to "
+            "confirm the bus itself is clean. DQ3 and DQ6 toggle too rarely under this BIST pattern for a "
+            "scope aimed right at them to build a picture quickly anyway.)",
         [&] (HostEngine& e)
         {
-            addStage (DdrController::id); addStage (DdrChip::id);
+            addStage (DdrController::id); addStage (DdrEyeScope::id); addStage (DdrChip::id);
             setParam (*e.getPlugin (0), "targetchip", 0.0f);
-            auto* chip = e.getPlugin (1);
+            auto* chip = e.getPlugin (2);
             setParam (*chip, "chipnumber", 0.0f);
             setParam (*chip, "dqskew3", 0.4f);   // only two of eight pins left untrained...
             setParam (*chip, "dqskew6", 0.4f);   // ...the rest of the byte lane is correctly deskewed
-        }, -1, -1, -1, 0 });
+        }, -1, -1, -1, 0, 1 });
 
     // --- 25 (DDR): the same ODT-mismatch reflection as #21, but this time the intended fix is the chip's
     // own DFE, not the ODT setting - demonstrating DQ receiver equalization as a real alternative mitigation,
@@ -933,18 +973,20 @@ int main (int argc, char** argv)
             "source (board respin required, a fixed ODT requirement elsewhere, etc.) can sometimes still be "
             "absorbed downstream by turning on equalization that was simply left off. It's not a substitute "
             "for fixing a real root cause when you can (see DDR Homework 5) - but it's a genuine, real option "
-            "when you can't.",
+            "when you can't. (A DDR Eye Scope on the bus shows the same wide-open eye whether the DFE is on "
+            "or off - the DFE, like the ODT problem it's cancelling, acts entirely inside the chip's own "
+            "receive path, not as something that changes what the bus itself looks like.)",
         [&] (HostEngine& e)
         {
-            addStage (DdrController::id); addStage (DdrChip::id);
+            addStage (DdrController::id); addStage (DdrEyeScope::id); addStage (DdrChip::id);
             setParam (*e.getPlugin (0), "targetchip", 0.0f);
-            auto* chip = e.getPlugin (1);
+            auto* chip = e.getPlugin (2);
             setParam (*chip, "chipnumber", 0.0f);
             setParam (*chip, "vref", 0.5f);
             setParam (*chip, "odt", 240.0f);     // same fixed ODT problem as DDR Homework 5...
             setParam (*chip, "zqerror", 0.0f);
             setParam (*chip, "dfe", 0.0f);       // ...but this chip's own DFE is simply left off
-        }, -1, -1, -1, 0 });
+        }, -1, -1, -1, 0, 1 });
 
     // --- write ---
     for (auto& hw : set)
@@ -983,6 +1025,39 @@ int main (int argc, char** argv)
             std::printf ("LIVE %-38s BIST words checked=%6llu errors=%6llu (%.1f%%)\n", hw.file,
                          (unsigned long long) checked, (unsigned long long) errors,
                          checked == 0 ? 0.0 : 100.0 * (double) errors / (double) checked);
+
+            // Confirms, rather than just asserts in the explanation text, what the DDR Eye Scope actually
+            // shows for this homework: either a genuinely degraded bus (Homework 2, the lossy-channel one)
+            // or a perfectly open eye despite the BIST failures above (every other DDR homework, whose
+            // faults live entirely inside the chip's own trained settings, not on the bus itself).
+            if (hw.ddrScopeSlot >= 0)
+            {
+                auto* ddrScope = dynamic_cast<DdrEyeScope*> (engine.getPlugin ((size_t) hw.ddrScopeSlot));
+                const int probeParam = (int) ddrScope->getParameterTree().getRawParameterValue ("probe")->load();
+                const bool isDqsProbe = probeParam == DdrBus::dqWidth;
+
+                ddrScope->setCaptureActive (true);
+                EyeAnalyzer ddrAnalyzer;
+                ddrAnalyzer.setup (ddrScope->getLink().samplesPerUI (ddrScope->getSampleRate()) * (isDqsProbe ? 0.5 : 1.0),
+                                   false, 0.75f);
+                std::vector<float> ds; std::vector<double> didx;
+                for (int t = 0; t < 90; ++t)
+                {
+                    wait (33); ds.clear(); didx.clear(); ddrScope->readCaptured (ds, didx);
+                    size_t rs = 0;
+                    for (size_t i = 1; i <= ds.size(); ++i)
+                        if (i == ds.size() || didx[i] - didx[i - 1] > 1.5)
+                        {
+                            if (i > rs) ddrAnalyzer.push (ds.data() + rs, (int) (i - rs), didx[rs]);
+                            rs = i;
+                        }
+                }
+                ddrScope->setCaptureActive (false);
+                auto dm = ddrAnalyzer.getMetrics();
+                std::printf ("     %-38s DQ/DQS eye (%s) locked=%d h=%5.1f%% (%.3f FS) w=%3.0f%% swing=%.3f FS\n", "",
+                             DdrEyeScope::getProbeName (probeParam), (int) ddrAnalyzer.isLocked(), dm.heightPct, dm.heightFS,
+                             dm.widthPct, dm.swing);
+            }
             continue;
         }
 

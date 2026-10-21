@@ -14,6 +14,16 @@
             numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
             uid="1c30c26d"/>
   </SLOT>
+  <SLOT bypassed="0" state="208.VMjLgbL....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHvI2ahUlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPGZxUmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhX2biEFakIBH1EFa0UVOh.iK2TCLv.CLvTSN1.CM1PCM3HxK9vyKSQUPTUjO..">
+    <PARAM id="vscale" value="0.5254070162773132"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="probe" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="DDR Eye Scope" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddreyescope" uniqueId="79b349d4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="18"
+            numOutputs="18" isShell="0" hasARAExtension="0" uid="79b349d4"/>
+  </SLOT>
   <SLOT bypassed="0" state="656.VMjLgbn....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhMv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHy3xMxTiL4.iL4fCM1DSNwPSYsjiHu3COPEjTA0DHoQVOhnWbkImbuImHfXWXrUWY8HBLt.iHu3COuLEUAQUQ9..">
     <PARAM id="chipnumber" value="0.0"/>
     <PARAM id="vref" value="0.5"/>
@@ -37,5 +47,5 @@
   <HOMEWORK title="DDR Homework 7: Every single bit of every word is wrong"
             prompt="This chip's memory test fails almost every word it checks - and when a word is wrong, it's not just a bit or two off, the whole byte usually comes back looking unrelated to what was written. There's no obvious per-pin pattern to it (it's not consistently one DQ line). What kind of mistake corrupts an entire byte lane uniformly like that?"
             hint="Check this chip's per-bit DQ deskew settings in its editor (the small indicator under each DQ column, or the parameters themselves) - are all eight bits skewed by about the same amount, or does one stand out from the rest?"
-            explanation="All eight DQ bits are skewed by the same amount - a single, shared DQS-to-byte-lane timing error, which is exactly what write levelling exists to correct and clearly never ran (or was undone by a board/trace change since). Because every bit lags identically, the chip captures essentially the *previous* word's data for the whole byte rather than the current one - a uniform, whole-byte corruption, not an isolated-pin problem. This is the real, textbook write-levelling symptom: DQS has to be aligned to CK at each individual DRAM to compensate for fly-by trace-length differences between ranks, and until that alignment is trained, every bit in the lane is wrong together, not just one troublesome pin. Contrast this with DDR Homework 8 (per-bit write-DQ deskew), where only a couple of individual pins are off and the rest of the byte lane is fine - a different real training step with a visibly different symptom."/>
+            explanation="All eight DQ bits are skewed by the same amount - a single, shared DQS-to-byte-lane timing error, which is exactly what write levelling exists to correct and clearly never ran (or was undone by a board/trace change since). Because every bit lags identically, the chip captures essentially the *previous* word's data for the whole byte rather than the current one - a uniform, whole-byte corruption, not an isolated-pin problem. This is the real, textbook write-levelling symptom: DQS has to be aligned to CK at each individual DRAM to compensate for fly-by trace-length differences between ranks, and until that alignment is trained, every bit in the lane is wrong together, not just one troublesome pin. Contrast this with DDR Homework 8 (per-bit write-DQ deskew), where only a couple of individual pins are off and the rest of the byte lane is fine - a different real training step with a visibly different symptom. (A DDR Eye Scope on the bus shows a perfectly open eye regardless - write levelling is about *when* the chip samples an otherwise-clean signal, not whether the signal itself is clean.)"/>
 </LABCHAIN>

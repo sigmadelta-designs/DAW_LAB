@@ -14,6 +14,16 @@
             numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
             uid="1c30c26d"/>
   </SLOT>
+  <SLOT bypassed="0" state="208.VMjLgbL....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHvI2ahUlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPGZxUmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhX2biEFakIBH1EFa0UVOh.iK2TCLv.CLvTSN1.CM1PCM3HxK9vyKSQUPTUjO..">
+    <PARAM id="vscale" value="0.5254070162773132"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="probe" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="DDR Eye Scope" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddreyescope" uniqueId="79b349d4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="18"
+            numOutputs="18" isShell="0" hasARAExtension="0" uid="79b349d4"/>
+  </SLOT>
   <SLOT bypassed="0" state="520.VMjLg7e....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhLz.iKvHxK9vCTAIUPMARZj0iH1IWYlIBH1EFa0UVOh.iK0HxK9vCTAIUPMARZj0iH5EWYxI2axIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
     <PARAM id="chipnumber" value="0.0"/>
     <PARAM id="vref" value="0.7777777910232544"/>
@@ -37,5 +47,5 @@
   <HOMEWORK title="DDR Homework 9: There's a DFE right there, and it's off"
             prompt="This chip has the same ODT-mismatch reflection problem as DDR Homework 5 - the mode register asks for termination effectively off - and the test fails almost every word the same way. This time, assume the ODT setting itself can't be changed (it's fixed by another requirement on this board). Is there anything else on this chip that could still clean this up?"
             hint="Check the chip's own DFE control. DDR5 DRAMs carry a real decision-feedback equalizer on their DQ receivers specifically to cancel known inter-symbol interference like this - is it actually turned on?"
-            explanation="The chip's single-tap DFE is sitting disabled. A DFE cancels inter-symbol interference using the receiver's own prior decision - here, specifically the kind of reflection-driven echo an ODT mismatch creates - and with it enabled, the same ODT problem that broke DDR Homework 5 is fully absorbed: the test passes cleanly even though nothing about the termination itself changed. This mirrors a real DDR5 capability: DQ receivers on the DRAM carry their own (4-tap, in a real part) DFE for exactly this reason, so a signal-integrity problem that can't be fixed at its physical source (board respin required, a fixed ODT requirement elsewhere, etc.) can sometimes still be absorbed downstream by turning on equalization that was simply left off. It's not a substitute for fixing a real root cause when you can (see DDR Homework 5) - but it's a genuine, real option when you can't."/>
+            explanation="The chip's single-tap DFE is sitting disabled. A DFE cancels inter-symbol interference using the receiver's own prior decision - here, specifically the kind of reflection-driven echo an ODT mismatch creates - and with it enabled, the same ODT problem that broke DDR Homework 5 is fully absorbed: the test passes cleanly even though nothing about the termination itself changed. This mirrors a real DDR5 capability: DQ receivers on the DRAM carry their own (4-tap, in a real part) DFE for exactly this reason, so a signal-integrity problem that can't be fixed at its physical source (board respin required, a fixed ODT requirement elsewhere, etc.) can sometimes still be absorbed downstream by turning on equalization that was simply left off. It's not a substitute for fixing a real root cause when you can (see DDR Homework 5) - but it's a genuine, real option when you can't. (A DDR Eye Scope on the bus shows the same wide-open eye whether the DFE is on or off - the DFE, like the ODT problem it's cancelling, acts entirely inside the chip's own receive path, not as something that changes what the bus itself looks like.)"/>
 </LABCHAIN>

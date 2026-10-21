@@ -537,6 +537,35 @@ double-pumped-per-clock timing upgrade; and Vref's 2D (Vref x timing) joint-trai
 covered, if not literally as a 2D sweep, by Homework 18. The full validation-sequence reference text this
 pass was built from is kept in this project's memory (`ddr_training_procedures.md`), not duplicated here.
 
+All nine DDR homeworks (17-25) now include a **DDR Eye Scope** in their chain (added after it was built -
+see "DDR stages" above), directly answering "can the DQ/DQS eye be checked like any other eye in this
+tool?" for every existing DDR scenario, not just new ones. The live-measurement pass now reports an actual
+eye reading for each, and the real numbers shaped the homeworks' own hint/explanation text rather than the
+other way around:
+- **18** is the one DDR homework where the eye genuinely shows something degraded - though the eye's own
+  "% of ideal" quality readout still says 100% (nothing else distorts its *shape*), so the number that
+  actually reveals the attenuation is the absolute swing ("Outer swing at sample point"), reading ~0.6 FS
+  here against this bus's normal 2.0 FS.
+- **20, 21, 23, 24, 25** all measure a perfectly open eye (100% height and width, full 2.0 FS swing) despite
+  their BIST failures - confirming, not just asserting, that ODT/ZQ/write-levelling/per-bit-deskew/DFE
+  faults live entirely inside the chip's own capture logic and are genuinely invisible to a scope sitting
+  on the bus upstream of it. This is real, useful bring-up methodology, not a tool limitation: a clean
+  channel eye rules out signal integrity and points you at the receiver's own trained settings instead.
+- **17, 19 and 22** turned up a real, non-obvious measurement finding: the eye scope there never even
+  *locks* within a normal measurement window, not because the signal is bad, but because every read in
+  these scenarios times out (waiting up to 500 UI for an answer that never comes) before any write traffic
+  follows it - so the tiny sliver of genuine write-burst time the scope can capture, within any reasonable
+  wall-clock window, falls far short of the ~1500 UI the eye analyzer needs to lock. The struggling, "stuck
+  measuring" scope is itself part of each of these three symptoms' real signature, and the explanation text
+  says so rather than overclaiming a clean picture a student would never actually see appear.
+- **24** specifically does not probe DQ3/DQ6 (the two actually-mistrained pins) even though they're the
+  ones with the bug - under this homework's deliberately sparse "address as data" BIST pattern (needed to
+  keep its ~11% intermittent-failure story, rather than switching to Checkerboard, which would make every
+  bit flip every address and turn this into a 23-style near-total failure instead), those two pins flip far
+  too rarely for a scope aimed at them to build a picture in reasonable time either - confirmed the same way
+  as the 17/19/22 finding above. Probing DQ0 (untouched by the bug) instead is the faster way to confirm the
+  bus itself is healthy.
+
 A `HostEngine::Homework` struct (title/prompt/hint/explanation) round-trips through `createChainXml`/
 `loadChain` as an optional `<HOMEWORK>` element, so resaving a homework chain keeps its exercise attached.
 There's no UI to author one - `Assets/generate_homework.cpp` (a one-off generator, not part of the app

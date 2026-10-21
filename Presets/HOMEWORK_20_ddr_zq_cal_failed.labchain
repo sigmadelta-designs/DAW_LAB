@@ -14,6 +14,16 @@
             numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
             uid="1c30c26d"/>
   </SLOT>
+  <SLOT bypassed="0" state="208.VMjLgbL....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHvI2ahUlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPGZxUmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhX2biEFakIBH1EFa0UVOh.iK2TCLv.CLvTSN1.CM1PCM3HxK9vyKSQUPTUjO..">
+    <PARAM id="vscale" value="0.5254070162773132"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="probe" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="DDR Eye Scope" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddreyescope" uniqueId="79b349d4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="18"
+            numOutputs="18" isShell="0" hasARAExtension="0" uid="79b349d4"/>
+  </SLOT>
   <SLOT bypassed="0" state="535.VMjLg3f....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhMv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHv3BNwjSN4jSN4HCNzbCMzHiMh7hO7.UPRETSfjFY8HhdwUlbx8lbh.hcgwVck0iHzfiKvHxK9vyKSQUPTUjO..">
     <PARAM id="chipnumber" value="0.0"/>
     <PARAM id="vref" value="0.9555556178092957"/>
@@ -37,5 +47,5 @@
   <HOMEWORK title="DDR Homework 4: ZQ calibration never finished cleanly"
             prompt="This chip's on-die termination is programmed to a perfectly sensible 60 ohm - matched to the board's trace - and Vref was trained carefully, close to the real centre for this channel. The memory test still fails almost every word. Nothing about the *settings* looks wrong by themselves - what haven't you checked yet?"
             hint="A programmed ODT value isn't the same thing as the chip's *actual* termination. Check whether ZQ calibration (against the external 240 ohm reference) actually landed on that target, or drifted well away from it."
-            explanation="The ODT target (60 ohm) and the trained Vref are both reasonable - the problem is that ZQ calibration itself never landed cleanly: the chip's real, effective termination ends up significantly off from the 60 ohm the mode register asked for. A mismatched termination reflects a scaled copy of the signal back into the same bit roughly a unit interval later - a real, physical echo, not a wrong number on a register readout - and against a Vref trained close to the edge of its margin (which looked fine for a clean channel), that echo is enough to flip bits almost every time data toggles. This is exactly why real DDR controllers re-run ZQ calibration periodically (including a poll after reset) rather than trusting it once: a *programmed* termination value tells you nothing about whether the calibration that was supposed to realise it in silicon actually worked. The fix is to re-run ZQ cal (here, bring the ZQ cal error back toward 0%), not to change the ODT setting that was already correct."/>
+            explanation="The ODT target (60 ohm) and the trained Vref are both reasonable - the problem is that ZQ calibration itself never landed cleanly: the chip's real, effective termination ends up significantly off from the 60 ohm the mode register asked for. A mismatched termination reflects a scaled copy of the signal back into the same bit roughly a unit interval later - a real, physical echo, not a wrong number on a register readout - and against a Vref trained close to the edge of its margin (which looked fine for a clean channel), that echo is enough to flip bits almost every time data toggles. This is exactly why real DDR controllers re-run ZQ calibration periodically (including a poll after reset) rather than trusting it once: a *programmed* termination value tells you nothing about whether the calibration that was supposed to realise it in silicon actually worked. The fix is to re-run ZQ cal (here, bring the ZQ cal error back toward 0%), not to change the ODT setting that was already correct. (A DDR Eye Scope on the bus here would show a perfectly open eye the whole time - the reflection this homework models happens entirely inside the chip's own capture logic, not as a channel-level distortion a scope upstream of it could ever see.)"/>
 </LABCHAIN>

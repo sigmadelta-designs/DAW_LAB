@@ -14,6 +14,16 @@
             numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
             uid="1c30c26d"/>
   </SLOT>
+  <SLOT bypassed="0" state="208.VMjLgbL....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHvI2ahUlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPGZxUmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhX2biEFakIBH1EFa0UVOh.iK2TCLv.CLvTSN1.CM1PCM3HxK9vyKSQUPTUjO..">
+    <PARAM id="vscale" value="0.5254070162773132"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="probe" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="DDR Eye Scope" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddreyescope" uniqueId="79b349d4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="18"
+            numOutputs="18" isShell="0" hasARAExtension="0" uid="79b349d4"/>
+  </SLOT>
   <SLOT bypassed="0" state="536.VMjLg7f....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhMv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHy3xMxTiL4.iL4fCM1DSNwPSYsjiHu3COPEjTA0DHoQVOhnWbkImbuImHfXWXrUWY8HBLt.iHu3COuLEUAQUQ9..">
     <PARAM id="chipnumber" value="0.0"/>
     <PARAM id="vref" value="0.5"/>
@@ -35,6 +45,6 @@
             isShell="0" hasARAExtension="0" uid="2800a3dd"/>
   </SLOT>
   <HOMEWORK title="DDR Homework 1: Reads never come back" prompt="This board has exactly one DDR chip populated, but the built-in memory test never passes a single word - every read comes back wrong, as if nothing is even there. CK and the command bus are clearly toggling into the chip (you can see the activity), so it isn't dead or unpowered. What's actually missing?"
-            hint="Check the controller's Target chip setting against the chip's own Chip number setting - do they agree on which CS line is actually in use?"
-            explanation="The controller's Target chip is set to chip 1, but the only chip on this board is strapped as chip number 0 - the controller is asserting CS1, a line nothing on this board is wired to answer. The chip isn't broken or unselected by a signal problem; it's faithfully ignoring every command because CS1 was simply never its line. This is a real, easy bring-up mistake: a rank-select register programmed for a populated slot that doesn't match the board, or a strap wired to the wrong CS pin during assembly. Matching Target chip to the chip that's actually there fixes it immediately - there's nothing to retrain or re-tune."/>
+            hint="Check the controller's Target chip setting against the chip's own Chip number setting - do they agree on which CS line is actually in use? A DDR Eye Scope on the bus confirms this isn't a signal-integrity question, though notice how long it takes to build any picture at all."
+            explanation="The controller's Target chip is set to chip 1, but the only chip on this board is strapped as chip number 0 - the controller is asserting CS1, a line nothing on this board is wired to answer. The chip isn't broken or unselected by a signal problem; it's faithfully ignoring every command because CS1 was simply never its line. This is a real, easy bring-up mistake: a rank-select register programmed for a populated slot that doesn't match the board, or a strap wired to the wrong CS pin during assembly. Matching Target chip to the chip that's actually there fixes it immediately - there's nothing to retrain or re-tune. (A DDR Eye Scope dropped into this chain eventually shows a wide-open DQ/DQS eye - the bus itself was never the problem - but it takes unusually long to get there: every read here times out waiting for an answer that will never come, and with no write traffic in between, the scope sees almost nothing but dead air. That sluggishness is itself a clue worth noticing, not just an inconvenience.)"/>
 </LABCHAIN>

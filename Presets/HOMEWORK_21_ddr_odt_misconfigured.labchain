@@ -14,6 +14,16 @@
             numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
             uid="1c30c26d"/>
   </SLOT>
+  <SLOT bypassed="0" state="208.VMjLgbL....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHvI2ahUlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPGZxUmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhX2biEFakIBH1EFa0UVOh.iK2TCLv.CLvTSN1.CM1PCM3HxK9vyKSQUPTUjO..">
+    <PARAM id="vscale" value="0.5254070162773132"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="probe" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="DDR Eye Scope" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddreyescope" uniqueId="79b349d4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="18"
+            numOutputs="18" isShell="0" hasARAExtension="0" uid="79b349d4"/>
+  </SLOT>
   <SLOT bypassed="0" state="520.VMjLg7e....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhLz.iKvHxK9vCTAIUPMARZj0iH1IWYlIBH1EFa0UVOh.iK0HxK9vCTAIUPMARZj0iH5EWYxI2axIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
     <PARAM id="chipnumber" value="0.0"/>
     <PARAM id="vref" value="0.7777777910232544"/>
@@ -37,5 +47,5 @@
   <HOMEWORK title="DDR Homework 5: ZQ cal is clean, and it still fails the same way"
             prompt="This board's memory test fails almost every word, the same way DDR Homework 4's did - but this time, ZQ calibration reports 0% error: whatever the mode register asks for, the chip delivers exactly. If the calibration itself isn't the problem here, what is?"
             hint="Check what the ODT mode register is actually asking the chip to be calibrated *to* - not whether the calibration hit that target, but whether the target itself makes sense for this bus."
-            explanation="ZQ calibration is genuinely clean here - the chip really does deliver whatever termination its mode register asks for. The register itself is just programmed wrong: it asks for on-die termination effectively off (a very high resistance), far from the bus's matched impedance, rather than a reasonable on value. The result is the identical reflection mechanism as DDR Homework 4 - a mismatched termination echoing a scaled copy of the signal back into later bits - just reached by a different real mistake: a bad ODT *setting*, not a bad *calibration* of an otherwise-correct setting. This is a genuinely useful distinction during bring-up: the same measured symptom (ZQ/ ODT-related data corruption) can come from either a calibration failure or a flat-out wrong mode register value, and you tell them apart by checking the calibration error itself before assuming the programmed target is fine. The fix here is to reprogram ODT to a sensible value, not to re-run a calibration that was never the problem."/>
+            explanation="ZQ calibration is genuinely clean here - the chip really does deliver whatever termination its mode register asks for. The register itself is just programmed wrong: it asks for on-die termination effectively off (a very high resistance), far from the bus's matched impedance, rather than a reasonable on value. The result is the identical reflection mechanism as DDR Homework 4 - a mismatched termination echoing a scaled copy of the signal back into later bits - just reached by a different real mistake: a bad ODT *setting*, not a bad *calibration* of an otherwise-correct setting. This is a genuinely useful distinction during bring-up: the same measured symptom (ZQ/ ODT-related data corruption) can come from either a calibration failure or a flat-out wrong mode register value, and you tell them apart by checking the calibration error itself before assuming the programmed target is fine. The fix here is to reprogram ODT to a sensible value, not to re-run a calibration that was never the problem. (Same as DDR Homework 4: a DDR Eye Scope on the bus shows a perfectly open eye - this reflection lives entirely inside the chip's own capture logic, invisible to anything watching the bus from outside.)"/>
 </LABCHAIN>
