@@ -27,6 +27,7 @@ private:
     juce::ToggleButton reverseButton { "Reverse tap direction (pre <-> post)" };
     juce::ToggleButton adaptButton { "Auto-adapt taps (link training against the Eye Scope downstream)" };
     juce::TextButton restartButton { "Restart" };
+    juce::TextButton zeroButton { "Zero all taps" };
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> txAttachment, reverseAttachment, adaptAttachment;
 
     juce::Rectangle<int> plotArea, textArea, statusArea;

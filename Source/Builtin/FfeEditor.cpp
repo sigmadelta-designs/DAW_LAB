@@ -41,8 +41,16 @@ FfeEditor::FfeEditor (DiffFfe& ffeToEdit)
     reverseButton.setTooltip (ControlTip::make ("Reverse tap direction", ControlTip::Domain::dut,
         "Swaps which taps are pre-cursor and which are post-cursor - the same mistake as wiring a real "
         "FFE's tap order backwards. Turn this on to see what a wrong-direction configuration does to the eye."));
+    zeroButton.setTooltip ("Sets every tap - including main - to zero, so you can build a configuration up "
+                           "from a known flat starting point instead of whatever the sliders happened to be at.");
     addAndMakeVisible (txModeButton);
     addAndMakeVisible (reverseButton);
+    addAndMakeVisible (zeroButton);
+    zeroButton.onClick = [this]
+    {
+        for (auto& slider : sliders)
+            slider.setValue (0.0, juce::sendNotificationSync);
+    };
     txAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (
         ffe.getParameterTree(), "txmode", txModeButton);
     reverseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (
@@ -87,7 +95,10 @@ void FfeEditor::resized()
     auto area = getLocalBounds().reduced (10);
 
     txModeButton.setBounds (area.removeFromTop (24));
-    reverseButton.setBounds (area.removeFromTop (24));
+    auto reverseRow = area.removeFromTop (24);
+    zeroButton.setBounds (reverseRow.removeFromRight (110));
+    reverseRow.removeFromRight (4);
+    reverseButton.setBounds (reverseRow);
 
     auto adaptRow = area.removeFromTop (26);
     restartButton.setBounds (adaptRow.removeFromRight (80));
