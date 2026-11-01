@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="BRINGUP_01_tx_output_check" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="357.VMjLgvU....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXsAGaoQWcjUlHfXWXrUWY8HBLt.yL4jSN4jSN4DCL0jyLvLyLh7hO7.UPRETSfjFY8HBYiQlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPlboYWYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBbgQGckImah.hcgwVck0iHz3BLh7hO7.UPRETSfjFY8HhboMWYh.hcgwVck0iHv3BMv.CLv.CLvTSN1.CM1PSMh7hO7.UPRETSfjFY8HhbpIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHyoVXsAmHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhLmZlIWYwIBH1EFa0UVOhTiKv.CLv.CLzbiM3LyMwTCNh7hO77xTTEDUE4C.">
+    <PARAM id="pattern" value="0.5"/>
+    <PARAM id="drive" value="0.0"/>
+    <PARAM id="amplitude" value="0.0416666679084301"/>
+    <PARAM id="rise" value="0.3684210479259491"/>
+    <PARAM id="rj" value="0.0"/>
+    <PARAM id="sjamp" value="0.0"/>
+    <PARAM id="sjfreq" value="0.3502276241779327"/>
+    <PARAM id="dcd" value="0.0"/>
+    <PLUGIN name="SerDes Signal Generator" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.generator" uniqueId="7f6fc3b2"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="7f6fc3b2"/>
+  </SLOT>
+  <SLOT bypassed="0" state="225.VMjLgfM....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzglb0IBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzIWXo4VYxIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iH1kVY2IBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1M2XgwVYh.hcgwVck0iHw3RMh7hO77xTTEDUE4C.">
+    <PARAM id="vscale" value="0.8325774669647217"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="trainer" value="1.0"/>
+    <PARAM id="view" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="SerDes Eye Scope" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.eyescope" uniqueId="81882a04"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="81882a04"/>
+  </SLOT>
+  <HOMEWORK title="Bring-Up 1: Does the driver actually work?" prompt="Before a channel, a receiver, or any equalizer is anywhere in the picture, confirm the transmitter alone launches a full, clean signal. Just a generator and an Eye Scope - look at what's actually coming out of the driver."
+            hint="Don't stop at the eye's &quot;height&quot; percentage - it normalizes to whatever swing is actually there, even a small one. Check the swing figure right next to it."
+            explanation="The transmitter's output amplitude is set to about 0.04, roughly a sixth of the usual 0.25 - the driver is alive and the Eye Scope's height reads a reassuring 100% (it's normalized to whatever swing is actually present), but the swing readout right next to it shows only about 0.16 FS where a healthy transmitter launches close to 1.0 FS. This is the single most important bring-up habit for reading any eye diagram, real or simulated: a &quot;wide open&quot; percentage only means the signal is clean relative to itself - always also check the absolute swing before concluding the driver is actually putting out a healthy signal. The fix is turning the TX output level/drive strength back up to spec."/>
+</LABCHAIN>

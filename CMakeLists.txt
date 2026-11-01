@@ -72,6 +72,7 @@ target_sources(DawLab
         ${DAWLAB_STAGE_SOURCES}
         Source/HostEngine.cpp
         Source/HintWindow.cpp
+        Source/BringUpWindow.cpp
         Source/MainComponent.cpp)
 
 # AU is a macOS/iOS format; there is nothing to host on Windows or Linux.

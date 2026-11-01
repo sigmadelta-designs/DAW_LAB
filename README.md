@@ -583,6 +583,47 @@ different pure-random-jitter seeds (0 false positives after the fix, several bef
 regeneration pass after the DDR work below still tripped it once more, so treat #16 as "usually, not
 guaranteed, shows no tone" until that gets tightened further.
 
+## Bring-up & validation plan
+
+`Presets/BRINGUP_*.labchain` are a different kind of exercise from the homeworks above: instead of nine
+independent scenarios, they're nine *steps* that stand a SerDes link up the way a real bring-up lab would -
+one piece at a time, in the order a real lab brings it up, each step's correct settings carried forward as
+the foundation the next step's scenario is built on:
+
+1. **TX output check** - is the driver actually launching a full-swing signal, before anything else is in the path?
+2. **Channel loss characterization** - measure the channel for real; don't trust its datasheet number.
+3. **TX FFE bring-up** - pre-emphasize for the *measured* loss, not the datasheet's.
+4. **RX clock recovery** - get a locked, tracking clock before enabling anything downstream of it.
+5. **RX linear EQ (CTLE)** - the boost has to land at the right frequency, not just be a big number.
+6. **RX decision-feedback EQ (DFE)** - brought up last, since it needs a locked clock and a settled CTLE.
+7. **Closed adaptive loop** - all three adaptive stages (TX FFE, CTLE, DFE) turned on together, and a checked "auto-adapt" box that still isn't actually training.
+8. **Margin stress test** - the same fully-trained link, now with a realistic aggressor actually running.
+9. **Final sign-off** - what a clean, zero-error short run actually proves (and doesn't).
+
+Each step still has something real to find - these aren't "press the next checkbox" tutorials - but the
+issue is the one that genuinely belongs at that point in a bring-up sequence (a reference-clock ppm offset
+the CDR's frequency loop is too weak to track; a CTLE zero parked past Nyquist so its boost never arrives;
+an auto-adapt checkbox that reads identically whether or not its loop is actually receiving feedback)
+rather than an arbitrary bug. Every step's hint/explanation text was written from the tool's own live
+measurement, the same discipline the homeworks above follow - for example, Bring-Up 4's CDR genuinely
+never locks (roughly a third of bits wrong, frequency readout stuck hundreds of ppm from the real -3000 ppm
+offset) with the loop's integral gain left too low for an independent-oscillator clocking architecture, and
+Bring-Up 7's FFE sits at zero adaptation trials forever - its "Auto-adapt" box checked exactly like CTLE's
+and DFE's, which ARE actually running - because the Eye Scope's own "Feed FFE trainer" switch (deliberately
+turned off in Bring-Ups 4-6 to isolate CTLE/DFE bring-up from the FFE's own loop) never got turned back on
+once the full loop was supposed to close: a real "enabled checkbox doesn't prove the loop is receiving
+feedback" lesson, caught only by actually testing the first hypothesis (three adaptive loops racing each
+other) and finding it didn't reproduce reliably through this tool's own save/reload round trip - replaced
+with the trainer-switch finding once that one measured cleanly and deterministically instead.
+
+**Bring-Up Plan...** opens a dedicated window (`BringUpWindow`/`Source/BringUpWindow.*`) that's deliberately
+simpler and more linear than Load Preset...: it scans the preset folder for `BRINGUP_*.labchain` (the
+zero-padded step number sorts them into plan order), shows the current step's scenario with the same
+hidden-until-revealed hint/explanation as the Homework Hint window, and a single **Next Step** button that
+both advances and loads the next step's chain - no need to open a file browser and remember which preset
+comes next. The current step persists across closing/reopening the window and across runs of the app (an
+app-settings value), and the window auto-loads step 1 the very first time it's ever opened.
+
 ## The stages as VST3 / AU plugins
 
 Every stage is also built as a plugin, so a chain can be assembled in any DAW:

@@ -114,6 +114,12 @@ int main (int argc, char** argv)
     };
 
     std::vector<Homework> set;
+    // The bring-up & validation plan: BRINGUP_01..NN, a step-by-step walk through standing up a SerDes
+    // link (TX alone, then channel, then TX EQ, then RX clocking, then RX linear/decision-feedback EQ,
+    // then the closed adaptive loop, then margin stress, then final sign-off) rather than a flat set of
+    // independent scenarios. Same Homework struct/mechanism as `set` above - the Bring-Up window in the
+    // app just scans for this filename prefix and walks it in sorted (= step) order.
+    std::vector<Homework> bringups;
 
     // --- 1: TX FFE left flat against a lossy channel - the most common "new board looks terrible" false alarm.
     set.push_back ({
@@ -988,8 +994,333 @@ int main (int argc, char** argv)
             setParam (*chip, "dfe", 0.0f);       // ...but this chip's own DFE is simply left off
         }, -1, -1, -1, 0, 1 });
 
+    // =====================================================================================
+    // Bring-up & validation plan: standing a SerDes link up one real bring-up step at a time
+    // (TX alone -> channel -> TX EQ -> RX clocking -> RX linear EQ -> RX decision-feedback EQ
+    // -> closed adaptive loop -> margin stress -> final sign-off), instead of a flat set of
+    // independent scenarios. Every step still has something real to find - these aren't just
+    // "turn this on" checkboxes - but the fault is the one that actually belongs at that point
+    // in a real bring-up sequence, and each step's correct settings are exactly what the next
+    // step's scenario is built on. The in-app Bring-Up window loads these in filename order.
+    // =====================================================================================
+
+    // --- Bring-up 1: is the transmitter itself actually launching a full-swing signal? ---
+    bringups.push_back ({
+        "BRINGUP_01_tx_output_check",
+        "Bring-Up 1: Does the driver actually work?",
+        "Before a channel, a receiver, or any equalizer is anywhere in the picture, confirm the "
+            "transmitter alone launches a full, clean signal. Just a generator and an Eye Scope - look at "
+            "what's actually coming out of the driver.",
+        "Don't stop at the eye's \"height\" percentage - it normalizes to whatever swing is actually "
+            "there, even a small one. Check the swing figure right next to it.",
+        "The transmitter's output amplitude is set to about 0.04, roughly a sixth of the usual 0.25 - the "
+            "driver is alive and the Eye Scope's height reads a reassuring 100% (it's normalized to "
+            "whatever swing is actually present), but the swing readout right next to it shows only about "
+            "0.16 FS where a healthy transmitter launches close to 1.0 FS. This is the single most "
+            "important bring-up habit for reading any eye diagram, real or simulated: a \"wide open\" "
+            "percentage only means the signal is clean relative to itself - always also check the absolute "
+            "swing before concluding the driver is actually putting out a healthy signal. The fix is "
+            "turning the TX output level/drive strength back up to spec.",
+        [&] (HostEngine& e)
+        {
+            e.link->lineRateGBd = 10.0f; e.link->modulation = LinkSettings::nrz;
+            addStage (SignalGenerator::id); addStage (EyeScope::id);
+            setParam (*e.getPlugin (0), "pattern", (float) PrbsGenerator::prbs15);
+            setParam (*e.getPlugin (0), "amplitude", 0.04f);
+            setParam (*e.getPlugin (1), "vscale", 1.5f);
+        }, 1 });
+
+    // --- Bring-up 2: characterize the channel for real before anyone tunes an equalizer against it. ---
+    bringups.push_back ({
+        "BRINGUP_02_channel_loss_characterization",
+        "Bring-Up 2: Measure the channel, don't trust its datasheet",
+        "The transmitter is confirmed healthy. Before anyone starts tuning an equalizer, characterize the "
+            "channel itself: add a Lossy Channel between the generator and the Eye Scope and see how "
+            "closed the eye actually gets. The cable assembly's datasheet lists about 11 dB of insertion "
+            "loss at Nyquist for a run this length - is that actually what you're measuring?",
+        "Check the Lossy Channel editor's own \"loss\" setting against the 11 dB the datasheet claims. "
+            "Does the as-built part match its own paperwork?",
+        "The channel is actually configured for 16 dB of loss at Nyquist, not the 11 dB its datasheet "
+            "claims for this length - a real \"the as-built part doesn't match its own paperwork\" finding "
+            "(a different cable gauge, an uncounted connector, extra board loss nobody budgeted for). With "
+            "zero equalization anywhere in the chain the eye is almost completely shut - around 2% "
+            "height, under a fifth of a UI wide - exactly what 16 dB alone does at this rate. The number "
+            "that matters for every later step is the one you just measured, 16 dB, not the 11 dB on the "
+            "datasheet: sizing the TX FFE for the wrong number is exactly the mistake Bring-Up 3 walks "
+            "into.",
+        [&] (HostEngine& e)
+        {
+            e.link->lineRateGBd = 10.0f; e.link->modulation = LinkSettings::nrz;
+            addStage (SignalGenerator::id); addStage (LossyChannel::id); addStage (EyeScope::id);
+            setParam (*e.getPlugin (0), "pattern", (float) PrbsGenerator::prbs15);
+            setParam (*e.getPlugin (0), "amplitude", 0.25f);
+            setParam (*e.getPlugin (1), "loss", 16.0f);
+            setParam (*e.getPlugin (2), "vscale", 0.6f);
+        }, 2 });
+
+    // --- Bring-up 3: TX FFE hand-sized for the datasheet's loss number, not the real measured one. ---
+    bringups.push_back ({
+        "BRINGUP_03_tx_ffe_wrong_budget",
+        "Bring-Up 3: A real equalizer, budgeted for the wrong channel",
+        "Pre-emphasize the transmitter for the channel - taps are hand-set (TX mode on, auto-adapt off, "
+            "the way you'd dial in a first guess before ever closing a training loop) using the 11 dB the "
+            "datasheet claims, the way you would if you trusted the paperwork instead of Bring-Up 2's "
+            "measurement.",
+        "The FFE's stem plot will show real, sensible pre-emphasis - it's not flat, and it's not "
+            "backwards. Compare its boost at Nyquist (under the plot) to the channel's actual measured "
+            "loss, not to what the datasheet said the channel should be.",
+        "These taps are exactly the ones that converge cleanly for an 11 dB channel - a real, "
+            "correctly-shaped equalizer (right direction, sensible magnitudes), just budgeted for the "
+            "wrong number. Against the real 16 dB channel from Bring-Up 2, the eye only reaches about 39% "
+            "height - clearly short of the roughly 55% you get from the same FFE re-budgeted for the real "
+            "measured loss (a bit more post-cursor tap, a bit less main tap, to spend more of the budget "
+            "cancelling the extra 5 dB). This is exactly the bring-up trap Bring-Up 2 existed to prevent: "
+            "an equalizer that looks completely reasonable - correct shape, correct direction, real "
+            "non-zero taps - but calibrated off a datasheet number instead of what you actually measured.",
+        [&] (HostEngine& e)
+        {
+            e.link->lineRateGBd = 10.0f; e.link->modulation = LinkSettings::nrz;
+            addStage (SignalGenerator::id); addStage (DiffFfe::id); addStage (LossyChannel::id); addStage (EyeScope::id);
+            setParam (*e.getPlugin (0), "pattern", (float) PrbsGenerator::prbs15);
+            auto* ffe = e.getPlugin (1);
+            setParam (*ffe, "txmode", 1.0f); setParam (*ffe, "adapt", 0.0f);
+            setParam (*ffe, DiffFfe::getTapParamId (0), -0.010f);   // pre3
+            setParam (*ffe, DiffFfe::getTapParamId (1), 0.010f);    // pre2
+            setParam (*ffe, DiffFfe::getTapParamId (2), -0.048f);   // pre1
+            setParam (*ffe, DiffFfe::getTapParamId (3), 0.643f);    // main - sized for 11 dB, not the real 16 dB
+            setParam (*ffe, DiffFfe::getTapParamId (4), -0.257f);   // post1
+            setParam (*ffe, DiffFfe::getTapParamId (5), 0.029f);    // post2
+            setParam (*ffe, DiffFfe::getTapParamId (6), -0.010f);   // post3
+            setParam (*e.getPlugin (2), "loss", 16.0f);
+            setParam (*e.getPlugin (3), "vscale", 0.6f);
+        }, 3 });
+
+    // --- Bring-up 4: receiver clocking - a real, unsynchronized reference-clock ppm offset the CDR's
+    // frequency loop is set too weak to ever track out. DFE deliberately left off to isolate the CDR. ---
+    bringups.push_back ({
+        "BRINGUP_04_cdr_frequency_tracking_too_slow",
+        "Bring-Up 4: The clock recovery never actually catches up",
+        "FFE and channel are sorted. Bring up the receiver's clock recovery next, before touching "
+            "anything else in the receiver (DFE is deliberately left off) - a stable recovered clock has "
+            "to come first. These two boards each run their own independent reference oscillator rather "
+            "than sharing one, so expect a real, nonzero ppm offset between TX and RX for the CDR to track "
+            "out.",
+        "Check the receiver editor's reported CDR frequency offset (ppm) against where it needs to end "
+            "up. Is it actually converging toward the real offset, or stuck nowhere near it?",
+        "The CDR's frequency-tracking (integral) gain is set to 0.5 uUI - fine if these boards shared one "
+            "reference clock and only had a few ppm of local drift to chase, but these boards each have an "
+            "independent oscillator and the real offset here is 3000 ppm. With the integral gain this low "
+            "the loop never gets anywhere near the real offset (it settles hundreds of ppm off, not the "
+            "needed -3000) - roughly a third of compared bits come back wrong, a real link failure even on "
+            "runs where the CDR's own \"locked\" flag still happens to read true (the frequency error, not "
+            "the lock flag, is the number to trust here). Turning the CDR's integral step back up into its normal range "
+            "(tens of uUI) lets it close that gap and lock cleanly, with nothing about the channel or TX "
+            "changed. The real-world version of this mistake: sizing a CDR's frequency-loop bandwidth for "
+            "the wrong clocking architecture - synchronous (one shared reference) versus asynchronous "
+            "(independent oscillators, a real ppm offset that has to be tracked, not just a little local "
+            "jitter).",
+        [&] (HostEngine& e)
+        {
+            e.link->lineRateGBd = 10.0f; e.link->modulation = LinkSettings::nrz;
+            addStage (SignalGenerator::id); addStage (DiffFfe::id); addStage (LossyChannel::id);
+            addStage (SerdesReceiver::id); addStage (EyeScope::id);
+            setParam (*e.getPlugin (0), "pattern", (float) PrbsGenerator::prbs15);
+            setParam (*e.getPlugin (1), "txmode", 1.0f); setParam (*e.getPlugin (1), "adapt", 1.0f);
+            setParam (*e.getPlugin (2), "loss", 8.0f);
+            auto* rx = e.getPlugin (3);
+            setParam (*rx, "ctleboost", 4.0f); setParam (*rx, "dfeadapt", 0.0f);
+            setParam (*rx, "clockppm", 3000.0f); setParam (*rx, "cdrki", 0.5f);
+            setParam (*e.getPlugin (4), "vscale", 0.6f); setParam (*e.getPlugin (4), "trainer", 0.0f);
+        }, 4, 3 });
+
+    // --- Bring-up 5: receiver linear EQ - boost dB is generous, but the zero frequency is set past
+    // Nyquist, so almost none of the dialed-in boost actually lands where it's needed. DFE still off. ---
+    bringups.push_back ({
+        "BRINGUP_05_ctle_zero_past_nyquist",
+        "Bring-Up 5: 10 dB of boost that never arrives",
+        "CDR is locked. Bring up the receiver's linear equalizer (CTLE) next, before the DFE (still off) "
+            "- get the analog boost right first. The boost knob is turned up to 10 dB, clearly more than a "
+            "flat response, so this should help against the channel's loss.",
+        "The CTLE has three real knobs, not one: the boost in dB, and where that boost actually starts "
+            "(the \"zero\" frequency) and stops (the high pole). Check the boost the receiver editor "
+            "reports AT Nyquist specifically, not just the headline boost setting.",
+        "10 dB of boost is dialed in, but the CTLE's zero (where the peaking starts) is set to 8 GHz - "
+            "above this link's 5 GHz Nyquist frequency entirely. A CTLE only delivers its full boost once "
+            "you're past the zero; at Nyquist, still below the zero, almost none of that 10 dB has actually "
+            "arrived (about 0.3 dB, read straight off the receiver), so the channel's real loss goes "
+            "essentially uncorrected and a couple of percent of bits come back wrong even though the CDR "
+            "is locked and the boost knob isn't remotely conservative. Moving the zero down to around "
+            "2 GHz - comfortably below Nyquist, where a CTLE sized for this channel would actually put it "
+            "- lets the same 10 dB actually land where it's needed instead. A CTLE's shape (where the "
+            "zero and pole sit), not just its boost magnitude, has to be sized for the link's real baud "
+            "rate.",
+        [&] (HostEngine& e)
+        {
+            e.link->lineRateGBd = 10.0f; e.link->modulation = LinkSettings::nrz;
+            addStage (SignalGenerator::id); addStage (DiffFfe::id); addStage (LossyChannel::id);
+            addStage (SerdesReceiver::id); addStage (EyeScope::id);
+            setParam (*e.getPlugin (0), "pattern", (float) PrbsGenerator::prbs15);
+            setParam (*e.getPlugin (1), "txmode", 1.0f); setParam (*e.getPlugin (1), "adapt", 0.0f);
+            setParam (*e.getPlugin (2), "loss", 14.0f);
+            auto* rx = e.getPlugin (3);
+            setParam (*rx, "clockppm", 0.0f); setParam (*rx, "dfeadapt", 0.0f);
+            setParam (*rx, "ctleboost", 10.0f); setParam (*rx, "ctlezero", 8.0f); setParam (*rx, "ctlepole2", 16.0f);
+            setParam (*e.getPlugin (4), "vscale", 0.6f); setParam (*e.getPlugin (4), "trainer", 0.0f);
+        }, 4, 3 });
+
+    // --- Bring-up 6: receiver DFE brought up last (it needs a locked clock and a settled CTLE first) -
+    // adaptation step left at its coarse, fast-sweep setting instead of tightened for steady-state. ---
+    bringups.push_back ({
+        "BRINGUP_06_dfe_step_too_coarse",
+        "Bring-Up 6: The last tap, still on its coarse setting",
+        "CDR locked, CTLE boost set. Bring up the DFE last - it needs correct decisions from an "
+            "already-locked, already-equalized receiver, which is exactly why it comes after CDR and CTLE "
+            "in this plan, not before. Auto-adapt is on.",
+        "A short BER check here might come back completely clean either way. Look at the eye's height and "
+            "width readouts instead of just the error count - do they look as good as they could?",
+        "The DFE's adaptation step is left at 0.01, its coarsest setting - good for grabbing a rough tap "
+            "value fast during an initial sweep, too coarse for settled, steady-state operation: the taps "
+            "keep hunting back and forth around the right value instead of settling onto it. A short BER "
+            "run can come back with zero errors either way (there usually isn't enough margin lost to flip "
+            "a bit most of the time), which is exactly why this step matters: eye height comes in around "
+            "55% here, versus about 66% once the step is tightened to a normal 0.001 (see Bring-Up 9's "
+            "otherwise-identical configuration) - real margin given "
+            "up to a setting that's easy to forget to tighten after bring-up's first, coarse pass. This is "
+            "the same lesson Bring-Up 9 ends on: a clean BER count over a short run doesn't mean there's "
+            "nothing left to improve, and eye margin is a more sensitive instrument to check than a short "
+            "error count alone.",
+        [&] (HostEngine& e)
+        {
+            e.link->lineRateGBd = 10.0f; e.link->modulation = LinkSettings::nrz;
+            addStage (SignalGenerator::id); addStage (DiffFfe::id); addStage (LossyChannel::id);
+            addStage (SerdesReceiver::id); addStage (EyeScope::id);
+            setParam (*e.getPlugin (0), "pattern", (float) PrbsGenerator::prbs15);
+            setParam (*e.getPlugin (1), "txmode", 1.0f); setParam (*e.getPlugin (1), "adapt", 1.0f);
+            setParam (*e.getPlugin (2), "loss", 10.0f);
+            auto* rx = e.getPlugin (3);
+            setParam (*rx, "clockppm", 0.0f); setParam (*rx, "ctleboost", 6.0f);
+            setParam (*rx, "dfeadapt", 1.0f); setParam (*rx, "dfestep", 0.01f);
+            setParam (*e.getPlugin (4), "vscale", 0.6f); setParam (*e.getPlugin (4), "trainer", 0.0f);
+        }, 4, 3 });
+
+    // --- Bring-up 7: close the full adaptive loop (FFE + CTLE + DFE all auto-adapting) - but the Eye
+    // Scope's own "Feed FFE trainer" switch, deliberately turned off back in Bring-Ups 4-6 to isolate
+    // the CTLE/DFE from the FFE's training loop while bringing each of THOSE up on its own, never got
+    // turned back on now that the full loop is supposed to close. ---
+    bringups.push_back ({
+        "BRINGUP_07_trainer_still_switched_off",
+        "Bring-Up 7: The trainer that's still switched off",
+        "Every piece of the receiver has now been brought up and checked individually - CDR, CTLE, DFE. "
+            "Close the loop: turn on auto-adaptation for all three (TX FFE, CTLE, DFE) together. The "
+            "FFE's \"Auto-adapt\" box is checked, the same as CTLE's and DFE's.",
+        "A checked box doesn't prove a training loop is actually receiving feedback. Open the FFE's own "
+            "editor and read its status line, not just whether the checkbox is ticked - is anything "
+            "actually happening?",
+        "All three auto-adapt boxes are genuinely checked, but the Eye Scope's own \"Feed FFE trainer\" "
+            "switch - turned off deliberately back in Bring-Ups 4-6 to isolate the CTLE and DFE from the "
+            "FFE's training loop while bringing each of THOSE up on its own - never got turned back on now "
+            "that the full loop is supposed to close. The FFE's trainer sits in \"Waiting for "
+            "measurements\" forever (zero adaptation trials ever run; its own editor's status line says "
+            "exactly this), even though its checkbox reads identically to the two loops that ARE actually "
+            "running. CTLE and DFE still adapt fine on their own (they judge themselves against the "
+            "receiver's own slicer error, not this shared probe), so the eye isn't catastrophic - around "
+            "71% height - just quietly worse than the roughly 80% you get once the switch is back on and "
+            "the FFE actually contributes. This is a real link-training mistake: an \"enabled\" checkbox "
+            "doesn't prove the loop it names is receiving feedback - a trainer's own status (not just its "
+            "own enable switch) is what to check before trusting that a trained link is actually trained.",
+        [&] (HostEngine& e)
+        {
+            e.link->lineRateGBd = 10.0f; e.link->modulation = LinkSettings::nrz;
+            addStage (SignalGenerator::id); addStage (DiffFfe::id); addStage (LossyChannel::id);
+            addStage (SerdesReceiver::id); addStage (EyeScope::id);
+            setParam (*e.getPlugin (0), "pattern", (float) PrbsGenerator::prbs15);
+            setParam (*e.getPlugin (1), "txmode", 1.0f); setParam (*e.getPlugin (1), "adapt", 1.0f);
+            setParam (*e.getPlugin (2), "loss", 14.0f);
+            auto* rx = e.getPlugin (3);
+            setParam (*rx, "clockppm", 0.0f);
+            setParam (*rx, "ctleadapt", 1.0f); setParam (*rx, "dfeadapt", 1.0f);
+            setParam (*e.getPlugin (4), "vscale", 0.6f); setParam (*e.getPlugin (4), "trainer", 0.0f);
+        }, 4, 3 });
+
+    // --- Bring-up 8: margin stress test - the fully-trained link from Steps 4-7, now with a realistic
+    // crosstalk aggressor actually running, not just a quiet bench. ---
+    bringups.push_back ({
+        "BRINGUP_08_crosstalk_margin_stress",
+        "Bring-Up 8: Fine on the bench, not fine next to a neighbour",
+        "The link is fully brought up - CDR, CTLE, and DFE all correctly set the way the earlier steps "
+            "left them. Before signing off, stress it the way a real validation lab would: with a "
+            "neighbouring aggressor lane actually running traffic, not just on a quiet bench. A second "
+            "lane couples into this one at a modest level, slightly offset in rate (a realistic "
+            "independent-clock aggressor, not a synchronized one).",
+        "Nothing about the link itself - FFE, CTLE, DFE - changed from the end of the earlier steps. "
+            "Check the Noise Injector's type and level before assuming the receiver regressed.",
+        "Nothing about the receiver's own settings changed from where the earlier bring-up steps left "
+            "them - a crosstalk aggressor at a coupling level of only 0.1 (modest, not an extreme value) "
+            "is enough to collapse the eye height from about 66% down to under 5% - a margin that was "
+            "comfortable moments ago is now right at the edge of actually failing, run to run. This is the actual point "
+            "of a margin stress test: a link that looks completely finished on a quiet bench can still "
+            "have very little real margin, and a crosstalk-free bring-up pass alone doesn't prove the "
+            "board will hold up once its neighbours are actually running traffic. (Pushing the coupling "
+            "level higher still - 0.2 and up, in this same setup - stops the receiver from syncing to the "
+            "data at all, the more obvious, easy-to-catch version of this failure; the quietly-degraded-"
+            "but-still-running case shown here is the one that's easy to miss if you only watch the error "
+            "counter.)",
+        [&] (HostEngine& e)
+        {
+            e.link->lineRateGBd = 10.0f; e.link->modulation = LinkSettings::nrz;
+            addStage (SignalGenerator::id); addStage (DiffFfe::id); addStage (LossyChannel::id);
+            addStage (NoiseInjector::id); addStage (SerdesReceiver::id); addStage (EyeScope::id);
+            setParam (*e.getPlugin (0), "pattern", (float) PrbsGenerator::prbs15);
+            setParam (*e.getPlugin (1), "txmode", 1.0f); setParam (*e.getPlugin (1), "adapt", 0.0f);
+            setParam (*e.getPlugin (2), "loss", 10.0f);
+            auto* noise = e.getPlugin (3);
+            setParam (*noise, "type", (float) NoiseInjector::crosstalk); setParam (*noise, "level", 0.1f);
+            setParam (*noise, "aggoffset", 3.0f);
+            auto* rx = e.getPlugin (4);
+            setParam (*rx, "clockppm", 0.0f); setParam (*rx, "ctleboost", 6.0f);
+            setParam (*rx, "dfeadapt", 1.0f); setParam (*rx, "dfestep", 0.001f);
+            setParam (*e.getPlugin (5), "vscale", 0.6f); setParam (*e.getPlugin (5), "trainer", 0.0f);
+        }, 5, 4 });
+
+    // --- Bring-up 9: final sign-off - everything correctly brought up, the actual issue to solve is
+    // methodological (how much does a clean short run really prove), not a new technical defect. ---
+    bringups.push_back ({
+        "BRINGUP_09_statistical_ber_validation",
+        "Bring-Up 9: Zero errors isn't the same as validated",
+        "Every earlier step is fixed and correctly brought up. Run the final validation the way a real "
+            "bring-up lab would, and decide: is this link actually ready to ship?",
+        "Zero errors over a short run doesn't, by itself, tell you the BER. What's the actual confidence "
+            "bound on the number you just measured, and how does it compare to a real link's typical spec "
+            "(often 1e-12 or tighter)?",
+        "Everything here is correctly brought up and a short run comes back with zero bit errors out of "
+            "roughly 66,000 compared - which sounds perfect, but zero errors only gives you an upper bound "
+            "on the true BER, not the true BER itself. By the \"rule of three\" (3 divided by the bit "
+            "count), that upper bound is only about 4.5e-5 at 95% confidence here. Real SerDes specs are "
+            "routinely 1e-12 or tighter - proving that statistically would take on the order of a trillion "
+            "compared bits, not sixty-six thousand. The honest conclusion from this run is \"no errors seen yet, with "
+            "a lot of margin left to prove,\" not \"validated to spec.\" Deciding how long a real bring-up "
+            "run actually needs to go - and watching eye margin as a leading indicator along the way, the "
+            "way Bring-Up 6 did - is the real last step of a validation plan, not just watching the error "
+            "counter stay at zero for a while.",
+        [&] (HostEngine& e)
+        {
+            e.link->lineRateGBd = 10.0f; e.link->modulation = LinkSettings::nrz;
+            addStage (SignalGenerator::id); addStage (DiffFfe::id); addStage (LossyChannel::id);
+            addStage (SerdesReceiver::id); addStage (EyeScope::id);
+            setParam (*e.getPlugin (0), "pattern", (float) PrbsGenerator::prbs15);
+            setParam (*e.getPlugin (1), "txmode", 1.0f); setParam (*e.getPlugin (1), "adapt", 1.0f);
+            setParam (*e.getPlugin (2), "loss", 10.0f);
+            auto* rx = e.getPlugin (3);
+            setParam (*rx, "clockppm", 0.0f); setParam (*rx, "ctleboost", 6.0f);
+            setParam (*rx, "dfeadapt", 1.0f); setParam (*rx, "dfestep", 0.001f);
+            setParam (*e.getPlugin (4), "vscale", 0.6f); setParam (*e.getPlugin (4), "trainer", 0.0f);
+        }, 4, 3 });
+
+    // --- write + measure, shared between the homework set and the bring-up plan below ---
+    auto processHomeworkSet = [&] (std::vector<Homework>& list)
+    {
     // --- write ---
-    for (auto& hw : set)
+    for (auto& hw : list)
     {
         engine.clearChain();
         hw.build (engine);
@@ -1003,7 +1334,7 @@ int main (int argc, char** argv)
     }
 
     // --- reload each and measure live, so the symptom described is a symptom you can actually see/measure ---
-    for (auto& hw : set)
+    for (auto& hw : list)
     {
         engine.clearChain();
         engine.link->lineRateGBd = 3.0f;
@@ -1093,17 +1424,19 @@ int main (int argc, char** argv)
             auto& st = compare.getStats();
             auto* rx = dynamic_cast<SerdesReceiver*> (engine.getPlugin ((size_t) hw.rxSlot));
             if (st.compared == 0)
-                std::printf ("LIVE %-38s eye h=%5.1f%% w=%3.0f%% | NO VALID BITS RECOVERED (never synced) | locked=%d\n",
-                             hw.file, m.heightPct, m.widthPct, rx ? (int) rx->status.locked.load() : -1);
+                std::printf ("LIVE %-38s eye h=%5.1f%% (%.3f FS) w=%3.0f%% swing=%.3f | NO VALID BITS RECOVERED (never synced) | locked=%d\n",
+                             hw.file, m.heightPct, m.heightFS, m.widthPct, m.swing, rx ? (int) rx->status.locked.load() : -1);
             else
-                std::printf ("LIVE %-38s eye h=%5.1f%% w=%3.0f%% | %6llu bits %5llu err BER %s | locked=%d\n", hw.file, m.heightPct, m.widthPct,
+                std::printf ("LIVE %-38s eye h=%5.1f%% (%.3f FS) w=%3.0f%% swing=%.3f | %6llu bits %5llu err BER %s | locked=%d\n", hw.file,
+                             m.heightPct, m.heightFS, m.widthPct, m.swing,
                              (unsigned long long) st.compared, (unsigned long long) st.errors,
                              (st.errors == 0 ? ("<" + String (compare.berUpperBound95(), 1, true)) : String (compare.ber(), 1, true)).toRawUTF8(),
                              rx ? (int) rx->status.locked.load() : -1);
         }
         else
         {
-            std::printf ("LIVE %-38s eye h=%5.1f%% w=%3.0f%% | NMSE %6.1f dB\n", hw.file, m.heightPct, m.widthPct,
+            std::printf ("LIVE %-38s eye h=%5.1f%% (%.3f FS) w=%3.0f%% swing=%.3f | NMSE %6.1f dB\n", hw.file,
+                         m.heightPct, m.heightFS, m.widthPct, m.swing,
                          LinkSettings::nmseToDb (engine.link->probe.nmse.load()));
         }
 
@@ -1138,6 +1471,10 @@ int main (int argc, char** argv)
             std::printf ("\n");
         }
     }
+    };
+
+    processHomeworkSet (set);
+    processHomeworkSet (bringups);
 
     return 0;
 }

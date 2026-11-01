@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="BRINGUP_03_tx_ffe_wrong_budget" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="342.VMjLgzT....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXsAGaoQWcjUlHfXWXrUWY8HBLtHSMh7hO7.UPRETSfjFY8HBYiQlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPlboYWYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBbgQGckImah.hcgwVck0iHz3BLh7hO7.UPRETSfjFY8HhboMWYh.hcgwVck0iHv3BMv.CLv.CLvTSN1.CM1PSMh7hO7.UPRETSfjFY8HhbpIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHyoVXsAmHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhLmZlIWYwIBH1EFa0UVOhTiKv.CLv.CLzbiM3LyMwTCNh7hO77xTTEDUE4C.">
+    <PARAM id="pattern" value="0.5"/>
+    <PARAM id="drive" value="0.0"/>
+    <PARAM id="amplitude" value="0.4791666865348816"/>
+    <PARAM id="rise" value="0.3684210479259491"/>
+    <PARAM id="rj" value="0.0"/>
+    <PARAM id="sjamp" value="0.0"/>
+    <PARAM id="sjfreq" value="0.3502276241779327"/>
+    <PARAM id="dcd" value="0.0"/>
+    <PLUGIN name="SerDes Signal Generator" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.generator" uniqueId="7f6fc3b2"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="7f6fc3b2"/>
+  </SLOT>
+  <SLOT bypassed="0" state="487.VMjLg3c....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRXjEFbzIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHsEVZtIBH1EFa0UVOh.iK1PiL3TyMwLCMyPiLwjyL1HxK9vCTAIUPMARZj0iHv81bzEiHfXWXrUWY8HRKv3hL0bSLzHCN2DiMwfiL2.SNh7hO7.UPRETSfjFY8HBbuMGcxHBH1EFa0UVOh.iKvHCN0bSLzHCN2LSLvfyL3biHu3COPEjTA0DHoQVOh.2ayQ2Lh.hcgwVck0iHs.iKv.SN0HyL3DCL3DCN2jSLyfSNh7hO7.UPRETSfjFY8HBbxUVLh.hcgwVck0iHs.iKvPyM1DSNvTiLxLSLyDSL3HxK9vCTAIUPMARZj0iHvIWYxHBH1EFa0UVOh.iKv.SN0HyL3.CN4TiMwPiMxPiHu3COPEjTA0DHoQVOh.mbkMiHfXWXrUWY8HRKv3BLvjSMxLCNw.CNwfyM4DyL3jiHu3COPEjTA0DHoQVOhHWY1UlbyUlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPGds8FYkIBH1EFa0UVOhDiKvHxK9vyKSQUPTUjO..">
+    <PARAM id="pre3" value="0.4920634925365448"/>
+    <PARAM id="pre2" value="0.5079364776611328"/>
+    <PARAM id="pre1" value="0.460317462682724"/>
+    <PARAM id="main" value="0.4285714328289032"/>
+    <PARAM id="post1" value="0.2857142686843872"/>
+    <PARAM id="post2" value="0.5238094925880432"/>
+    <PARAM id="post3" value="0.4920634925365448"/>
+    <PARAM id="txmode" value="1.0"/>
+    <PARAM id="reverse" value="0.0"/>
+    <PARAM id="adapt" value="0.0"/>
+    <PLUGIN name="SerDes FFE" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ffe" uniqueId="fc2287c4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="fc2287c4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="127.VMjLgXG....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HRYtElXrUFYh.hcgwVck0iHw3BLh7hO7.UPRETSfjFY8HBauM2bh.hcgwVck0iHwXiKvHxK9vyKSQUPTUjO..">
+    <PARAM id="enabled" value="1.0"/>
+    <PARAM id="loss" value="0.4000000059604645"/>
+    <PLUGIN name="SerDes Lossy Channel" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.channel" uniqueId="f90351a2"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="f90351a2"/>
+  </SLOT>
+  <SLOT bypassed="0" state="240.VMjLgbN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzglb0IBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzIWXo4VYxIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iH1kVY2IBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1M2XgwVYh.hcgwVck0iHv3RM4jSN4jSN1PiLybiLwLSLh7hO77xTTEDUE4C.">
+    <PARAM id="vscale" value="0.4488795399665833"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="trainer" value="1.0"/>
+    <PARAM id="view" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="SerDes Eye Scope" format="DAW_LAB Built-in" category="SerDes"
+            manufacturer="DAW_LAB" version="1.0" file="lab.eyescope" uniqueId="81882a04"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="2"
+            numOutputs="2" isShell="0" hasARAExtension="0" uid="81882a04"/>
+  </SLOT>
+  <HOMEWORK title="Bring-Up 3: A real equalizer, budgeted for the wrong channel"
+            prompt="Pre-emphasize the transmitter for the channel - taps are hand-set (TX mode on, auto-adapt off, the way you'd dial in a first guess before ever closing a training loop) using the 11 dB the datasheet claims, the way you would if you trusted the paperwork instead of Bring-Up 2's measurement."
+            hint="The FFE's stem plot will show real, sensible pre-emphasis - it's not flat, and it's not backwards. Compare its boost at Nyquist (under the plot) to the channel's actual measured loss, not to what the datasheet said the channel should be."
+            explanation="These taps are exactly the ones that converge cleanly for an 11 dB channel - a real, correctly-shaped equalizer (right direction, sensible magnitudes), just budgeted for the wrong number. Against the real 16 dB channel from Bring-Up 2, the eye only reaches about 39% height - clearly short of the roughly 55% you get from the same FFE re-budgeted for the real measured loss (a bit more post-cursor tap, a bit less main tap, to spend more of the budget cancelling the extra 5 dB). This is exactly the bring-up trap Bring-Up 2 existed to prevent: an equalizer that looks completely reasonable - correct shape, correct direction, real non-zero taps - but calibrated off a datasheet number instead of what you actually measured."/>
+</LABCHAIN>

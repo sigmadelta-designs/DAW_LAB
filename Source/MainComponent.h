@@ -3,6 +3,7 @@
 #include "ChainView.h"
 #include "HostEngine.h"
 #include "HintWindow.h"
+#include "BringUpWindow.h"
 #include "Builtin/DawLabLookAndFeel.h"
 
 // Top-level UI: pick a scanned plugin, append it to the chain, reorder/bypass/
@@ -41,6 +42,7 @@ private:
     void layoutChain();
     void setStatus (const juce::String& text);
     void toggleHintWindow();
+    void toggleBringUpWindow();
 
     static juce::File getPresetDirectory();
 
@@ -49,6 +51,7 @@ private:
     std::vector<juce::PluginDescription> pluginChoices;
     std::map<juce::AudioProcessorGraph::NodeID, std::unique_ptr<PluginWindow>> editors;
     std::unique_ptr<HintWindow> hintWindow;
+    std::unique_ptr<BringUpWindow> bringUpWindow;
     std::unique_ptr<juce::FileChooser> chooser;
     juce::String chainName;
     bool busy = false;
@@ -60,7 +63,8 @@ private:
                      loadButton       { "Load Preset..." },
                      clearButton      { "Clear Chain" },
                      audioButton      { "Audio Settings..." },
-                     hintButton       { "Homework Hint..." };
+                     hintButton       { "Homework Hint..." },
+                     bringUpButton    { "Bring-Up Plan..." };
     juce::Label chainLabel, statusLabel, rateLabel { {}, "Line rate" }, rateInfoLabel;
     juce::Slider rateSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight };
     juce::ComboBox modulationBox;

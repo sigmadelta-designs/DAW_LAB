@@ -28,7 +28,7 @@ MainComponent::MainComponent()
 {
     setLookAndFeel (&lookAndFeel);
 
-    for (auto* button : { &addButton, &scanButton, &saveButton, &loadButton, &clearButton, &audioButton, &hintButton })
+    for (auto* button : { &addButton, &scanButton, &saveButton, &loadButton, &clearButton, &audioButton, &hintButton, &bringUpButton })
         addAndMakeVisible (button);
 
     addAndMakeVisible (pluginBox);
@@ -56,6 +56,10 @@ MainComponent::MainComponent()
     hintButton.setTooltip ("Opens the homework window: the scenario for a HOMEWORK_*.labchain preset, "
                            "with a hint and an explanation you can reveal if you get stuck.");
     hintButton.onClick = [this] { toggleHintWindow(); };
+    bringUpButton.setTooltip ("Opens a guided, linear walk through the BRINGUP_*.labchain sequence - each "
+                              "step is its own mission with something to find, and finishing one loads the "
+                              "next with a single button press instead of Load Preset... each time.");
+    bringUpButton.onClick = [this] { toggleBringUpWindow(); };
 
     // 1 GBd on the wire runs as 1 kBd here (simulation scale 1e6).
     rateSlider.setRange (LinkSettings::minGBd, LinkSettings::maxGBd, 0.01);
@@ -99,7 +103,7 @@ MainComponent::MainComponent()
     engine.chainChanged.addChangeListener (this);
     refreshPluginList();
     setStatus ("Empty chain: input is passed straight to output");
-    setSize (780, 600);
+    setSize (860, 600);
     triggerAsyncUpdate();
 }
 
@@ -147,6 +151,8 @@ void MainComponent::resized()
     audioButton.setBounds (bottom.removeFromRight (140));
     bottom.removeFromRight (6);
     hintButton.setBounds (bottom.removeFromRight (130));
+    bottom.removeFromRight (6);
+    bringUpButton.setBounds (bottom.removeFromRight (130));
     bottom.removeFromRight (6);
     clearButton.setBounds (bottom.removeFromRight (100));
     bottom.removeFromRight (6);
@@ -397,6 +403,30 @@ void MainComponent::toggleHintWindow()
             {
                 if (safeThis != nullptr)
                     safeThis->hintWindow.reset();
+            });
+        });
+}
+
+void MainComponent::toggleBringUpWindow()
+{
+    if (bringUpWindow != nullptr)
+    {
+        bringUpWindow.reset();
+        return;
+    }
+
+    bringUpWindow = std::make_unique<BringUpWindow> (engine, getPresetDirectory(),
+        [safeThis = juce::Component::SafePointer<MainComponent> (this)] (const juce::File& file)
+        {
+            if (safeThis != nullptr)
+                safeThis->loadPresetFile (file);
+        },
+        [safeThis = juce::Component::SafePointer<MainComponent> (this)]
+        {
+            juce::MessageManager::callAsync ([safeThis]
+            {
+                if (safeThis != nullptr)
+                    safeThis->bringUpWindow.reset();
             });
         });
 }
