@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="DDRBRINGUP_08_margin_stress_fixed_odt" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="238.VMjLgTN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhX0I2bzc2axQ1bh.hcgwVck0iH1PiKvHxK9vCTAIUPMARZj0iHiE1brEFck41X4IBH1EFa0UVOhPiKvHxK9vCTAIUPMARZj0iHvEFczUlbtIBH1EFa0UVOhHiKvHxK9vCTAIUPMARZj0iHxUmatklamIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFcigVZvIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="targetchip" value="0.0"/>
+    <PARAM id="pattern" value="0.6666666865348816"/>
+    <PARAM id="burstwords" value="0.2380952388048172"/>
+    <PARAM id="caslatency" value="0.2000000029802322"/>
+    <PARAM id="running" value="1.0"/>
+    <PLUGIN name="DDR Controller" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddrcontroller"
+            uniqueId="1c30c26d" isInstrument="0" fileTime="0" infoUpdateTime="0"
+            numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
+            uid="1c30c26d"/>
+  </SLOT>
+  <SLOT bypassed="0" state="208.VMjLgbL....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHvI2ahUlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPGZxUmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhX2biEFakIBH1EFa0UVOh.iK2TCLv.CLvTSN1.CM1PCM3HxK9vyKSQUPTUjO..">
+    <PARAM id="vscale" value="0.5254070162773132"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="probe" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="DDR Eye Scope" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddreyescope" uniqueId="79b349d4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="18"
+            numOutputs="18" isShell="0" hasARAExtension="0" uid="79b349d4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="520.VMjLg7e....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhLz.iKvHxK9vCTAIUPMARZj0iH1IWYlIBH1EFa0UVOh.iK0HxK9vCTAIUPMARZj0iH5EWYxI2axIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="chipnumber" value="0.0"/>
+    <PARAM id="vref" value="0.7777777910232544"/>
+    <PARAM id="odt" value="0.7857142686843872"/>
+    <PARAM id="zqerror" value="0.5"/>
+    <PARAM id="cstiming" value="0.0"/>
+    <PARAM id="dqskew0" value="0.0"/>
+    <PARAM id="dqskew1" value="0.0"/>
+    <PARAM id="dqskew2" value="0.0"/>
+    <PARAM id="dqskew3" value="0.0"/>
+    <PARAM id="dqskew4" value="0.0"/>
+    <PARAM id="dqskew5" value="0.0"/>
+    <PARAM id="dqskew6" value="0.0"/>
+    <PARAM id="dqskew7" value="0.0"/>
+    <PARAM id="dfe" value="0.0"/>
+    <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
+            version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"
+            isShell="0" hasARAExtension="0" uid="2800a3dd"/>
+  </SLOT>
+  <HOMEWORK title="DDR Bring-Up 8: ODT is fixed elsewhere on the board - now what?"
+            prompt="Separate from the specific board Bring-Up 2 and 7 dealt with, this chip is now being characterized on a clean test fixture at its full rated swing - standard practice for a chip-level spec, independent of any one board's own channel. A late system-level finding says this chip's ODT target has to stay at its current (effectively-off) value for an unrelated board requirement - it cannot be reprogrammed. The memory test fails almost every word at that fixed ODT. Is there anything else on this chip that could still clean this up, given ODT itself is off the table?"
+            hint="Check the chip's own DFE control. DDR5 DRAMs carry a real decision-feedback equalizer on their DQ receivers specifically to cancel known inter-symbol interference like a termination mismatch - is it actually turned on?"
+            explanation="With ODT fixed at a mismatched value, the resulting termination reflects a scaled echo of the signal back into later bits - the same reflection mechanism as Bring-Up 3, just with the fix (reprogramming ODT) taken off the table this time. The chip's own single-tap DFE is sitting disabled; turning it on cancels that known echo using the chip's own prior decision, fully absorbing the same ODT problem without changing the termination itself - DFE Bring-Up 9 confirms with a live measurement, not just this claim. This mirrors a real DDR5 capability (DQ receivers carry their own, 4-tap-in-a-real-part DFE for exactly this reason) and the same real lesson as DDR Homework 9 in the flat set: when a signal-integrity problem can't be fixed at its physical source, equalization that was simply left off can sometimes still absorb it downstream - but (as Bring-Up 9 also found) only within the operating range that simplified equalizer was actually characterized for."/>
+</LABCHAIN>

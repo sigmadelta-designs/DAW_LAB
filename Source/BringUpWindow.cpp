@@ -4,18 +4,21 @@ class BringUpWindow::Content : public juce::Component,
                                private juce::ChangeListener
 {
 public:
-    Content (HostEngine& engineToWatch, juce::File directory, std::function<void (const juce::File&)> loader)
-        : engine (engineToWatch), loadStepFile (std::move (loader))
+    Content (HostEngine& engineToWatch, juce::File directory, juce::String pattern, juce::String title,
+             juce::String settingsKeyToUse, std::function<void (const juce::File&)> loader)
+        : engine (engineToWatch), loadStepFile (std::move (loader)), filePattern (std::move (pattern)),
+          planTitle (std::move (title)), settingsKey (std::move (settingsKeyToUse))
     {
         setLookAndFeel (&lookAndFeel);
 
-        // BRINGUP_01_..., BRINGUP_02_... - the zero-padded step number is what makes plain filename
-        // sorting double as plan order, the same trick the HOMEWORK_* presets already rely on.
-        for (const auto& f : directory.findChildFiles (juce::File::findFiles, false, "BRINGUP_*.labchain"))
+        // e.g. BRINGUP_01_..., BRINGUP_02_... (or DDRBRINGUP_01_... for the DDR plan) - the zero-padded
+        // step number is what makes plain filename sorting double as plan order, the same trick the
+        // HOMEWORK_* presets already rely on.
+        for (const auto& f : directory.findChildFiles (juce::File::findFiles, false, filePattern))
             steps.add (f);
         steps.sort();
 
-        currentStep = juce::jlimit (0, steps.size(), engine.getSettings()->getIntValue ("bringupStep", 0));
+        currentStep = juce::jlimit (0, steps.size(), engine.getSettings()->getIntValue (settingsKey, 0));
 
         progressLabel.setFont (juce::FontOptions (13.0f));
         progressLabel.setColour (juce::Label::textColourId, juce::Colours::lightgrey);
@@ -101,7 +104,7 @@ private:
             return;
 
         currentStep = step;
-        engine.getSettings()->setValue ("bringupStep", currentStep);
+        engine.getSettings()->setValue (settingsKey, currentStep);
         loadStepFile (steps[currentStep - 1]);
         // The chain-loaded callback will fire engine.chainChanged shortly, which calls refresh() - but
         // refresh now too so the progress line updates immediately instead of looking unresponsive.
@@ -120,9 +123,9 @@ private:
     {
         if (steps.isEmpty())
         {
-            progressLabel.setText ("No BRINGUP_*.labchain presets found", juce::dontSendNotification);
-            titleLabel.setText ("Bring-Up & Validation Plan", juce::dontSendNotification);
-            bodyEditor.setText ("Generate the BRINGUP_*.labchain presets into this app's preset folder "
+            progressLabel.setText ("No " + filePattern + " presets found", juce::dontSendNotification);
+            titleLabel.setText (planTitle, juce::dontSendNotification);
+            bodyEditor.setText ("Generate the " + filePattern + " presets into this app's preset folder "
                                  "to use this window.", juce::dontSendNotification);
             previousButton.setEnabled (false);
             nextButton.setEnabled (false);
@@ -165,6 +168,7 @@ private:
 
     HostEngine& engine;
     std::function<void (const juce::File&)> loadStepFile;
+    juce::String filePattern, planTitle, settingsKey;
     juce::Array<juce::File> steps;
     int currentStep = 0;   // 1-based; 0 only while no BRINGUP_* presets exist at all
 
@@ -178,13 +182,15 @@ private:
     juce::TooltipWindow tooltipWindow { this };
 };
 
-BringUpWindow::BringUpWindow (HostEngine& engineToWatch, juce::File presetDirectory,
+BringUpWindow::BringUpWindow (HostEngine& engineToWatch, juce::File presetDirectory, juce::String filePattern,
+                              juce::String windowTitle, juce::String settingsKey,
                               std::function<void (const juce::File&)> loadStepFile, std::function<void()> onClose)
-    : DocumentWindow ("Bring-Up & Validation Plan", juce::Colours::darkgrey, DocumentWindow::closeButton),
+    : DocumentWindow (windowTitle, juce::Colours::darkgrey, DocumentWindow::closeButton),
       closeCallback (std::move (onClose))
 {
     setUsingNativeTitleBar (true);
-    setContentOwned (new Content (engineToWatch, std::move (presetDirectory), std::move (loadStepFile)), true);
+    setContentOwned (new Content (engineToWatch, std::move (presetDirectory), std::move (filePattern),
+                                  windowTitle, std::move (settingsKey), std::move (loadStepFile)), true);
     setResizable (true, false);
     centreWithSize (getWidth(), getHeight());
     setVisible (true);

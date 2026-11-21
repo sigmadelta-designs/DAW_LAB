@@ -49,6 +49,10 @@ set(DAWLAB_STAGE_SOURCES
     Source/Builtin/LossyEditor.cpp
     Source/Builtin/NoiseInjector.cpp
     Source/Builtin/NoiseEditor.cpp
+    Source/Builtin/PllCore.cpp
+    Source/Builtin/PllCoreEditor.cpp
+    Source/Builtin/PllJitterScope.cpp
+    Source/Builtin/PllJitterScopeEditor.cpp
     Source/Builtin/SignalGenerator.cpp
     Source/Builtin/ReceiverEditor.cpp
     Source/Builtin/SerdesReceiver.cpp

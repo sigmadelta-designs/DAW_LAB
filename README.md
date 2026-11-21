@@ -418,6 +418,91 @@ nature is covered already, if not literally as a 2D sweep, by Homework 18. Stand
 foundation was solid rather than be built in parallel, also remain future work. Homework scenarios (17-25)
 do exist now - see "Homework" below.
 
+## PLL stages (built in) - first pass
+
+A third, independent domain alongside SerDes and DDR, sharing the same app shell/plugin-format machinery
+but with its own link object (`PllLinkSettings`) and its own stage. Where DDR needed an independent domain
+because of its bidirectional bus, a standalone frequency-synthesis PLL is actually a friendlier fit for
+this project's feed-forward chain model than DDR was: reference clock in, locked clock out, nothing to loop
+back. "PLL validation" here means the real bench concerns - lock time, lock/capture range, loop bandwidth
+and damping, reference spurs, holdover - for a clock-*synthesis* PLL (reference -> PFD -> charge pump -> VCO
+-> /N feedback), a different loop from the Alexander bang-bang clock-*recovery* CDR already buried in
+`SerdesReceiver` (that one tracks an already-present data stream's edges; this one generates a clean
+multiplied clock from its own reference).
+
+**PLL Core** (`lab.pllcore`) is the whole loop in one stage (the same "one stage, several probe points"
+shape `SerdesReceiver` uses for CTLE/AGC/CDR/DFE, rather than separate PFD/filter/VCO plugins): a reference
+oscillator it owns and drives itself (no separate clock-source stage needed, the same way `DdrController`
+owns CK generation), a real 2-flip-flop phase/frequency detector (not a linear phase-error subtraction -
+this is what gives it genuine, not-assumed frequency-acquisition behaviour outside +-2pi, the same
+"model the real circuit" choice DDR Chip's ODT/ZQ reflection made), a loop filter folded into two direct
+gains (**Loop filter proportional gain** / **Loop filter integral gain** - R1/C1's roles, not a literal
+transconductance/capacitance, the same disclosed simplification the SerDes CDR's own kp/ki already makes),
+a VCO (**VCO free-run frequency** + the loop's correction), and an integer **Feedback divider N**. Exposes
+four channels (reference, VCO/output, divided feedback, loop-filter control signal) as real +-1 square
+waves (control signal as a raw analog level) so a future scope could probe any of them - DQ/DQS-style
+single-ended nodes, not a differential pair, since a PLL's internal clocks normally are. One SIM param,
+**Injected reference jitter (UI rms)**, stresses the loop with Gaussian per-edge timing jitter (same Box-
+Muller convention as the SerDes generator's RJ, with the shift itself clamped rather than the resulting
+phase - clamping or wrapping the *result* instead, tried first, biased the long-run reference rate because
+it silently discards or re-randomises large excursions rather than just bounding a nudge).
+
+Verified against the closed-form theory this exact discrete model reduces to under small-phase-error
+averaging (`wn = sqrt(loopki/N)`, `zeta = loopkp / (2*sqrt(N*loopki))`, derived in a header comment in
+`PllCore.cpp`) via a scratch harness: cold-start lock from a genuine initial frequency error lands on
+*exactly* N x reference (not just close to the VCO's free-run frequency); a post-lock reference-frequency
+step is tracked back to zero steady-state phase error at the new frequency; and a 24x sweep of the
+proportional gain shows monotonically decreasing step-response overshoot, the qualitative trend the theory
+predicts, confirmed by measurement rather than assumed. Default gains were chosen (not guessed blind) to
+land near zeta ~ 0.7 with the loop bandwidth comfortably below the default reference frequency. Two
+deliberately-misconfigured scenarios were also checked end to end: a wrong feedback divider locks
+confidently to the *wrong* frequency with no error reported at all (the same "looks fine but isn't" lesson
+as the DDR chip-select-mismatch homeworks), and weak loop gains fail to pull in a modest frequency step
+within a 10-second window (a genuine "loop bandwidth too narrow" fault, not a hand-wave).
+
+**PLL Core's editor** (`PllCoreEditor`) is six sliders (the DUT/SIM params above) plus a live status line
+(locked/acquiring, VCO frequency vs. target, phase error) and a lock-acquisition transient strip chart -
+VCO frequency error vs. time since the last reference/divider change, the view nothing else in this project
+shows (EyeScope/JitterScope are steady-state-only tools; this is what you'd actually watch on a bench while
+a PLL pulls in). **PLL Jitter / Phase Noise Scope** (`lab.plljitter`, `PllJitterScope`) reuses `JitterAnalyzer`
+completely unchanged, the same move DDR Eye Scope made with `EyeAnalyzer` - a near-free reuse once the
+underlying analyzer is already generic. Sits downstream of PLL Core on its 4-channel bus (Pass-through off
+terminates it) with a **Probe** choice of Reference / VCO output / Feedback, reading the expected clock rate
+for whichever node is selected from `PllLinkSettings` (published by PLL Core each block - `refFreqHz`,
+`vcoFreqHz`, `fbDivider`, `locked` - so a downstream stage that cannot see PLL Core directly still knows
+what frequency it should be looking at, the same reason `LinkSettings::baudHz()`/`DdrLinkSettings::busHz()`
+exist for their domains). Pointed at the VCO output, this is the real bench measurement for reference spurs
+and jitter peaking.
+
+Four flat homework presets (`HOMEWORK_26-29`) exist now - a wrong feedback divider that locks confidently to
+the *wrong* frequency with zero error reported; loop gains ~50x too weak to pull in a cold-start error in any
+reasonable time; a badly underdamped loop filter (proportional gain ~6x low) that rings before settling; and
+a methodology lesson where a noisy reference trips the simple instantaneous-phase-error lock detector even
+though the loop is genuinely tracking correctly on *average* (measured, not asserted: averaging the VCO
+frequency over the second half of a measurement window - what the homework itself tells the reader to do -
+lands within a fraction of a percent of target, where a single instantaneous reading can be off by several
+percent purely from sampling noise under jitter this large). See "Homework" below.
+
+A 6-step **PLL Bring-Up & Validation plan** (`PLLBRINGUP_01-06`) also exists now, opened from its own "PLL
+Bring-Up..." button/window (third independent `BringUpWindow` instance, `PLLBRINGUP_*.labchain`/
+`"pllBringupStep"`, same non-colliding-prefix convention as the DDR plan): (1) free-run VCO check with the
+loop deliberately open (both gains zero) - the VCO is 200 MHz/20% short of spec before the loop is ever
+closed, the same "check the foundation first" habit as both other domains' own Bring-Up 1; (2) closing the
+loop with a wrong feedback divider - locks confidently to 1025 MHz instead of 1000; (3) the right divider,
+but loop gains ~50x too weak to finish acquiring; (4) gains restored but unbalanced - rings for over 4
+seconds before settling, vs. ~2 seconds for a balanced loop in step 2; (5) a deliberate reference-jitter
+stress test once everything else is tuned, with the same lock-detector-vs-average-frequency lesson as
+Homework 29; (6) final sign-off with a clean reference restored - locks in 1.7 s, exactly on frequency,
+zero final phase error. Every step's numbers are from the real `GenerateHomework` tool's own
+write-XML-reload-measure round trip, not assumed from the theory.
+
+**Not done yet, by design:** fractional-N (integer-N only, so delta-sigma-modulator spurs aren't modelled);
+a holdover/reference-loss scenario (the `refjitter` SIM param exists, a reference-loss toggle doesn't yet); a
+lock detector robust to injected reference jitter (the current one is a simple instantaneous-phase-error
+threshold - Homework 29/Bring-Up 5 turn this into a deliberate teaching point rather than hiding it, but the
+detector itself isn't more robust); and standalone VST3/AU packaging (built-in only for now, consistent with
+the DDR stages' own precedent).
+
 ## Chain presets
 
 Save Preset... / Load Preset... write `.labchain` files (XML, default folder
@@ -622,7 +707,47 @@ zero-padded step number sorts them into plan order), shows the current step's sc
 hidden-until-revealed hint/explanation as the Homework Hint window, and a single **Next Step** button that
 both advances and loads the next step's chain - no need to open a file browser and remember which preset
 comes next. The current step persists across closing/reopening the window and across runs of the app (an
-app-settings value), and the window auto-loads step 1 the very first time it's ever opened.
+app-settings value), and the window auto-loads step 1 the very first time it's ever opened. `BringUpWindow`
+itself is generic over which plan it's walking (filename pattern, window title, persisted-step settings
+key) rather than hardcoded to this one SerDes sequence - see the DDR and PLL bring-up plans below, which
+each reuse it as their own independent window/button rather than a second (or third) implementation.
+
+## DDR bring-up & validation plan
+
+`Presets/DDRBRINGUP_*.labchain` are the DDR-domain counterpart to the plan above: nine steps standing a DRAM
+byte lane up in the real JEDEC-ish training order the flat DDR homeworks (17-25) already individually model
+- chip-select sanity before anything else, then characterize the real channel, then ZQ cal, CS/CA training,
+write levelling, and per-bit DQ deskew (all amplitude-independent, so done at full bench swing), then Vref
+training against the real, previously-characterized board channel, then a chip-level margin-stress check,
+then a final validation run:
+
+1. **Chip-select sanity** - does the chip even answer its own chip-select, before training anything.
+2. **Channel swing characterization** - measure the real board trace's DQ/DQS swing with the DDR Eye Scope; don't assume it.
+3. **ZQ calibration** - a programmed ODT target isn't the same thing as a *calibrated* one.
+4. **CS/CA training** - align when this chip samples chip-select, or every read times out even though writes work.
+5. **Write levelling** - align DQS to CK as a byte lane; done, every bit lags (or leads) together.
+6. **Per-bit DQ deskew** - the finer-grained training step after write levelling, for the pins write levelling alone can't fix.
+7. **Vref training for the real channel** - a Vref trained on the bench doesn't carry over to the real board's attenuated swing.
+8. **Margin stress, ODT fixed** - a termination that can't be reprogrammed; does the chip's own DFE absorb it instead?
+9. **Final validation** - telling a one-time BIST warm-up transient apart from a real, persistent fault, and what a short clean run actually proves.
+
+Every step's numbers come from this tool's own live measurement, the same discipline the SerDes plan above
+follows - and that discipline surfaced two real findings specific to the DDR side, not asserted up front:
+every `DdrController`/`DdrChip` BIST run shows a one-time burst of errors (about one full address sweep's
+worth) in the first fraction of a second after any chain loads, then runs completely clean afterward - a
+cold-start artifact of the existing DDR BIST logic, confirmed by sampling the live error counters repeatedly
+rather than trusting one final total, and called out explicitly in Bring-Up 2 and 9 rather than left to look
+like an unexplained fault. And Bring-Up 8/9's "ODT can't be reprogrammed, so enable DFE instead" scenario -
+initially built, like the SerDes side's `DDR Homework 9`, on top of Bring-Up 7's real ~30%-of-ideal board
+swing - measured as a clear *regression* once DFE was turned on: this chip's single-tap DFE cancels using
+the previous bit's *full-scale* decision rather than the actual swing-scaled echo, so at reduced swing it
+overcorrects and makes the error rate worse, not better. Bring-Up 8/9 were rebuilt at the chip's full rated
+swing instead (characterization on a clean test fixture, independent of any one board's channel), where live
+testing confirms DFE genuinely drives the error rate back down to just the cold-start baseline.
+
+**DDR Bring-Up...** opens a second `BringUpWindow` instance pointed at the `DDRBRINGUP_*.labchain` prefix,
+its own window title, and its own persisted-step settings key - a completely independent plan and window
+from **Bring-Up Plan...**, not a second sequence mixed into the same one.
 
 ## The stages as VST3 / AU plugins
 

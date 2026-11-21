@@ -1,9 +1,16 @@
 #pragma once
 
 #include "LinkSettings.h"
-#include <type_traits>
 
 class DdrLinkSettings;   // forward declared only for the category-name trait check below
+class PllLinkSettings;   // ditto
+
+// One category name per link-object type, so the plugin-description "category" field (and anything else
+// that wants a human-readable domain name) stays a one-line addition when a new domain is added, instead
+// of growing into a chain of ?: checks.
+template <typename LinkSettingsType> struct LinkCategoryName        { static constexpr const char* value = "SerDes"; };
+template <> struct LinkCategoryName<DdrLinkSettings>                { static constexpr const char* value = "DDR"; };
+template <> struct LinkCategoryName<PllLinkSettings>                { static constexpr const char* value = "PLL"; };
 
 // Shared plumbing for the SerDes stages: a processor with a parameter tree, state save/restore, and the
 // plugin-description boilerplate the host needs to treat it like any other plugin. Templated on which
@@ -36,7 +43,7 @@ public:
         description.name = name;
         description.descriptiveName = name;
         description.pluginFormatName = formatName;
-        description.category = std::is_same_v<LinkSettingsType, DdrLinkSettings> ? "DDR" : "SerDes";
+        description.category = LinkCategoryName<LinkSettingsType>::value;
         description.manufacturerName = "DAW_LAB";
         description.version = "1.0";
         description.fileOrIdentifier = identifier;

@@ -43,6 +43,8 @@ private:
     void setStatus (const juce::String& text);
     void toggleHintWindow();
     void toggleBringUpWindow();
+    void toggleDdrBringUpWindow();
+    void togglePllBringUpWindow();
 
     static juce::File getPresetDirectory();
 
@@ -52,6 +54,8 @@ private:
     std::map<juce::AudioProcessorGraph::NodeID, std::unique_ptr<PluginWindow>> editors;
     std::unique_ptr<HintWindow> hintWindow;
     std::unique_ptr<BringUpWindow> bringUpWindow;
+    std::unique_ptr<BringUpWindow> ddrBringUpWindow;
+    std::unique_ptr<BringUpWindow> pllBringUpWindow;
     std::unique_ptr<juce::FileChooser> chooser;
     juce::String chainName;
     bool busy = false;
@@ -64,7 +68,9 @@ private:
                      clearButton      { "Clear Chain" },
                      audioButton      { "Audio Settings..." },
                      hintButton       { "Homework Hint..." },
-                     bringUpButton    { "Bring-Up Plan..." };
+                     bringUpButton    { "Bring-Up Plan..." },
+                     ddrBringUpButton { "DDR Bring-Up..." },
+                     pllBringUpButton { "PLL Bring-Up..." };
     juce::Label chainLabel, statusLabel, rateLabel { {}, "Line rate" }, rateInfoLabel;
     juce::Slider rateSlider { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight };
     juce::ComboBox modulationBox;

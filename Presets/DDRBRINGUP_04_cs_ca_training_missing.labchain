@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="DDRBRINGUP_04_cs_ca_training_missing" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="238.VMjLgTN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhX0I2bzc2axQ1bh.hcgwVck0iHwXiKvHxK9vCTAIUPMARZj0iHiE1brEFck41X4IBH1EFa0UVOhPiKvHxK9vCTAIUPMARZj0iHvEFczUlbtIBH1EFa0UVOhHiKvHxK9vCTAIUPMARZj0iHxUmatklamIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFcigVZvIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="targetchip" value="0.0"/>
+    <PARAM id="pattern" value="0.6666666865348816"/>
+    <PARAM id="burstwords" value="0.0476190485060215"/>
+    <PARAM id="caslatency" value="0.2000000029802322"/>
+    <PARAM id="running" value="1.0"/>
+    <PLUGIN name="DDR Controller" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddrcontroller"
+            uniqueId="1c30c26d" isInstrument="0" fileTime="0" infoUpdateTime="0"
+            numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
+            uid="1c30c26d"/>
+  </SLOT>
+  <SLOT bypassed="0" state="208.VMjLgbL....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHvI2ahUlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPGZxUmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhX2biEFakIBH1EFa0UVOh.iK2TCLv.CLvTSN1.CM1PCM3HxK9vyKSQUPTUjO..">
+    <PARAM id="vscale" value="0.5254070162773132"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="probe" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="DDR Eye Scope" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddreyescope" uniqueId="79b349d4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="18"
+            numOutputs="18" isShell="0" hasARAExtension="0" uid="79b349d4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="549.VMjLgvg....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iK4XSN4jSN4XSNv.SM0fCM2HxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhMv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHv3BNwjSN4jSN4HCNzbCMzHiMh7hO7.UPRETSfjFY8HhdwUlbx8lbh.hcgwVck0iHv3BLh7hO77xTTEDUE4C.">
+    <PARAM id="chipnumber" value="0.0"/>
+    <PARAM id="vref" value="0.9555556178092957"/>
+    <PARAM id="odt" value="0.1428571492433548"/>
+    <PARAM id="zqerror" value="0.5"/>
+    <PARAM id="cstiming" value="0.9699999690055847"/>
+    <PARAM id="dqskew0" value="0.0"/>
+    <PARAM id="dqskew1" value="0.0"/>
+    <PARAM id="dqskew2" value="0.0"/>
+    <PARAM id="dqskew3" value="0.0"/>
+    <PARAM id="dqskew4" value="0.0"/>
+    <PARAM id="dqskew5" value="0.0"/>
+    <PARAM id="dqskew6" value="0.0"/>
+    <PARAM id="dqskew7" value="0.0"/>
+    <PARAM id="dfe" value="0.0"/>
+    <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
+            version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"
+            isShell="0" hasARAExtension="0" uid="2800a3dd"/>
+  </SLOT>
+  <HOMEWORK title="DDR Bring-Up 4: Train CS/CA timing next" prompt="ZQ cal is clean now. The memory test still fails almost every read with a timeout, even though CK, the command bus, and chip-select all look completely normal on a scope. Writes seem to go through. What training step runs right after ZQ cal, and is it done yet?"
+            hint="CS/CA training aligns *when* this chip samples chip-select against the rest of the command bus - it isn't automatic after reset. Check this chip's own CS timing-error setting."
+            explanation="CS/CA training was simply never run: this chip's own chip-select sampling lags the real signal by most of a unit interval. A read is only asserted for a single unit interval before the controller moves on, so by the time this chip's own &quot;am I selected&quot; check catches up, the window has already closed - it misses the read outright and the controller eventually times out. Writes still work because a write burst holds CS asserted continuously across many consecutive unit intervals, so a timing lag that would miss one brief pulse doesn't matter once CS has been high for a while. Run CS/CA training (bring the CS timing error back to 0) before moving on to the write-path training steps - the identical real symptom as DDR Homework 6 in the flat set."/>
+</LABCHAIN>

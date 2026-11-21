@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_26_pll_wrong_feedback_divider" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="272.VMjLgbP....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhYhQVZ1kFYkImHfXWXrUWY8HBMw3BLh7hO7.UPRETSfjFY8HBau8FbqklHfXWXrUWY8HRLw.CLt.iHu3COPEjTA0DHoQVOhv1auA2ZvIBH1EFa0UVOhHSNv3BLh7hO7.UPRETSfjFY8HhbkYlYxUVbh.hcgwVck0iHxTiKvHxK9vCTAIUPMARZj0iHxUlYpkFczUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8Hhci8lYxUVYh.hcgwVck0iH4TCLt.iHu3COuLEUAQUQ9..">
+    <PARAM id="reffreq" value="0.2424242496490479"/>
+    <PARAM id="fbdivider" value="0.07647059112787247"/>
+    <PARAM id="vcofree" value="0.1818181872367859"/>
+    <PARAM id="loopkp" value="0.09666666388511658"/>
+    <PARAM id="loopki" value="0.05499999970197678"/>
+    <PARAM id="refjitter" value="0.0"/>
+    <PLUGIN name="PLL Core" format="DAW_LAB Built-in" category="PLL" manufacturer="DAW_LAB"
+            version="1.0" file="lab.pllcore" uniqueId="b01dbe2e" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="4" numOutputs="4"
+            isShell="0" hasARAExtension="0" uid="b01dbe2e"/>
+  </SLOT>
+  <HOMEWORK title="Homework 26: It's locked. It's also wrong." prompt="A frequency synthesizer is supposed to multiply a 25 MHz reference up to 1000 MHz. Lab status shows LOCKED, steady, no alarms. A technician downstream reports every measurement off this clock is subtly wrong. Before assuming their equipment is miscalibrated, check what this synthesizer is actually putting out."
+            hint="Read the VCO output frequency directly, not just the lock indicator. Does it match 25 MHz x the programmed feedback divider?"
+            explanation="The feedback divider is programmed for N=41, not the intended N=40. The loop does exactly what it's designed to do - it locks the VCO to N times the reference - it just locks to the wrong N. A PLL's lock detector only confirms the loop found a stable, phase-aligned state; it says nothing about whether that state is the one you actually wanted. This is a real, easy-to-make bring-up mistake (a register field one off, a strapping error) that produces zero alarms and a perfectly confident LOCKED status - always cross-check the actual output frequency against reference x N, not just the lock flag, before trusting a synthesizer's output."/>
+</LABCHAIN>

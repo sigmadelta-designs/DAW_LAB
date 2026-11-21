@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_29_pll_jitter_trips_lock_detector"
+          lineRateGBd="10.0" modulation="0">
+  <SLOT bypassed="0" state="289.VMjLgfQ....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhYhQVZ1kFYkImHfXWXrUWY8HBMv3BLh7hO7.UPRETSfjFY8HBau8FbqklHfXWXrUWY8HRLw.CLt.iHu3COPEjTA0DHoQVOhv1auA2ZvIBH1EFa0UVOhHSNv3BLh7hO7.UPRETSfjFY8HhbkYlYxUVbh.hcgwVck0iHxTiKvHxK9vCTAIUPMARZj0iHxUlYpkFczUlbh.hcgwVck0iHv3BL0.CLv.CLv.yMzTCL0fCL1HxK9vCTAIUPMARZj0iH1M1alIWYkIBH1EFa0UVOhDCLv.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="reffreq" value="0.2424242496490479"/>
+    <PARAM id="fbdivider" value="0.07450980693101883"/>
+    <PARAM id="vcofree" value="0.1919191926717758"/>
+    <PARAM id="loopkp" value="0.09666666388511658"/>
+    <PARAM id="loopki" value="0.05499999970197678"/>
+    <PARAM id="refjitter" value="0.25"/>
+    <PLUGIN name="PLL Core" format="DAW_LAB Built-in" category="PLL" manufacturer="DAW_LAB"
+            version="1.0" file="lab.pllcore" uniqueId="b01dbe2e" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="4" numOutputs="4"
+            isShell="0" hasARAExtension="0" uid="b01dbe2e"/>
+  </SLOT>
+  <HOMEWORK title="Homework 29: The lock light won't stay on, but the frequency is right"
+            prompt="This PLL's reference, divider and loop gains are all the normal, correct values for this design - but the lock indicator flickers on and off instead of staying solid, which someone has flagged as a loop stability problem. Before touching the loop filter, actually check what the output frequency is doing."
+            hint="Average the VCO output frequency over a few seconds rather than reading the lock flag alone. Is the average close to reference x N, even while the lock indicator flickers?"
+            explanation="The reference input itself carries a large amount of injected timing jitter - large enough that individual reference edges arrive measurably early or late, which is enough to trip a simple instantaneous-phase-error lock detector on its own, even though the loop filter is correctly averaging the jitter out and the VCO's output frequency lands close to the intended reference x N. This is a real measurement-methodology lesson, the PLL-domain counterpart to this project's earlier &quot;check the absolute swing, not just the eye height percentage&quot; lesson: a lock detector built on an instantaneous threshold can read as unlocked even when the loop is genuinely doing its job, if the thing it's watching (phase error, here) is itself noisy for a reason that has nothing to do with loop stability. The real problem to chase, if there is one, is upstream of the PLL - whatever's injecting that much jitter onto the reference - not the loop filter."/>
+</LABCHAIN>

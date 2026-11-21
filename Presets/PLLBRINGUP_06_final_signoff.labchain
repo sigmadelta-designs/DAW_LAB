@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="PLLBRINGUP_06_final_signoff" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="273.VMjLgfP....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhYhQVZ1kFYkImHfXWXrUWY8HBMv3BLh7hO7.UPRETSfjFY8HBau8FbqklHfXWXrUWY8HRLw.CLt.iHu3COPEjTA0DHoQVOhv1auA2ZvIBH1EFa0UVOhHSNv3BLh7hO7.UPRETSfjFY8HhbkYlYxUVbh.hcgwVck0iHxTiKvHxK9vCTAIUPMARZj0iHxUlYpkFczUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8Hhci8lYxUVYh.hcgwVck0iHw.CLv3BLh7hO77xTTEDUE4C.">
+    <PARAM id="reffreq" value="0.2424242496490479"/>
+    <PARAM id="fbdivider" value="0.07450980693101883"/>
+    <PARAM id="vcofree" value="0.1919191926717758"/>
+    <PARAM id="loopkp" value="0.09666666388511658"/>
+    <PARAM id="loopki" value="0.05499999970197678"/>
+    <PARAM id="refjitter" value="0.0"/>
+    <PLUGIN name="PLL Core" format="DAW_LAB Built-in" category="PLL" manufacturer="DAW_LAB"
+            version="1.0" file="lab.pllcore" uniqueId="b01dbe2e" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="4" numOutputs="4"
+            isShell="0" hasARAExtension="0" uid="b01dbe2e"/>
+  </SLOT>
+  <HOMEWORK title="PLL Bring-Up 6: Final sign-off" prompt="Every step so far is corrected and the stress test is behind it. With a clean reference restored, run the final sign-off the way a real bring-up lab would and confirm this synthesizer is ready: locked, on frequency, and settled - not just technically running."
+            hint="Check all three together: the lock indicator, the output frequency against reference x N, and the instantaneous phase error once settled - not just whichever one looks best on its own."
+            explanation="With every earlier fault corrected and a clean reference restored, the synthesizer locks cleanly, settles without the ringing Bring-Up 4 showed, and the output frequency lands on reference x N to within a small fraction of a percent - genuinely ready, not just technically running. This is the real final-sign-off habit this whole plan has been building toward: confirm the lock indicator, the actual output frequency, and the settled phase error together, the same &quot;don't trust a single number alone&quot; discipline Bring-Up 2 and Bring-Up 5 each already needed for their own reasons."/>
+</LABCHAIN>

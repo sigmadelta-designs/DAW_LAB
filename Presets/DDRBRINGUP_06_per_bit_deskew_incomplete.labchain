@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="DDRBRINGUP_06_per_bit_deskew_incomplete" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="238.VMjLgTN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhX0I2bzc2axQ1bh.hcgwVck0iH1PiKvHxK9vCTAIUPMARZj0iHiE1brEFck41X4IBH1EFa0UVOhPiKvHxK9vCTAIUPMARZj0iHvEFczUlbtIBH1EFa0UVOhHiKvHxK9vCTAIUPMARZj0iHxUmatklamIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFcigVZvIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="targetchip" value="0.0"/>
+    <PARAM id="pattern" value="0.6666666865348816"/>
+    <PARAM id="burstwords" value="0.2380952388048172"/>
+    <PARAM id="caslatency" value="0.2000000029802322"/>
+    <PARAM id="running" value="1.0"/>
+    <PLUGIN name="DDR Controller" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddrcontroller"
+            uniqueId="1c30c26d" isInstrument="0" fileTime="0" infoUpdateTime="0"
+            numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
+            uid="1c30c26d"/>
+  </SLOT>
+  <SLOT bypassed="0" state="208.VMjLgbL....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHvI2ahUlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPGZxUmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhX2biEFakIBH1EFa0UVOh.iK2TCLv.CLvTSN1.CM1PCM3HxK9vyKSQUPTUjO..">
+    <PARAM id="vscale" value="0.5254070162773132"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="probe" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="DDR Eye Scope" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddreyescope" uniqueId="79b349d4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="18"
+            numOutputs="18" isShell="0" hasARAExtension="0" uid="79b349d4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="564.VMjLgrh....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhMv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHv3BNwjSN4jSN4HCNzbCMzHiMh7hO7.UPRETSfjFY8HhdwUlbx8lbh.hcgwVck0iHv3BLh7hO77xTTEDUE4C.">
+    <PARAM id="chipnumber" value="0.0"/>
+    <PARAM id="vref" value="0.9555556178092957"/>
+    <PARAM id="odt" value="0.1428571492433548"/>
+    <PARAM id="zqerror" value="0.5"/>
+    <PARAM id="cstiming" value="0.0"/>
+    <PARAM id="dqskew0" value="0.0"/>
+    <PARAM id="dqskew1" value="0.0"/>
+    <PARAM id="dqskew2" value="0.0"/>
+    <PARAM id="dqskew3" value="0.7999999523162842"/>
+    <PARAM id="dqskew4" value="0.0"/>
+    <PARAM id="dqskew5" value="0.0"/>
+    <PARAM id="dqskew6" value="0.7999999523162842"/>
+    <PARAM id="dqskew7" value="0.0"/>
+    <PARAM id="dfe" value="0.0"/>
+    <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
+            version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"
+            isShell="0" hasARAExtension="0" uid="2800a3dd"/>
+  </SLOT>
+  <HOMEWORK title="DDR Bring-Up 6: Finish per-bit DQ deskew" prompt="Write levelling is done - CK and DQS are well aligned as a byte lane. The memory test mostly passes now, but a consistent minority of addresses still fail every run, while most are completely solid. What finer-grained training step comes after write levelling?"
+            hint="Look at the per-bit DQ deskew indicators again now that write levelling is done - is it still every bit evenly, or just one or two that stand out from an otherwise well-trained byte lane?"
+            explanation="Two individual DQ pins were left with real per-bit deskew error while the rest of the byte lane is correctly centred - the training step real DDR calls per-bit write-DQ deskew, centring each pin's data against DQS individually rather than the byte lane as a whole. Because only two of eight bits are actually wrong, a captured byte is only corrupted on the addresses where at least one of those two bits happens to differ from the previous word's same bit, which is exactly why this looks sparser and &quot;only on certain data&quot; rather than totally broken. Deskew the remaining two pins individually - the identical real symptom as DDR Homework 8 in the flat set - and every DQ bit in the byte lane is now fully trained."/>
+</LABCHAIN>

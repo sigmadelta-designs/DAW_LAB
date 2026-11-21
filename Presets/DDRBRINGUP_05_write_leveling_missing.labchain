@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="DDRBRINGUP_05_write_leveling_missing" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="238.VMjLgTN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhX0I2bzc2axQ1bh.hcgwVck0iH1PiKvHxK9vCTAIUPMARZj0iHiE1brEFck41X4IBH1EFa0UVOhPiKvHxK9vCTAIUPMARZj0iHvEFczUlbtIBH1EFa0UVOhHiKvHxK9vCTAIUPMARZj0iHxUmatklamIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFcigVZvIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="targetchip" value="0.0"/>
+    <PARAM id="pattern" value="0.6666666865348816"/>
+    <PARAM id="burstwords" value="0.2380952388048172"/>
+    <PARAM id="caslatency" value="0.2000000029802322"/>
+    <PARAM id="running" value="1.0"/>
+    <PLUGIN name="DDR Controller" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddrcontroller"
+            uniqueId="1c30c26d" isInstrument="0" fileTime="0" infoUpdateTime="0"
+            numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
+            uid="1c30c26d"/>
+  </SLOT>
+  <SLOT bypassed="0" state="208.VMjLgbL....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHvI2ahUlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPGZxUmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhX2biEFakIBH1EFa0UVOh.iK2TCLv.CLvTSN1.CM1PCM3HxK9vyKSQUPTUjO..">
+    <PARAM id="vscale" value="0.5254070162773132"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="probe" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="DDR Eye Scope" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddreyescope" uniqueId="79b349d4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="18"
+            numOutputs="18" isShell="0" hasARAExtension="0" uid="79b349d4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="654.VMjLgTn....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3xL4jSN4jSN2XSL0fSLzHSLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhMv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHv3BNwjSN4jSN4HCNzbCMzHiMh7hO7.UPRETSfjFY8HhdwUlbx8lbh.hcgwVck0iHv3BLh7hO77xTTEDUE4C.">
+    <PARAM id="chipnumber" value="0.0"/>
+    <PARAM id="vref" value="0.9555556178092957"/>
+    <PARAM id="odt" value="0.1428571492433548"/>
+    <PARAM id="zqerror" value="0.5"/>
+    <PARAM id="cstiming" value="0.0"/>
+    <PARAM id="dqskew0" value="0.7999999523162842"/>
+    <PARAM id="dqskew1" value="0.7999999523162842"/>
+    <PARAM id="dqskew2" value="0.7999999523162842"/>
+    <PARAM id="dqskew3" value="0.7999999523162842"/>
+    <PARAM id="dqskew4" value="0.7999999523162842"/>
+    <PARAM id="dqskew5" value="0.7999999523162842"/>
+    <PARAM id="dqskew6" value="0.7999999523162842"/>
+    <PARAM id="dqskew7" value="0.7999999523162842"/>
+    <PARAM id="dfe" value="0.0"/>
+    <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
+            version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"
+            isShell="0" hasARAExtension="0" uid="2800a3dd"/>
+  </SLOT>
+  <HOMEWORK title="DDR Bring-Up 5: Align DQS to CK - write levelling" prompt="CS/CA timing is trained. Now the memory test fails almost every word, and when a word is wrong the whole byte usually comes back looking unrelated to what was written - no single pin stands out. What training step aligns DQS to CK at the DRAM, and is it done yet?"
+            hint="Check this chip's per-bit DQ deskew settings - are all eight bits skewed by about the same amount, or does one stand out?"
+            explanation="All eight DQ bits are skewed by the same amount - a single, shared DQS-to-byte-lane timing error, exactly what write levelling exists to correct. Because every bit lags identically, the chip captures essentially the *previous* word's data for the whole byte rather than the current one - a uniform, whole-byte corruption, not an isolated-pin problem. Run write levelling (bring all eight DQ skews back to 0 together) before per-bit deskew in the next step - the identical real symptom as DDR Homework 7 in the flat set."/>
+</LABCHAIN>

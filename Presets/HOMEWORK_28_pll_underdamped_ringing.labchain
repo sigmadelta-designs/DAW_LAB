@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_28_pll_underdamped_ringing" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="284.VMjLgLQ....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhYhQVZ1kFYkImHfXWXrUWY8HBMv3BLh7hO7.UPRETSfjFY8HBau8FbqklHfXWXrUWY8HRLw.CLt.iHu3COPEjTA0DHoQVOhv1auA2ZvIBH1EFa0UVOhTCLt.CLv.CLyfSLzXSN2HyMh7hO7.UPRETSfjFY8HhbkYlYxUVbh.hcgwVck0iHxTiKvHxK9vCTAIUPMARZj0iHxUlYpkFczUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8Hhci8lYxUVYh.hcgwVck0iH4TCLt.iHu3COuLEUAQUQ9..">
+    <PARAM id="reffreq" value="0.2424242496490479"/>
+    <PARAM id="fbdivider" value="0.07450980693101883"/>
+    <PARAM id="vcofree" value="0.1818181872367859"/>
+    <PARAM id="loopkp" value="0.01666666753590107"/>
+    <PARAM id="loopki" value="0.05499999970197678"/>
+    <PARAM id="refjitter" value="0.0"/>
+    <PLUGIN name="PLL Core" format="DAW_LAB Built-in" category="PLL" manufacturer="DAW_LAB"
+            version="1.0" file="lab.pllcore" uniqueId="b01dbe2e" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="4" numOutputs="4"
+            isShell="0" hasARAExtension="0" uid="b01dbe2e"/>
+  </SLOT>
+  <HOMEWORK title="Homework 28: It locks, but it takes the scenic route"
+            prompt="This PLL does eventually report LOCKED, but a technician watching the output frequency during power-up says it visibly overshoots and rings back and forth several times before settling, instead of smoothly approaching the target. For a clock that's supposed to be ready quickly and cleanly after power-up, is this normal?"
+            hint="Compare the loop filter's proportional gain against its integral gain. A PLL's damping comes from the balance between those two, not either one alone - is this one balanced, or is one path dominating?"
+            explanation="The loop filter's proportional gain is set roughly 6x lower than this design's normal value while the integral gain is unchanged - a classic underdamped loop filter. The integral path still has plenty of authority to eventually pull the frequency all the way in, but with so little proportional damping to restrain it, the loop overshoots the target and rings back and forth before settling, instead of approaching it smoothly. This is exactly the lesson a real loop filter's R1 (proportional) / C1 (integral) balance teaches: raising the proportional gain back toward its normal value damps the ringing out without changing how far the loop can ultimately pull in."/>
+</LABCHAIN>

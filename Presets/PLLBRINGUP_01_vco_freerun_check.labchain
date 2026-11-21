@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="PLLBRINGUP_01_vco_freerun_check" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="267.VMjLgHP....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhYhQVZ1kFYkImHfXWXrUWY8HBMv3BLh7hO7.UPRETSfjFY8HBau8FbqklHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhv1auA2ZvIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHxUlYlIWYwIBH1EFa0UVOhHSMt.iHu3COPEjTA0DHoQVOhHWYloVZzQWYxIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1M1alIWYkIBH1EFa0UVOhfCLv3BLh7hO77xTTEDUE4C.">
+    <PARAM id="reffreq" value="0.2424242496490479"/>
+    <PARAM id="fbdivider" value="0.07450980693101883"/>
+    <PARAM id="vcofree" value="0.1515151560306549"/>
+    <PARAM id="loopkp" value="0.0"/>
+    <PARAM id="loopki" value="0.0"/>
+    <PARAM id="refjitter" value="0.0"/>
+    <PLUGIN name="PLL Core" format="DAW_LAB Built-in" category="PLL" manufacturer="DAW_LAB"
+            version="1.0" file="lab.pllcore" uniqueId="b01dbe2e" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="4" numOutputs="4"
+            isShell="0" hasARAExtension="0" uid="b01dbe2e"/>
+  </SLOT>
+  <HOMEWORK title="PLL Bring-Up 1: Before closing any loop, check the oscillator alone"
+            prompt="A new frequency synthesizer board is meant to multiply a 25 MHz reference up to 1000 MHz. Before wiring up the feedback path at all, characterize the VCO by itself: with the loop filter disconnected (zero gain, so the VCO just runs at whatever its own free-run frequency is), what does it actually put out?"
+            hint="With both loop filter gains at zero, the VCO's output is simply its own free-run frequency - no correction is being applied at all. Read that frequency directly. Is it anywhere close to the 1000 MHz this board is specified to lock to?"
+            explanation="With the loop filter gains both at zero (an intentionally open loop, so the VCO's output is exactly its own free-run frequency with no correction), the VCO measures at roughly 800 MHz - 200 MHz, a full 20%, short of the 1000 MHz this board needs to lock to. This is the first thing a real PLL bring-up checks, before the loop is ever closed: a VCO's free-run (&quot;center&quot;) frequency has to land within the loop's capture range of the actual target, or closing the loop may never achieve lock no matter how well the loop filter itself is tuned - exactly the same &quot;check the foundation before building on it&quot; habit as the SerDes side's own Bring-Up 1 (TX output alone) and the DDR side's Bring-Up 1 (chip-select alone). The fix here is correcting the VCO's free-run frequency setting to land close to the intended target before closing the loop."/>
+</LABCHAIN>

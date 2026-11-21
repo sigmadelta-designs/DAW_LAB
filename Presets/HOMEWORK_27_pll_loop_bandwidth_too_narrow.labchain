@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="HOMEWORK_27_pll_loop_bandwidth_too_narrow"
+          lineRateGBd="10.0" modulation="0">
+  <SLOT bypassed="0" state="267.VMjLgHP....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhYhQVZ1kFYkImHfXWXrUWY8HBMv3BLh7hO7.UPRETSfjFY8HBau8FbqklHfXWXrUWY8HRMt.iHu3COPEjTA0DHoQVOhv1auA2ZvIBH1EFa0UVOhTiKvHxK9vCTAIUPMARZj0iHxUlYlIWYwIBH1EFa0UVOhHSMt.iHu3COPEjTA0DHoQVOhHWYloVZzQWYxIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1M1alIWYkIBH1EFa0UVOhjSMv3BLh7hO77xTTEDUE4C.">
+    <PARAM id="reffreq" value="0.2424242496490479"/>
+    <PARAM id="fbdivider" value="0.07450980693101883"/>
+    <PARAM id="vcofree" value="0.1818181872367859"/>
+    <PARAM id="loopkp" value="0.001666666707023978"/>
+    <PARAM id="loopki" value="0.0002500000118743628"/>
+    <PARAM id="refjitter" value="0.0"/>
+    <PLUGIN name="PLL Core" format="DAW_LAB Built-in" category="PLL" manufacturer="DAW_LAB"
+            version="1.0" file="lab.pllcore" uniqueId="b01dbe2e" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="4" numOutputs="4"
+            isShell="0" hasARAExtension="0" uid="b01dbe2e"/>
+  </SLOT>
+  <HOMEWORK title="Homework 27: It never quite gets there" prompt="This PLL's feedback divider and reference are both correct, but it's been sitting on the bench for a very long time now and still reports not locked - the VCO output frequency is close to the target, but visibly, persistently short of it. Narrow down what's actually wrong before assuming the VCO itself is faulty."
+            hint="Check the loop filter's gain settings against how big a cold-start frequency error they actually need to pull in. Is the loop bandwidth anywhere close to being fast enough?"
+            explanation="Both loop filter gains (proportional and integral) are set roughly 50x weaker than this design's normal values. The feedback divider and reference are correct, and the loop IS pulling the VCO in the right direction - it's just doing it so slowly that it hasn't finished within any reasonable bring-up window. This is a genuine &quot;loop bandwidth too narrow&quot; fault, not a hand-wave: a real PLL's loop gains set how fast it can acquire lock after a frequency step or cold start, and gains dialled in too conservatively (perhaps copied from a much higher-N design without rescaling) leave a synthesizer that technically works but never actually finishes locking on any timescale a bring-up lab can wait for."/>
+</LABCHAIN>

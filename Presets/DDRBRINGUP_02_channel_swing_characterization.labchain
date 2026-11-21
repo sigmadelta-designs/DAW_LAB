@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="DDRBRINGUP_02_channel_swing_characterization"
+          lineRateGBd="10.0" modulation="0">
+  <SLOT bypassed="0" state="238.VMjLgTN....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhX0I2bzc2axQ1bh.hcgwVck0iH1PiKvHxK9vCTAIUPMARZj0iHiE1brEFck41X4IBH1EFa0UVOhPiKvHxK9vCTAIUPMARZj0iHvEFczUlbtIBH1EFa0UVOhHiKvHxK9vCTAIUPMARZj0iHxUmatklamIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHzElbmUFcigVZvIBH1EFa0UVOh.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="targetchip" value="0.0"/>
+    <PARAM id="pattern" value="0.6666666865348816"/>
+    <PARAM id="burstwords" value="0.2380952388048172"/>
+    <PARAM id="caslatency" value="0.2000000029802322"/>
+    <PARAM id="running" value="1.0"/>
+    <PLUGIN name="DDR Controller" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddrcontroller"
+            uniqueId="1c30c26d" isInstrument="0" fileTime="0" infoUpdateTime="0"
+            numInputs="18" numOutputs="18" isShell="0" hasARAExtension="0"
+            uid="1c30c26d"/>
+  </SLOT>
+  <SLOT bypassed="0" state="95.VMjLgXE....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8Hxb2klamIBH1EFa0UVOhLCLt.iHu3COuLEUAQUQ9..">
+    <PARAM id="swing" value="0.2631579041481018"/>
+    <PLUGIN name="DDR Lossy Channel" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddrlossy" uniqueId="d8960045"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="18"
+            numOutputs="18" isShell="0" hasARAExtension="0" uid="d8960045"/>
+  </SLOT>
+  <SLOT bypassed="0" state="208.VMjLgbL....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HBbkI2boMGck41XkIBH1EFa0UVOhDiKvHxK9vCTAIUPMARZj0iHvI2ahUlHfXWXrUWY8HBLt.iHu3COPEjTA0DHoQVOhPGZxUmHfXWXrUWY8HRLt.iHu3COPEjTA0DHoQVOhX2biEFakIBH1EFa0UVOh.iK2TCLv.CLvTSN1.CM1PCM3HxK9vyKSQUPTUjO..">
+    <PARAM id="vscale" value="0.5254070162773132"/>
+    <PARAM id="thru" value="1.0"/>
+    <PARAM id="probe" value="0.0"/>
+    <PARAM id="persistence" value="0.5"/>
+    <PLUGIN name="DDR Eye Scope" format="DAW_LAB Built-in" category="DDR"
+            manufacturer="DAW_LAB" version="1.0" file="lab.ddreyescope" uniqueId="79b349d4"
+            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="18"
+            numOutputs="18" isShell="0" hasARAExtension="0" uid="79b349d4"/>
+  </SLOT>
+  <SLOT bypassed="0" state="536.VMjLg7f....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HxXnkFbtUWahUlbh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxXyQWZsklamIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iHjYVYh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmLh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Lh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcGMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcWMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2ZkcmMh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HBYwM2Zkc2Mh.hcgwVck0iHv3BLh7hO7.UPRETSfjFY8HxajQmHfXWXrUWY8HhMv3BLh7hO7.UPRETSfjFY8HhcxUlYh.hcgwVck0iHy3xMxTiL4.iL4fCM1DSNwPSYsjiHu3COPEjTA0DHoQVOhnWbkImbuImHfXWXrUWY8HBLt.iHu3COuLEUAQUQ9..">
+    <PARAM id="chipnumber" value="0.0"/>
+    <PARAM id="vref" value="0.5"/>
+    <PARAM id="odt" value="0.1428571492433548"/>
+    <PARAM id="zqerror" value="0.5"/>
+    <PARAM id="cstiming" value="0.0"/>
+    <PARAM id="dqskew0" value="0.0"/>
+    <PARAM id="dqskew1" value="0.0"/>
+    <PARAM id="dqskew2" value="0.0"/>
+    <PARAM id="dqskew3" value="0.0"/>
+    <PARAM id="dqskew4" value="0.0"/>
+    <PARAM id="dqskew5" value="0.0"/>
+    <PARAM id="dqskew6" value="0.0"/>
+    <PARAM id="dqskew7" value="0.0"/>
+    <PARAM id="dfe" value="0.0"/>
+    <PLUGIN name="DDR Chip" format="DAW_LAB Built-in" category="DDR" manufacturer="DAW_LAB"
+            version="1.0" file="lab.ddrchip" uniqueId="2800a3dd" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="18" numOutputs="18"
+            isShell="0" hasARAExtension="0" uid="2800a3dd"/>
+  </SLOT>
+  <HOMEWORK title="DDR Bring-Up 2: Measure the channel, don't assume it"
+            prompt="Chip-select is fixed. The memory test shows a small burst of errors right when the chain loads, then runs clean for as long as you watch it. Before training Vref or anything else amplitude-sensitive later in this plan, characterize what this board's real trace actually delivers - don't carry over a number from a datasheet or a different board."
+            hint="Put the DDR Eye Scope on DQS and read its &quot;Outer swing at sample point&quot; readout directly, rather than assuming this board's trace behaves like a short bench fixture. Separately: when exactly did those first errors happen, and have there been any more since?"
+            explanation="This board's real trace attenuates DQ/DQS to about 30% of ideal swing - a perfectly normal amount of loss for a populated board, not a fault by itself (Vref is still at its centred default, which stays correct at any swing as long as nothing else is wrong). The handful of errors right after the chain loads are a separate, one-time thing worth recognizing on sight: this controller/chip pair's built-in memory test always shows one burst's worth of mismatches in the first fraction of a second after any chain loads (the BIST needs one full address sweep to synchronize), then runs completely clean afterward, no matter how good or bad the settings are otherwise - it shows up again in Bring-Up 9's own final run. Telling a real, persistent fault apart from this kind of load transient (by checking *when* errors happened, not just whether the count is zero) is itself a real bring-up skill. The point of this step is purely measurement: note the real 30%-of-ideal swing this board delivers now, before Vref Bring-Up 7 later in this plan has to train against it. Skipping this and assuming a bench-fixture-like swing is exactly how DDR Homework 2 in the flat homework set gets built."/>
+</LABCHAIN>

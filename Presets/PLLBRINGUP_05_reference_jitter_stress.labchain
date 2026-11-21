@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="PLLBRINGUP_05_reference_jitter_stress" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="289.VMjLgfQ....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhYhQVZ1kFYkImHfXWXrUWY8HBMv3BLh7hO7.UPRETSfjFY8HBau8FbqklHfXWXrUWY8HRLw.CLt.iHu3COPEjTA0DHoQVOhv1auA2ZvIBH1EFa0UVOhHSNv3BLh7hO7.UPRETSfjFY8HhbkYlYxUVbh.hcgwVck0iHxTiKvHxK9vCTAIUPMARZj0iHxUlYpkFczUlbh.hcgwVck0iHv3BL0.CLv.CLv.yMzTCL0fCL1HxK9vCTAIUPMARZj0iH1M1alIWYkIBH1EFa0UVOhDCLv.iKvHxK9vyKSQUPTUjO..">
+    <PARAM id="reffreq" value="0.2424242496490479"/>
+    <PARAM id="fbdivider" value="0.07450980693101883"/>
+    <PARAM id="vcofree" value="0.1919191926717758"/>
+    <PARAM id="loopkp" value="0.09666666388511658"/>
+    <PARAM id="loopki" value="0.05499999970197678"/>
+    <PARAM id="refjitter" value="0.25"/>
+    <PLUGIN name="PLL Core" format="DAW_LAB Built-in" category="PLL" manufacturer="DAW_LAB"
+            version="1.0" file="lab.pllcore" uniqueId="b01dbe2e" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="4" numOutputs="4"
+            isShell="0" hasARAExtension="0" uid="b01dbe2e"/>
+  </SLOT>
+  <HOMEWORK title="PLL Bring-Up 5: A margin stress test - how noisy a reference can this tolerate?"
+            prompt="The loop is fully tuned to its normal values and locks cleanly. Before sign-off, stress it the way a real validation lab would: feed it a deliberately noisy reference and see what actually degrades. A technician watching the lock indicator during this test reports it flickering on and off and calls it a loop stability failure - is that the right read?"
+            hint="Don't trust the lock indicator alone under a noisy reference. Average the VCO output frequency over a few seconds instead - is the average still close to reference x N, even while the indicator flickers?"
+            explanation="A large amount of timing jitter is injected onto the reference - enough that individual reference edges arrive measurably early or late, which alone is enough to trip a simple instantaneous-phase-error lock detector, even though the loop filter is correctly averaging the jitter out and the VCO's output frequency, averaged over a few seconds, still lands close to the intended reference x N (HOMEWORK_29 demonstrates the same effect in isolation). This is a genuine measurement-methodology lesson for a stress test, not a loop-stability failure: a lock detector built on an instantaneous threshold can read as unlocked even while the loop is doing its job correctly, if the thing it's watching is itself noisy for a reason that has nothing to do with loop stability. The real action item from a result like this is upstream - tightening whatever is injecting that much jitter onto the reference - not retuning the loop filter."/>
+</LABCHAIN>

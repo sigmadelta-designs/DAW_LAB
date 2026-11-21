@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LABCHAIN version="1" name="PLLBRINGUP_03_loop_gain_too_weak" lineRateGBd="10.0"
+          modulation="0">
+  <SLOT bypassed="0" state="267.VMjLgHP....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOSQUPTUjO7.UPRETSfjFY8HhYhQVZ1kFYkImHfXWXrUWY8HBMv3BLh7hO7.UPRETSfjFY8HBau8FbqklHfXWXrUWY8HRMt.iHu3COPEjTA0DHoQVOhv1auA2ZvIBH1EFa0UVOhTiKvHxK9vCTAIUPMARZj0iHxUlYlIWYwIBH1EFa0UVOhHSMt.iHu3COPEjTA0DHoQVOhHWYloVZzQWYxIBH1EFa0UVOh.iKvHxK9vCTAIUPMARZj0iH1M1alIWYkIBH1EFa0UVOhjSMv3BLh7hO77xTTEDUE4C.">
+    <PARAM id="reffreq" value="0.2424242496490479"/>
+    <PARAM id="fbdivider" value="0.07450980693101883"/>
+    <PARAM id="vcofree" value="0.1818181872367859"/>
+    <PARAM id="loopkp" value="0.001666666707023978"/>
+    <PARAM id="loopki" value="0.0002500000118743628"/>
+    <PARAM id="refjitter" value="0.0"/>
+    <PLUGIN name="PLL Core" format="DAW_LAB Built-in" category="PLL" manufacturer="DAW_LAB"
+            version="1.0" file="lab.pllcore" uniqueId="b01dbe2e" isInstrument="0"
+            fileTime="0" infoUpdateTime="0" numInputs="4" numOutputs="4"
+            isShell="0" hasARAExtension="0" uid="b01dbe2e"/>
+  </SLOT>
+  <HOMEWORK title="PLL Bring-Up 3: Right divider, but it still never gets there"
+            prompt="The feedback divider is corrected to N=40. The output frequency is now heading in the right direction, but after a long wait it's still visibly, persistently short of 1000 MHz and never reports LOCKED. Before suspecting the VCO or divider again, look at how hard the loop filter is actually correcting."
+            hint="Compare the loop filter's gains against the values Bring-Up 2 just used successfully. Were they carried forward, or left at something much weaker?"
+            explanation="Both loop filter gains were left roughly 50x weaker than Bring-Up 2's working values - the loop is pulling the VCO in the right direction, just far too slowly to finish in any reasonable bring-up window (HOMEWORK_27 demonstrates the same fault in isolation). The divider and reference are both correct; this is a genuine loop-bandwidth problem, not a sign of anything wrong upstream. The fix is restoring both loop filter gains to this design's normal values."/>
+</LABCHAIN>

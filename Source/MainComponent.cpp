@@ -28,7 +28,7 @@ MainComponent::MainComponent()
 {
     setLookAndFeel (&lookAndFeel);
 
-    for (auto* button : { &addButton, &scanButton, &saveButton, &loadButton, &clearButton, &audioButton, &hintButton, &bringUpButton })
+    for (auto* button : { &addButton, &scanButton, &saveButton, &loadButton, &clearButton, &audioButton, &hintButton, &bringUpButton, &ddrBringUpButton, &pllBringUpButton })
         addAndMakeVisible (button);
 
     addAndMakeVisible (pluginBox);
@@ -60,6 +60,14 @@ MainComponent::MainComponent()
                               "step is its own mission with something to find, and finishing one loads the "
                               "next with a single button press instead of Load Preset... each time.");
     bringUpButton.onClick = [this] { toggleBringUpWindow(); };
+    ddrBringUpButton.setTooltip ("Opens a guided, linear walk through the DDRBRINGUP_*.labchain sequence - "
+                                 "the DRAM-training counterpart to Bring-Up Plan..., same one-button-per-step "
+                                 "flow, a completely separate plan/window.");
+    ddrBringUpButton.onClick = [this] { toggleDdrBringUpWindow(); };
+    pllBringUpButton.setTooltip ("Opens a guided, linear walk through the PLLBRINGUP_*.labchain sequence - "
+                                 "the frequency-synthesizer counterpart to Bring-Up Plan... and DDR Bring-Up..., "
+                                 "same one-button-per-step flow, a completely separate plan/window.");
+    pllBringUpButton.onClick = [this] { togglePllBringUpWindow(); };
 
     // 1 GBd on the wire runs as 1 kBd here (simulation scale 1e6).
     rateSlider.setRange (LinkSettings::minGBd, LinkSettings::maxGBd, 0.01);
@@ -103,7 +111,7 @@ MainComponent::MainComponent()
     engine.chainChanged.addChangeListener (this);
     refreshPluginList();
     setStatus ("Empty chain: input is passed straight to output");
-    setSize (860, 600);
+    setSize (1132, 600);
     triggerAsyncUpdate();
 }
 
@@ -153,6 +161,10 @@ void MainComponent::resized()
     hintButton.setBounds (bottom.removeFromRight (130));
     bottom.removeFromRight (6);
     bringUpButton.setBounds (bottom.removeFromRight (130));
+    bottom.removeFromRight (6);
+    ddrBringUpButton.setBounds (bottom.removeFromRight (130));
+    bottom.removeFromRight (6);
+    pllBringUpButton.setBounds (bottom.removeFromRight (130));
     bottom.removeFromRight (6);
     clearButton.setBounds (bottom.removeFromRight (100));
     bottom.removeFromRight (6);
@@ -416,6 +428,7 @@ void MainComponent::toggleBringUpWindow()
     }
 
     bringUpWindow = std::make_unique<BringUpWindow> (engine, getPresetDirectory(),
+        "BRINGUP_*.labchain", "Bring-Up & Validation Plan", "bringupStep",
         [safeThis = juce::Component::SafePointer<MainComponent> (this)] (const juce::File& file)
         {
             if (safeThis != nullptr)
@@ -427,6 +440,56 @@ void MainComponent::toggleBringUpWindow()
             {
                 if (safeThis != nullptr)
                     safeThis->bringUpWindow.reset();
+            });
+        });
+}
+
+void MainComponent::toggleDdrBringUpWindow()
+{
+    if (ddrBringUpWindow != nullptr)
+    {
+        ddrBringUpWindow.reset();
+        return;
+    }
+
+    ddrBringUpWindow = std::make_unique<BringUpWindow> (engine, getPresetDirectory(),
+        "DDRBRINGUP_*.labchain", "DDR Bring-Up & Validation Plan", "ddrBringupStep",
+        [safeThis = juce::Component::SafePointer<MainComponent> (this)] (const juce::File& file)
+        {
+            if (safeThis != nullptr)
+                safeThis->loadPresetFile (file);
+        },
+        [safeThis = juce::Component::SafePointer<MainComponent> (this)]
+        {
+            juce::MessageManager::callAsync ([safeThis]
+            {
+                if (safeThis != nullptr)
+                    safeThis->ddrBringUpWindow.reset();
+            });
+        });
+}
+
+void MainComponent::togglePllBringUpWindow()
+{
+    if (pllBringUpWindow != nullptr)
+    {
+        pllBringUpWindow.reset();
+        return;
+    }
+
+    pllBringUpWindow = std::make_unique<BringUpWindow> (engine, getPresetDirectory(),
+        "PLLBRINGUP_*.labchain", "PLL Bring-Up & Validation Plan", "pllBringupStep",
+        [safeThis = juce::Component::SafePointer<MainComponent> (this)] (const juce::File& file)
+        {
+            if (safeThis != nullptr)
+                safeThis->loadPresetFile (file);
+        },
+        [safeThis = juce::Component::SafePointer<MainComponent> (this)]
+        {
+            juce::MessageManager::callAsync ([safeThis]
+            {
+                if (safeThis != nullptr)
+                    safeThis->pllBringUpWindow.reset();
             });
         });
 }
