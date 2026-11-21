@@ -1,4 +1,5 @@
 #include "DdrController.h"
+#include "DdrControllerEditor.h"
 
 DdrController::DdrController (std::shared_ptr<DdrLinkSettings> linkSettings)
     : BuiltInProcessorBase (id, "DDR Controller", std::move (linkSettings), createLayout(), DdrBus::numChannels)
@@ -160,4 +161,9 @@ void DdrController::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBu
 
         samplePos -= 1.0;
     }
+}
+
+juce::AudioProcessorEditor* DdrController::createEditor()
+{
+    return new DdrControllerEditor (*this);
 }

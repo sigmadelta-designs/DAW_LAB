@@ -31,7 +31,11 @@ The rendering lives in `Source/Builtin/ControlTip.h` (the DUT/SIM encoding) and
 `juce::TooltipWindow`, so this also works when a stage is loaded as a standalone plugin in another DAW.
 The Signal Generator, Lossy Channel and Noise Injector stages - previously shown with JUCE's generic,
 un-tooltipped parameter list - now have small dedicated editors (`GeneratorEditor`, `LossyEditor`,
-`NoiseEditor`, built on a shared `SimpleParamEditor` base) so their controls get tips too.
+`NoiseEditor`, built on a shared `SimpleParamEditor` base) so their controls get tips too. The DDR domain's
+DDR Controller and DDR Lossy Channel got the identical treatment on their own `DdrSimpleParamEditor` base
+(a separate class, not a template specialisation of `SimpleParamEditor`, since it's typed on
+`DdrLinkSettings` rather than `LinkSettings`) - every control on every built-in stage across all three
+domains (SerDes, DDR, PLL) now has a hover tip, not just most of them.
 
 ## SerDes / TxRx stages (built in)
 
@@ -287,7 +291,13 @@ placeholder for DDR's real double-pumped-per-clock timing.
 self-test (BIST): write a pattern across an address sweep (All zero / All one / Address as data /
 Checkerboard), then read it back and compare, counting mismatches live - the same "run forever, show a
 live error count" idea as the SerDes side's BitCompare, just for memory words instead of a bitstream.
-**Target chip** picks which CS wire it asserts.
+**Target chip** picks which CS wire it asserts; **CAS latency** is the minimum wait, in UI, before it even
+checks for a read's reply - the real tCL timing parameter, in this bus's own UI units. Its editor
+(`DdrControllerEditor`, built on the DDR domain's own `DdrSimpleParamEditor` - the same "just a vertical
+list of tooltipped sliders/combos" idea as the SerDes side's `SimpleParamEditor`, kept as a separate class
+rather than a shared template for the same reason the PLL domain got its own stages) replaced JUCE's
+generic, un-tooltipped parameter list, so every control here - DUT (Target chip, CAS latency) and SIM (BIST
+pattern, sweep length, running) alike - gets a proper hover tip too.
 
 **DDR Chip** (`lab.ddrchip`) is the memory side. Its **Chip number** is literally which CS wire it's
 strapped to (`DdrBus::csChannel(chipNumber)`) - the same kind of choice a real package/rank-select pin is -
@@ -296,7 +306,7 @@ real hardware. Writes are genuine signal-level simulation: a DQS edge is the cap
 is sliced against a trainable **Vref**, a real, common DDR mis-training bug. It never modifies or clears
 the bus - a real multi-drop bus has every chip just listen and pass the signals on, which is what lets
 several `DdrChip` stages (one per rank) sit one after another in an ordinary chain, the way several ranks
-share one real bus. Its editor (the first GUI anywhere in the DDR domain) shows the memory array
+share one real bus. Its editor (the first bespoke, non-generic-list GUI in the DDR domain) shows the memory array
 "physically": one row per address, one column per DQ bit, a literal 0/1 digit per cell, live as the BIST
 writes and reads it - the most direct reading of what this simulation actually stores ("rows and columns"
 here means address x bit-position, not a model of a real DRAM's row/column/bank addressing, which this
@@ -341,7 +351,8 @@ just as deliberately a placeholder: one **DQ/DQS swing** parameter attenuates on
 an eye actually forms on and a Vref is trained against), leaving CK/CS/CMD/ADDR untouched. Enough to make
 "a real channel has loss, and Vref has to be trained for the swing it actually sees" a genuine, measurable
 scenario (see Homework 18 below) without yet modelling trace-length skew, reflections, or a fly-by/
-multi-drop topology.
+multi-drop topology. Its editor (`DdrLossyChannelEditor`, also on `DdrSimpleParamEditor`) gives that one
+slider the same tagged hover tip every other DUT control gets, replacing JUCE's generic editor here too.
 
 **DDR Eye Scope** (`lab.ddreyescope`) is the DDR-domain counterpart to the SerDes side's Eye Scope, letting
 a chain check a real eye diagram on **DQ0-7 or DQS** - directly answering the question of whether DQ/DQS

@@ -20,6 +20,9 @@ public:
     void prepareToPlay (double, int) override {}
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
+    bool hasEditor() const override { return true; }
+    juce::AudioProcessorEditor* createEditor() override;
+
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout createLayout();
 

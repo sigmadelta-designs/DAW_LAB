@@ -27,8 +27,8 @@ public:
     void prepareToPlay (double sampleRate, int) override;
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
-    // No editor yet - this pass is about getting the protocol/chip-select/BIST logic right and verified;
-    // a GUI (and hooking the Eye/Jitter Scopes up to this bus) is the next step, not an oversight.
+    bool hasEditor() const override { return true; }
+    juce::AudioProcessorEditor* createEditor() override;
 
     double getSampleRate() const noexcept { return sampleRate.load(); }
 

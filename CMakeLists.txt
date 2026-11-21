@@ -33,9 +33,12 @@ set(DAWLAB_STAGE_SOURCES
     Source/Builtin/DdrChip.cpp
     Source/Builtin/DdrChipEditor.cpp
     Source/Builtin/DdrController.cpp
+    Source/Builtin/DdrControllerEditor.cpp
     Source/Builtin/DdrEyeScope.cpp
     Source/Builtin/DdrEyeScopeEditor.cpp
     Source/Builtin/DdrLossyChannel.cpp
+    Source/Builtin/DdrLossyChannelEditor.cpp
+    Source/Builtin/DdrSimpleParamEditor.cpp
     Source/Builtin/DiffFfe.cpp
     Source/Builtin/EyeAnalyzer.cpp
     Source/Builtin/EyeScope.cpp

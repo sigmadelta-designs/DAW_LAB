@@ -1,4 +1,5 @@
 #include "DdrLossyChannel.h"
+#include "DdrLossyChannelEditor.h"
 
 DdrLossyChannel::DdrLossyChannel (std::shared_ptr<DdrLinkSettings> linkSettings)
     : BuiltInProcessorBase (id, "DDR Lossy Channel", std::move (linkSettings), createLayout(), DdrBus::numChannels)
@@ -28,4 +29,9 @@ void DdrLossyChannel::processBlock (juce::AudioBuffer<float>& buffer, juce::Midi
         buffer.applyGain (DdrBus::dqChannel (b), 0, numSamples, gain);
     buffer.applyGain (DdrBus::dqsP, 0, numSamples, gain);
     buffer.applyGain (DdrBus::dqsN, 0, numSamples, gain);
+}
+
+juce::AudioProcessorEditor* DdrLossyChannel::createEditor()
+{
+    return new DdrLossyChannelEditor (*this);
 }
